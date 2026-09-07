@@ -4,13 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Daily Chonk</title>
-  <meta name="description" content="Live onchain wardrobe — a new outfit daily." />
-
-  <!-- Favicon (your Chonk) -->
+  <meta name="description" content="Daily Chonk — an onchain experiment. A new outfit every 24 hours." />
   <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAABAElEQVR4nO2asQ3CMBBF75CrMAIbsABMQRNKNmCD9DAJJTQsQOsJsgEjQHu02I7kGNn6nHSvSxT78vRt2ZHDRCT0je+pFNlci9tMwczFbRZVKgMxATRMvpf8YyG1xnyOOXNCfQImgMYE0JgAGvUCPy1k/4T6BEwADcvYBXOAL68qHcthGRaq1C+dww2e+gRMAI16ATdncskpvE6+lIZ0LWzVb4z6BEwAjWu14MgqHM/8bLNnVJ+ACaBRL2C7UTQmgIYpOmKSsQO9Sgqv39ln1CdgAmhccueRH3et4GN5G/UJmAAa9QIu/jeC7xNnwLt9m+pxLR/V2d6yXahPwATQfABRGTZIW+9a2QAAAABJRU5ErkJggg==">
-
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
-
   <style>
     :root {
       --ink: #191919;
@@ -18,83 +14,94 @@
       --card: #fffaf1;
       --line: #191919;
       --accent: #ffcf4a;
+      --accent-soft: #ffe9a3;
       --muted: #6d665d;
       --progress-bg: #ffffff;
+      --green: #63d391;
+      --shadow: 8px 8px 0 var(--line);
     }
-
     [data-theme="dark"] {
       --ink: #e8eef7;
       --paper: #0f172a;
       --card: #1e293b;
       --line: #334155;
       --accent: #ffcf4a;
+      --accent-soft: #493d18;
       --muted: #94a3b8;
       --progress-bg: #0f172a;
+      --green: #63d391;
+      --shadow: 8px 8px 0 var(--line);
     }
-
     * {
       box-sizing: border-box;
     }
-
+    html {
+      scroll-behavior: smooth;
+    }
     body {
       margin: 0;
       min-height: 100vh;
       color: var(--ink);
       background:
-        radial-gradient(circle at 20% 10%, rgba(255, 207, 74, 0.18), transparent 28%),
+        radial-gradient(circle at 15% 5%, rgba(255, 207, 74, 0.20), transparent 28%),
         radial-gradient(circle at 90% 80%, rgba(255, 170, 120, 0.12), transparent 25%),
         var(--paper);
       font-family: ui-rounded, "Trebuchet MS", system-ui, sans-serif;
       transition: background 0.25s ease, color 0.25s ease;
     }
-
-    .wrap {
-      width: min(1080px, calc(100% - 32px));
-      margin: auto;
-      padding: 38px 0 60px;
+    a {
+      color: inherit;
+      font-weight: 900;
+      text-decoration: none;
     }
-
+    a:hover {
+      text-decoration: underline;
+    }
+    button {
+      font-family: inherit;
+    }
+    .wrap {
+      width: min(1120px, calc(100% - 32px));
+      margin: auto;
+      padding: 34px 0 70px;
+    }
+    /* ---------------- HEADER ---------------- */
     header {
       display: flex;
       justify-content: space-between;
-      gap: 20px;
+      gap: 24px;
       align-items: end;
-      margin-bottom: 26px;
+      margin-bottom: 22px;
     }
-
     .eyebrow {
-      font-weight: 900;
-      letter-spacing: 0.14em;
+      font-weight: 950;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       color: var(--muted);
     }
-
     h1 {
-      font-size: clamp(1.9rem, 5.5vw, 3.6rem);
-      line-height: 0.95;
-      margin: 0.15rem 0 0;
-      letter-spacing: -0.04em;
+      font-size: clamp(2.2rem, 6vw, 4.5rem);
+      line-height: 0.9;
+      margin: 0.25rem 0 0;
+      letter-spacing: -0.055em;
     }
-
     .header-right {
       display: flex;
       align-items: center;
       gap: 12px;
     }
-
     .tag {
       border: 3px solid var(--line);
       padding: 10px 14px;
       background: var(--accent);
       color: #191919;
-      font-weight: 900;
-      font-size: 0.85rem;
+      font-weight: 950;
+      font-size: 0.82rem;
       letter-spacing: 0.04em;
       box-shadow: 5px 5px 0 var(--line);
       white-space: nowrap;
     }
-
     .theme-toggle {
       border: 3px solid var(--line);
       background: var(--card);
@@ -107,227 +114,336 @@
       display: grid;
       place-items: center;
       box-shadow: 4px 4px 0 var(--line);
-      transition: background 0.2s ease;
+      transition: transform 0.15s ease, background 0.2s ease;
     }
-
     .theme-toggle:hover {
       background: var(--accent);
       color: #191919;
+      transform: translate(-2px, -2px);
     }
-
-    main {
-      display: grid;
-      grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
-      gap: 24px;
-    }
-
+    /* ---------------- COMMON ---------------- */
     .card {
       border: 3px solid var(--line);
       background: var(--card);
-      box-shadow: 8px 8px 0 var(--line);
+      box-shadow: var(--shadow);
       border-radius: 18px;
       transition: background 0.25s ease, border-color 0.25s ease;
     }
-
+    .section-kicker {
+      color: var(--muted);
+      text-transform: uppercase;
+      font-weight: 950;
+      letter-spacing: 0.13em;
+      font-size: 0.7rem;
+      margin-bottom: 5px;
+    }
+    /* ---------------- HERO ---------------- */
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+      gap: 24px;
+      align-items: stretch;
+    }
     .chonk-card {
-      padding: 22px;
-      min-height: 650px;
+      padding: 20px;
+      min-height: 690px;
       display: flex;
       flex-direction: column;
+      position: relative;
+      overflow: hidden;
     }
-
+    .hero-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .today-pill {
+      border: 2px solid var(--line);
+      background: var(--accent-soft);
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
     .image-wrap {
       flex: 1;
-      min-height: 520px;
+      min-height: 540px;
       display: grid;
       place-items: center;
       overflow: hidden;
       border: 3px dashed var(--line);
       border-radius: 14px;
-      background: var(--progress-bg);
+      background:
+        radial-gradient(circle at 50% 45%, rgba(255, 207, 74, 0.15), transparent 42%),
+        var(--progress-bg);
+      position: relative;
     }
-
+    .image-wrap::after {
+      content: "ONCHAIN";
+      position: absolute;
+      bottom: 12px;
+      right: 14px;
+      font-size: 0.62rem;
+      font-weight: 950;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+      pointer-events: none;
+    }
     #chonk-image {
-      width: min(100%, 620px);
+      width: min(100%, 650px);
+      max-height: 580px;
       height: auto;
       image-rendering: pixelated;
+      transition:
+        opacity 0.35s ease,
+        transform 0.45s cubic-bezier(.2,.8,.2,1);
     }
-
+    #chonk-image.changing {
+      opacity: 0;
+      transform: scale(0.96) rotate(-2deg);
+    }
     .loading {
-      font-weight: 900;
-      font-size: 1.05rem;
+      position: absolute;
+      z-index: 2;
+      font-weight: 950;
+      font-size: 1rem;
       padding: 30px;
       text-align: center;
       color: var(--muted);
     }
-
+    /* ---------------- SIDE ---------------- */
     .side {
       display: flex;
       flex-direction: column;
       gap: 24px;
     }
-
     .timer-card {
       padding: 26px;
     }
-
-    .label {
-      color: var(--muted);
-      text-transform: uppercase;
-      font-weight: 900;
-      letter-spacing: 0.12em;
-      font-size: 0.72rem;
+    .timer-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
     }
-
+    .live-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--green);
+      border: 2px solid var(--line);
+      animation: pulse 1.8s infinite;
+      flex: 0 0 auto;
+    }
+    @keyframes pulse {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(99, 211, 145, 0.45);
+      }
+      50% {
+        box-shadow: 0 0 0 7px rgba(99, 211, 145, 0);
+      }
+    }
     #countdown {
       font-variant-numeric: tabular-nums;
-      font-size: clamp(2.4rem, 5.5vw, 4.4rem);
+      font-size: clamp(2.5rem, 5vw, 4rem);
       font-weight: 1000;
-      letter-spacing: -0.05em;
-      margin: 6px 0 16px;
-      line-height: 1;
+      letter-spacing: -0.065em;
+      margin: 7px 0 18px;
+      line-height: 0.95;
     }
-
+    .countdown-caption {
+      font-weight: 900;
+      font-size: 0.95rem;
+      margin-bottom: 15px;
+    }
     .progress {
-      height: 14px;
+      height: 15px;
       border: 3px solid var(--line);
       border-radius: 99px;
       overflow: hidden;
       background: var(--progress-bg);
     }
-
     #progress {
       width: 0%;
       height: 100%;
       background: var(--accent);
       transition: width 0.5s linear;
     }
-
     .status {
       margin-top: 14px;
-      font-weight: 800;
-      font-size: 0.95rem;
+      color: var(--muted);
+      font-weight: 850;
+      font-size: 0.9rem;
       line-height: 1.35;
     }
-
+    /* ---------------- TRAITS ---------------- */
     .details {
       padding: 24px;
+      flex: 1;
     }
-
-    .details h2 {
-      margin: 0 0 14px;
-      font-size: 1.35rem;
-      letter-spacing: -0.02em;
+    .details h2,
+    .about h2 {
+      margin: 0;
+      font-size: 1.45rem;
+      letter-spacing: -0.03em;
     }
-
     .traits {
       display: grid;
-      gap: 10px;
+      gap: 9px;
+      margin-top: 18px;
     }
-
     .trait {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       gap: 14px;
-      border-top: 2px solid var(--line);
-      padding-top: 10px;
+      border: 2px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 11px;
+      background: var(--progress-bg);
     }
-
     .trait span:first-child {
       color: var(--muted);
-      font-weight: 800;
+      font-weight: 850;
+      font-size: 0.82rem;
     }
-
     .trait span:last-child {
       font-weight: 950;
       text-align: right;
+      font-size: 0.88rem;
     }
-
-    /* About section */
+    /* ---------------- ABOUT ---------------- */
     .about {
-      margin-top: 32px;
-      padding: 32px;
+      margin-top: 30px;
+      padding: 30px;
     }
-
-    .about h2 {
-      margin: 0 0 16px;
-      font-size: 1.6rem;
-      letter-spacing: -0.02em;
+    .about-inner {
+      max-width: 820px;
     }
-
     .about p {
-      margin: 0 0 14px;
-      line-height: 1.55;
-      font-size: 1.05rem;
+      margin: 12px 0 0;
+      line-height: 1.58;
+      font-size: 1.03rem;
     }
-
-    .about p:last-child {
-      margin-bottom: 0;
+    .about .statement {
+      margin-top: 22px;
+      padding: 18px 20px;
+      border-left: 6px solid var(--line);
+      background: var(--accent-soft);
+      font-size: 1.1rem;
+      font-weight: 950;
+      line-height: 1.4;
     }
-
+    /* ---------------- LINKS ---------------- */
+    .links {
+      margin-top: 30px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .link-card {
+      border: 3px solid var(--line);
+      background: var(--card);
+      box-shadow: 5px 5px 0 var(--line);
+      border-radius: 13px;
+      padding: 17px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+    .link-card:hover {
+      transform: translate(-2px, -2px);
+      background: var(--accent);
+      text-decoration: none;
+    }
+    .link-card span:first-child {
+      font-weight: 950;
+    }
+    .link-card span:last-child {
+      font-size: 1.1rem;
+    }
+    /* ---------------- FOOTER ---------------- */
     footer {
       margin-top: 34px;
       color: var(--muted);
-      font-size: 0.9rem;
+      font-size: 0.84rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 15px;
       flex-wrap: wrap;
     }
-
     .footer-links {
       display: flex;
       align-items: center;
       gap: 18px;
       flex-wrap: wrap;
     }
-
-    a {
-      color: inherit;
-      font-weight: 900;
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
     .error {
       padding: 8px 0;
       color: #f87171;
       font-weight: 900;
       font-size: 0.95rem;
     }
-
+    /* ---------------- MOBILE ---------------- */
     @media (max-width: 820px) {
+      .wrap {
+        width: min(100% - 22px, 700px);
+        padding-top: 22px;
+      }
       header {
         align-items: start;
         flex-direction: column;
       }
-
-      h1 {
-        font-size: clamp(1.8rem, 8vw, 2.9rem);
+      .header-right {
+        width: 100%;
+        justify-content: space-between;
       }
-
+      h1 {
+        font-size: clamp(2.2rem, 12vw, 3.6rem);
+      }
       main {
         grid-template-columns: 1fr;
       }
-
       .chonk-card {
         min-height: 0;
       }
-
       .image-wrap {
-        min-height: 360px;
+        min-height: 390px;
+      }
+      .links {
+        grid-template-columns: 1fr;
       }
     }
-
     @media (max-width: 500px) {
-      h1 {
-        font-size: clamp(1.7rem, 10vw, 2.4rem);
+      .wrap {
+        width: min(100% - 16px, 700px);
       }
-
+      .tag {
+        font-size: 0.72rem;
+        padding: 8px 10px;
+      }
+      .chonk-card {
+        padding: 12px;
+      }
+      .image-wrap {
+        min-height: 330px;
+      }
+      #countdown {
+        font-size: 2.7rem;
+      }
+      .timer-card,
+      .details,
+      .about {
+        padding: 20px;
+      }
       footer {
         align-items: flex-start;
         flex-direction: column;
@@ -337,33 +453,56 @@
 </head>
 <body>
   <div class="wrap">
+    <!-- HEADER -->
     <header>
       <div>
         <div class="eyebrow">Daily Chonk</div>
-        <h1>A NEW OUTFIT DAILY</h1>
+        <h1>A NEW OUTFIT<br>EVERY 24 HOURS.</h1>
       </div>
       <div class="header-right">
-        <button class="theme-toggle" id="theme-toggle" title="Toggle light/dark mode" aria-label="Toggle theme">
+        <button
+          class="theme-toggle"
+          id="theme-toggle"
+          title="Toggle light/dark mode"
+          aria-label="Toggle theme">
           ☾
         </button>
-        <div class="tag">Live · Onchain</div>
+        <div class="tag">● LIVE · ONCHAIN</div>
       </div>
     </header>
 
+    <!-- HERO -->
     <main>
       <section class="card chonk-card">
-        <div id="loading" class="loading">
-          Loading today’s outfit…
+        <div class="hero-top">
+          <div>
+            <strong>Chonk #30000</strong>
+          </div>
+          <div class="today-pill">Daily fit</div>
         </div>
         <div class="image-wrap">
-          <img id="chonk-image" alt="Today’s Chonk outfit" hidden />
+          <div id="loading" class="loading">
+            Loading today’s outfit…
+          </div>
+          <img
+            id="chonk-image"
+            alt="Today’s Daily Chonk outfit"
+            hidden
+          />
         </div>
       </section>
 
       <aside class="side">
+        <!-- TIMER -->
         <section class="card timer-card">
-          <div class="label">Next wardrobe change</div>
+          <div class="timer-heading">
+            <div class="label">Next fit in</div>
+            <div class="live-dot" title="Live"></div>
+          </div>
           <div id="countdown">00:00:00</div>
+          <div class="countdown-caption">
+            The wardrobe rolls again soon.
+          </div>
           <div class="progress">
             <div id="progress"></div>
           </div>
@@ -372,8 +511,10 @@
           </div>
         </section>
 
+        <!-- TRAITS -->
         <section class="card details">
-          <h2>Current traits</h2>
+          <div class="section-kicker">The current fit</div>
+          <h2>Today's traits</h2>
           <div id="traits" class="traits">
             <div class="trait">
               <span>Status</span>
@@ -384,36 +525,67 @@
       </aside>
     </main>
 
-    <!-- About section -->
+    <!-- ABOUT -->
     <section class="card about">
-      <h2>About Daily Chonk</h2>
-      <p>What if your Chonk got a new outfit every day?</p>
-      <p>
-        Daily Chonk is an onchain experiment that gives a Chonk a fresh look every 24 hours.
-        A bot randomly selects from a wardrobe made up of all the original base traits,
-        mixed with a growing collection of face, head, and accessory traits
-        creating a new combination every day.
-      </p>
-      <p>
-        No manual outfit changes. No two days are quite the same.
-        Just one Chonk, getting dressed up and doing its thing.
-      </p>
-      <p>
-        New day. New fit. Same Chonk.
-      </p>
+      <div class="about-inner">
+        <div class="section-kicker">The experiment</div>
+        <h2>One Chonk. One new fit every day.</h2>
+        <p>
+          What if your Chonk got a new outfit every day?
+        </p>
+        <p>
+          Daily Chonk is an onchain experiment that makes the most out of its
+          ERC-6551 backpack. A bot randomly selects from a wardrobe made up of
+          the original base traits, mixed with a growing collection of face,
+          head, and accessory traits, creating a new combination every day.
+        </p>
+        <p>
+          No manual outfit changes. No two days are quite the same.
+          Just one Chonk, getting dressed up and doing its thing.
+        </p>
+        <div class="statement">
+          New day. New fit. Same Chonk.
+        </div>
+      </div>
     </section>
 
+    <!-- LINKS -->
+    <div class="links">
+      <a
+        class="link-card"
+        href="https://www.chonks.xyz/chonks/30000"
+        target="_blank"
+        rel="noopener">
+        <span>View Chonk #30000</span>
+        <span>↗</span>
+      </a>
+      <a
+        class="link-card"
+        href="https://x.com/jpegsonbase"
+        target="_blank"
+        rel="noopener">
+        <span>Follow @jpegsonbase</span>
+        <span>↗</span>
+      </a>
+      <a
+        class="link-card"
+        href="https://www.chonks.xyz/"
+        target="_blank"
+        rel="noopener">
+        <span>Learn more about Chonks</span>
+        <span>↗</span>
+      </a>
+    </div>
+
+    <!-- FOOTER -->
     <footer>
       <span>
         Rendered directly from the Base blockchain.
       </span>
       <div class="footer-links">
-        <a href="https://www.chonks.xyz/chonks/30000" target="_blank" rel="noopener">
-          View on chonks.xyz ↗
-        </a>
-        <a href="https://x.com/jpegsonbase" target="_blank" rel="noopener">
-          @jpegsonbase ↗
-        </a>
+        <span>ERC-6551</span>
+        <span>·</span>
+        <span>Daily Chonk</span>
       </div>
     </footer>
   </div>
@@ -424,7 +596,7 @@
       const CONTRACT = "0x07152bfde079b5319e5308c43fb1dbc9c76cb4f9";
       const RPC = "https://mainnet.base.org";
 
-      // Edit this timestamp to control when the current cycle started
+      // Current cycle start
       const LAST_CHANGE = Date.parse("2026-09-06T18:33:04Z");
       const CYCLE = 24 * 60 * 60 * 1000;
 
@@ -444,7 +616,9 @@
       const statusEl = document.getElementById("status");
       const themeToggle = document.getElementById("theme-toggle");
 
-      // ---------- Safe localStorage helpers ----------
+      // --------------------------------------------------
+      // LOCAL STORAGE
+      // --------------------------------------------------
       function getStoredTheme() {
         try {
           return localStorage.getItem("chonk-theme");
@@ -457,11 +631,13 @@
         try {
           localStorage.setItem("chonk-theme", theme);
         } catch (e) {
-          // Sandboxed environment – just ignore
+          // Ignore restricted environments
         }
       }
 
-      // ---------- Theme ----------
+      // --------------------------------------------------
+      // THEME
+      // --------------------------------------------------
       function applyTheme(theme) {
         document.documentElement.setAttribute("data-theme", theme);
         themeToggle.textContent = theme === "dark" ? "☀" : "☾";
@@ -472,11 +648,14 @@
       applyTheme(savedTheme);
 
       themeToggle.addEventListener("click", () => {
-        const current = document.documentElement.getAttribute("data-theme");
+        const current =
+          document.documentElement.getAttribute("data-theme");
         applyTheme(current === "dark" ? "light" : "dark");
       });
 
-      // ---------- Helpers ----------
+      // --------------------------------------------------
+      // HELPERS
+      // --------------------------------------------------
       function decodeDataUri(uri) {
         if (!uri.startsWith("data:")) return uri;
         const comma = uri.indexOf(",");
@@ -488,14 +667,27 @@
       }
 
       function escapeHtml(s) {
-        return String(s).replace(/[&<>"']/g, c =>
-          ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[c])
+        return String(s).replace(
+          /[&<>"']/g,
+          c =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#039;"
+            }[c])
         );
       }
 
+      // --------------------------------------------------
+      // TRAITS
+      // --------------------------------------------------
       function showTraits(json) {
         traitsEl.innerHTML = "";
-        const attrs = Array.isArray(json.attributes) ? json.attributes : [];
+        const attrs = Array.isArray(json.attributes)
+          ? json.attributes
+          : [];
 
         if (!attrs.length) {
           traitsEl.innerHTML = `
@@ -518,6 +710,9 @@
         });
       }
 
+      // --------------------------------------------------
+      // LOAD CHONK
+      // --------------------------------------------------
       async function loadChonk() {
         try {
           const [uri, svgUri] = await Promise.all([
@@ -539,61 +734,100 @@
             }
           }
 
-          if (imageUri) {
+          if (!imageUri) {
+            throw new Error(
+              "No image found in on-chain metadata"
+            );
+          }
+
+          // Animate outfit refresh
+          image.classList.add("changing");
+          setTimeout(() => {
             image.src = imageUri;
             image.hidden = false;
             loading.hidden = true;
-          } else {
-            throw new Error("No image found in on-chain metadata");
-          }
+            requestAnimationFrame(() => {
+              image.classList.remove("changing");
+            });
+          }, 220);
 
           showTraits(metadata);
-          statusEl.textContent = "Live — refreshing from the chain every 60 seconds.";
+          statusEl.textContent =
+            "Live — refreshing directly from the Base chain.";
         } catch (err) {
           console.error(err);
-          loading.textContent = "Unable to load today’s outfit.";
-          statusEl.textContent = "RPC or contract request failed. Retrying shortly.";
+          loading.textContent =
+            "Unable to load today’s outfit.";
+          statusEl.textContent =
+            "RPC or contract request failed. Retrying shortly.";
           traitsEl.innerHTML = `
             <div class="error">
-              Could not fetch on-chain data. Please try again in a moment.
+              Could not fetch on-chain data.
+              Please try again in a moment.
             </div>
           `;
         }
       }
 
-      // ---------- Countdown + auto-refresh on reset ----------
+      // --------------------------------------------------
+      // COUNTDOWN
+      // --------------------------------------------------
       let lastRemaining = Infinity;
 
       function tick() {
         const now = Date.now();
-        let elapsed = (now - LAST_CHANGE) % CYCLE;
-        if (elapsed < 0) elapsed += CYCLE;
+        let elapsed =
+          (now - LAST_CHANGE) % CYCLE;
+        if (elapsed < 0) {
+          elapsed += CYCLE;
+        }
 
-        const remaining = CYCLE - elapsed;
-        const h = Math.floor(remaining / 3600000);
-        const m = Math.floor((remaining % 3600000) / 60000);
-        const s = Math.floor((remaining % 60000) / 1000);
+        const remaining =
+          CYCLE - elapsed;
+
+        const h =
+          Math.floor(remaining / 3600000);
+        const m =
+          Math.floor(
+            (remaining % 3600000) / 60000
+          );
+        const s =
+          Math.floor(
+            (remaining % 60000) / 1000
+          );
 
         countdownEl.textContent =
           `${String(h).padStart(2, "0")}:` +
           `${String(m).padStart(2, "0")}:` +
           `${String(s).padStart(2, "0")}`;
 
-        progressEl.style.width = `${(elapsed / CYCLE) * 100}%`;
+        progressEl.style.width =
+          `${(elapsed / CYCLE) * 100}%`;
 
-        // Detect when the timer resets (new cycle starts)
-        if (remaining > lastRemaining && lastRemaining < 5000) {
-          loadChonk(); // Force refresh of the Chonk
+        // Detect new daily cycle
+        if (
+          remaining > lastRemaining &&
+          lastRemaining < 5000
+        ) {
+          loadChonk();
         }
         lastRemaining = remaining;
 
-        statusEl.textContent =
-          remaining < 60000
-            ? "Wardrobe change imminent…"
-            : "Next outfit change runs on the daily cycle.";
+        if (remaining < 60000) {
+          statusEl.textContent =
+            "The wardrobe is about to roll…";
+        } else if (remaining < 3600000) {
+          statusEl.textContent =
+            "Less than an hour until the next fit.";
+        } else {
+          statusEl.textContent =
+            "The bot picks a new combination every 24 hours.";
+        }
       }
 
-      // Initial load
+      // --------------------------------------------------
+      // INITIAL LOAD
+      // --------------------------------------------------
       loadChonk();
       tick();
 
