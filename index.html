@@ -161,7 +161,7 @@
     }
     .today-pill {
       border: 2px solid var(--line);
-      background: var(--accent);          /* ← now same yellow as LIVE tag */
+      background: var(--accent);
       color: #191919;
       padding: 7px 10px;
       border-radius: 999px;
@@ -307,6 +307,7 @@
       border-radius: 10px;
       padding: 10px 11px;
       background: var(--progress-bg);
+      transition: background 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
     }
     .trait span:first-child {
       color: var(--muted);
@@ -317,6 +318,34 @@
       font-weight: 950;
       text-align: right;
       font-size: 0.88rem;
+    }
+    /* Linked trait rows */
+    a.trait {
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+    }
+    a.trait:hover {
+      background: var(--accent);
+      color: #191919;
+      transform: translate(-2px, -2px);
+      box-shadow: 3px 3px 0 var(--line);
+      text-decoration: none;
+    }
+    a.trait:hover span:first-child {
+      color: #191919;
+    }
+    a.trait .trait-value {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    a.trait .trait-arrow {
+      font-size: 0.85rem;
+      opacity: 0.7;
+    }
+    a.trait:hover .trait-arrow {
+      opacity: 1;
     }
     /* ---------------- ABOUT ---------------- */
     .about {
@@ -335,7 +364,7 @@
       margin-top: 22px;
       padding: 18px 20px;
       border-left: 6px solid var(--line);
-      background: var(--accent);          /* ← now same yellow as LIVE tag */
+      background: var(--accent);
       color: #191919;
       font-size: 1.1rem;
       font-weight: 950;
@@ -472,7 +501,6 @@
         <div class="tag">● LIVE · ONCHAIN</div>
       </div>
     </header>
-
     <!-- HERO -->
     <main>
       <section class="card chonk-card">
@@ -493,7 +521,6 @@
           />
         </div>
       </section>
-
       <aside class="side">
         <!-- TIMER -->
         <section class="card timer-card">
@@ -512,7 +539,6 @@
             Syncing with the daily cycle…
           </div>
         </section>
-
         <!-- TRAITS -->
         <section class="card details">
           <div class="section-kicker">The current fit</div>
@@ -526,7 +552,6 @@
         </section>
       </aside>
     </main>
-
     <!-- ABOUT -->
     <section class="card about">
       <div class="about-inner">
@@ -550,7 +575,6 @@
         </div>
       </div>
     </section>
-
     <!-- LINKS -->
     <div class="links">
       <a
@@ -578,7 +602,6 @@
         <span>↗</span>
       </a>
     </div>
-
     <!-- FOOTER -->
     <footer>
       <span>
@@ -591,25 +614,50 @@
       </div>
     </footer>
   </div>
-
   <script>
     (() => {
       const CHONK_ID = 30000;
       const CONTRACT = "0x07152bfde079b5319e5308c43fb1dbc9c76cb4f9";
       const RPC = "https://mainnet.base.org";
-
       // Current cycle start
       const LAST_CHANGE = Date.parse("2026-09-06T18:33:04Z");
       const CYCLE = 24 * 60 * 60 * 1000;
+      const TRAIT_PAGE_BASE = "https://www.chonks.xyz/traits/";
+      // TraitCategory.Name: None=0, Head=1, Hair=2, Face=3, Accessory=4, Top=5, Bottom=6, Shoes=7
+      const CATEGORY_NUM = {
+        head: 1,
+        hair: 2,
+        face: 3,
+        accessory: 4,
+        top: 5,
+        bottoms: 6,
+        bottom: 6,
+        pants: 6,
+        shoes: 7,
+        shoe: 7
+      };
+
+      // Map attribute trait_type (lowercase, stripped) → StoredChonk field
+      const CATEGORY_TO_FIELD = {
+        head: "headId",
+        hair: "hairId",
+        face: "faceId",
+        accessory: "accessoryId",
+        top: "topId",
+        bottoms: "bottomId",
+        bottom: "bottomId",
+        pants: "bottomId",
+        shoes: "shoesId",
+        shoe: "shoesId"
+      };
 
       const abi = [
         "function tokenURI(uint256) view returns (string)",
-        "function renderAsDataUri2D(uint256) view returns (string)"
+        "function renderAsDataUri2D(uint256) view returns (string)",
+        "function getChonk(uint256) view returns (tuple(uint256 tokenId, uint256 headId, uint256 hairId, uint256 faceId, uint256 accessoryId, uint256 topId, uint256 bottomId, uint256 shoesId, uint8 bodyIndex, string backgroundColor, bool render3D))"
       ];
-
       const provider = new ethers.JsonRpcProvider(RPC);
       const contract = new ethers.Contract(CONTRACT, abi, provider);
-
       const image = document.getElementById("chonk-image");
       const loading = document.getElementById("loading");
       const traitsEl = document.getElementById("traits");
@@ -617,7 +665,6 @@
       const progressEl = document.getElementById("progress");
       const statusEl = document.getElementById("status");
       const themeToggle = document.getElementById("theme-toggle");
-
       // --------------------------------------------------
       // LOCAL STORAGE
       // --------------------------------------------------
@@ -628,7 +675,6 @@
           return null;
         }
       }
-
       function setStoredTheme(theme) {
         try {
           localStorage.setItem("chonk-theme", theme);
@@ -636,7 +682,6 @@
           // Ignore restricted environments
         }
       }
-
       // --------------------------------------------------
       // THEME
       // --------------------------------------------------
@@ -645,16 +690,13 @@
         themeToggle.textContent = theme === "dark" ? "☀" : "☾";
         setStoredTheme(theme);
       }
-
       const savedTheme = getStoredTheme() || "light";
       applyTheme(savedTheme);
-
       themeToggle.addEventListener("click", () => {
         const current =
           document.documentElement.getAttribute("data-theme");
         applyTheme(current === "dark" ? "light" : "dark");
       });
-
       // --------------------------------------------------
       // HELPERS
       // --------------------------------------------------
@@ -667,7 +709,6 @@
           ? atob(data)
           : decodeURIComponent(data);
       }
-
       function escapeHtml(s) {
         return String(s).replace(
           /[&<>"']/g,
@@ -681,16 +722,35 @@
             }[c])
         );
       }
+      // --------------------------------------------------
+      // TRAITS (with market links)
+      // --------------------------------------------------
+      function traitSlug(value) {
+        return String(value || "")
+          .trim()
+          .toLowerCase()
+          .replace(/[''`]/g, "")
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+      }
 
-      // --------------------------------------------------
-      // TRAITS
-      // --------------------------------------------------
+      function resolveTraitPageUrl(traitType, value) {
+        const key = String(traitType || "")
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z]/g, "");
+        const category = CATEGORY_NUM[key];
+        if (!category) return null; // body, background, etc. — not a purchasable trait type
+        const slug = traitSlug(value);
+        if (!slug) return null;
+        return `${TRAIT_PAGE_BASE}${encodeURIComponent(slug)}?category=${category}`;
+      }
+
       function showTraits(json) {
         traitsEl.innerHTML = "";
         const attrs = Array.isArray(json.attributes)
           ? json.attributes
           : [];
-
         if (!attrs.length) {
           traitsEl.innerHTML = `
             <div class="trait">
@@ -700,32 +760,51 @@
           `;
           return;
         }
-
         attrs.forEach(a => {
-          const row = document.createElement("div");
-          row.className = "trait";
-          row.innerHTML = `
-            <span>${escapeHtml(a.trait_type ?? "Trait")}</span>
-            <span>${escapeHtml(String(a.value ?? "—"))}</span>
-          `;
-          traitsEl.appendChild(row);
+          const type = a.trait_type ?? "Trait";
+          const value = String(a.value ?? "—");
+          const href = resolveTraitPageUrl(type, value);
+          console.log("[Daily Chonk] trait row", type, value, "→", href || "(no link)");
+
+          if (href) {
+            const link = document.createElement("a");
+            link.className = "trait";
+            link.href = href;
+            link.target = "_blank";
+            link.rel = "noopener";
+            link.title = `Browse ${value} traits on Chonks`;
+            link.innerHTML = `
+              <span>${escapeHtml(type)}</span>
+              <span class="trait-value">${escapeHtml(value)} <span class="trait-arrow">↗</span></span>
+            `;
+            traitsEl.appendChild(link);
+          } else {
+            const row = document.createElement("div");
+            row.className = "trait";
+            row.innerHTML = `
+              <span>${escapeHtml(type)}</span>
+              <span>${escapeHtml(value)}</span>
+            `;
+            traitsEl.appendChild(row);
+          }
         });
       }
-
       // --------------------------------------------------
       // LOAD CHONK
       // --------------------------------------------------
       async function loadChonk() {
         try {
-          const [uri, svgUri] = await Promise.all([
+          const [uri, svgUri, chonk] = await Promise.all([
             contract.tokenURI(CHONK_ID),
-            contract.renderAsDataUri2D(CHONK_ID)
+            contract.renderAsDataUri2D(CHONK_ID),
+            contract.getChonk(CHONK_ID).catch(err => {
+              console.error("[Daily Chonk] getChonk failed", err);
+              return null;
+            })
           ]);
-
           const sourceUri = svgUri || uri;
           let metadata = {};
           let imageUri = null;
-
           try {
             const decoded = decodeDataUri(sourceUri);
             metadata = JSON.parse(decoded);
@@ -735,13 +814,11 @@
               imageUri = sourceUri;
             }
           }
-
           if (!imageUri) {
             throw new Error(
               "No image found in on-chain metadata"
             );
           }
-
           // Animate outfit refresh
           image.classList.add("changing");
           setTimeout(() => {
@@ -752,7 +829,6 @@
               image.classList.remove("changing");
             });
           }, 220);
-
           showTraits(metadata);
           statusEl.textContent =
             "Live — refreshing directly from the Base chain.";
@@ -770,12 +846,10 @@
           `;
         }
       }
-
       // --------------------------------------------------
       // COUNTDOWN
       // --------------------------------------------------
       let lastRemaining = Infinity;
-
       function tick() {
         const now = Date.now();
         let elapsed =
@@ -783,10 +857,8 @@
         if (elapsed < 0) {
           elapsed += CYCLE;
         }
-
         const remaining =
           CYCLE - elapsed;
-
         const h =
           Math.floor(remaining / 3600000);
         const m =
@@ -797,15 +869,12 @@
           Math.floor(
             (remaining % 60000) / 1000
           );
-
         countdownEl.textContent =
           `${String(h).padStart(2, "0")}:` +
           `${String(m).padStart(2, "0")}:` +
           `${String(s).padStart(2, "0")}`;
-
         progressEl.style.width =
           `${(elapsed / CYCLE) * 100}%`;
-
         // Detect new daily cycle
         if (
           remaining > lastRemaining &&
@@ -814,7 +883,6 @@
           loadChonk();
         }
         lastRemaining = remaining;
-
         if (remaining < 60000) {
           statusEl.textContent =
             "The wardrobe is about to roll…";
@@ -826,13 +894,11 @@
             "The bot picks a new combination every 24 hours.";
         }
       }
-
       // --------------------------------------------------
       // INITIAL LOAD
       // --------------------------------------------------
       loadChonk();
       tick();
-
       setInterval(tick, 1000);
       setInterval(loadChonk, 60000);
     })();
