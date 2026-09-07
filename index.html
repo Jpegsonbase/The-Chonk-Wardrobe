@@ -3,9 +3,19 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <title>Daily Chonk</title>
-  <meta name="description" content="Daily Chonk — an onchain experiment. A new outfit every 24 hours." />
-  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAABAElEQVR4nO2asQ3CMBBF75CrMAIbsABMQRNKNmCD9DAJJTQsQOsJsgEjQHu02I7kGNn6nHSvSxT78vRt2ZHDRCT0je+pFNlci9tMwczFbRZVKgMxATRMvpf8YyG1xnyOOXNCfQImgMYE0JgAGvUCPy1k/4T6BEwADcvYBXOAL68qHcthGRaq1C+dww2e+gRMAI16ATdncskpvE6+lIZ0LWzVb4z6BEwAjWu14MgqHM/8bLNnVJ+ACaBRL2C7UTQmgIYpOmKSsQO9Sgqv39ln1CdgAmhccueRH3et4GN5G/UJmAAa9QIu/jeC7xNnwLt9m+pxLR/V2d6yXahPwATQfABRGTZIW+9a2QAAAABJRU5ErkJggg==">
+
+  <meta
+    name="description"
+    content="Daily Chonk — an onchain experiment. A new outfit every 24 hours."
+  />
+
+  <link
+    rel="icon"
+    type="image/png"
+    href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAABAElEQVR4nO2asQ3CMBBF75CrMAIbsABMQRNKNmCD9DAJJTQsQOsJsgEjQHu02I7kGNn6nHSvSxT78vRt2ZHDRCT0je+pFNlci9tMwczFbRZVKgMxATRMvpf8YyG1xnyOOXNCfQImgMYE0JgAGvUCPy1k/4T6BEwADcvYBXOAL68qHcthGRaq1C+dww2e+gRMAI16ATdncskpvE6+lIZ0LWzVb4z6BEwAjWu14MgqHM/8bLNnVJ+ACaBRL2C7UTQmgIYpOmKSsQO9Sgqv39ln1CdgAmhccueRH3et4GN5G/UJmAAa9QIu/jeC7xNnwLt9m+pxLR/V2d6yXahPwATQfABRGTZIW+9a2QAAAABJRU5ErkJggg=="
+  >
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
 
@@ -49,11 +59,21 @@
       min-height: 100vh;
       color: var(--ink);
       background:
-        radial-gradient(circle at 15% 5%, rgba(255, 207, 74, 0.20), transparent 28%),
-        radial-gradient(circle at 90% 80%, rgba(255, 170, 120, 0.12), transparent 25%),
+        radial-gradient(
+          circle at 15% 5%,
+          rgba(255, 207, 74, 0.20),
+          transparent 28%
+        ),
+        radial-gradient(
+          circle at 90% 80%,
+          rgba(255, 170, 120, 0.12),
+          transparent 25%
+        ),
         var(--paper);
       font-family: ui-rounded, "Trebuchet MS", system-ui, sans-serif;
-      transition: background 0.25s ease, color 0.25s ease;
+      transition:
+        background 0.25s ease,
+        color 0.25s ease;
     }
 
     a {
@@ -101,6 +121,56 @@
       letter-spacing: -0.055em;
     }
 
+    /* Animated headline */
+
+    .animated-title {
+      display: block;
+      min-height: 1.8em;
+    }
+
+    .title-line {
+      display: block;
+      min-height: 0.9em;
+    }
+
+    .title-letter {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(12px) rotate(3deg) scale(0.92);
+      animation: letterPop 0.32s cubic-bezier(.2,.8,.2,1) forwards;
+    }
+
+    .title-space {
+      display: inline-block;
+      width: 0.28em;
+    }
+
+    @keyframes letterPop {
+      0% {
+        opacity: 0;
+        transform:
+          translateY(12px)
+          rotate(3deg)
+          scale(0.92);
+      }
+
+      70% {
+        opacity: 1;
+        transform:
+          translateY(-3px)
+          rotate(-1deg)
+          scale(1.03);
+      }
+
+      100% {
+        opacity: 1;
+        transform:
+          translateY(0)
+          rotate(0)
+          scale(1);
+      }
+    }
+
     .header-right {
       display: flex;
       align-items: center;
@@ -131,7 +201,9 @@
       display: grid;
       place-items: center;
       box-shadow: 4px 4px 0 var(--line);
-      transition: transform 0.15s ease, background 0.2s ease;
+      transition:
+        transform 0.15s ease,
+        background 0.2s ease;
     }
 
     .theme-toggle:hover {
@@ -147,7 +219,9 @@
       background: var(--card);
       box-shadow: var(--shadow);
       border-radius: 18px;
-      transition: background 0.25s ease, border-color 0.25s ease;
+      transition:
+        background 0.25s ease,
+        border-color 0.25s ease;
     }
 
     .section-kicker {
@@ -163,7 +237,9 @@
 
     main {
       display: grid;
-      grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+      grid-template-columns:
+        minmax(0, 1.35fr)
+        minmax(300px, 0.65fr);
       gap: 24px;
       align-items: stretch;
     }
@@ -206,7 +282,11 @@
       border: 3px dashed var(--line);
       border-radius: 14px;
       background:
-        radial-gradient(circle at 50% 45%, rgba(255, 207, 74, 0.15), transparent 42%),
+        radial-gradient(
+          circle at 50% 45%,
+          rgba(255, 207, 74, 0.15),
+          transparent 42%
+        ),
         var(--progress-bg);
       position: relative;
     }
@@ -235,7 +315,9 @@
 
     #chonk-image.changing {
       opacity: 0;
-      transform: scale(0.96) rotate(-2deg);
+      transform:
+        scale(0.96)
+        rotate(-2deg);
     }
 
     .loading {
@@ -246,6 +328,46 @@
       padding: 30px;
       text-align: center;
       color: var(--muted);
+    }
+
+    /* ---------------- OUTFIT NAME ---------------- */
+
+    .outfit-name {
+      margin-top: 18px;
+      border: 3px solid var(--line);
+      background: var(--accent);
+      color: #191919;
+      padding: 17px 18px;
+      box-shadow: 5px 5px 0 var(--line);
+      border-radius: 13px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .outfit-name-label {
+      font-size: 0.65rem;
+      font-weight: 950;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      opacity: 0.65;
+      margin-bottom: 4px;
+    }
+
+    #outfit-name {
+      margin: 0;
+      font-size: clamp(1.25rem, 3vw, 2rem);
+      line-height: 1;
+      letter-spacing: -0.035em;
+      font-weight: 1000;
+      text-transform: uppercase;
+      transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    #outfit-name.changing {
+      opacity: 0;
+      transform: translateY(6px);
     }
 
     /* ---------------- SIDE ---------------- */
@@ -280,11 +402,13 @@
 
     @keyframes pulse {
       0%, 100% {
-        box-shadow: 0 0 0 0 rgba(99, 211, 145, 0.45);
+        box-shadow:
+          0 0 0 0 rgba(99, 211, 145, 0.45);
       }
 
       50% {
-        box-shadow: 0 0 0 7px rgba(99, 211, 145, 0);
+        box-shadow:
+          0 0 0 7px rgba(99, 211, 145, 0);
       }
     }
 
@@ -324,40 +448,6 @@
       font-weight: 850;
       font-size: 0.9rem;
       line-height: 1.35;
-    }
-
-    /* ---------------- OUTFIT NAME ---------------- */
-
-    .outfit-name-card {
-      padding: 24px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .outfit-name-card::before {
-      content: "✦";
-      position: absolute;
-      right: 20px;
-      top: 15px;
-      font-size: 2.5rem;
-      opacity: 0.12;
-      transform: rotate(15deg);
-    }
-
-    .outfit-name {
-      margin-top: 9px;
-      font-size: clamp(1.55rem, 3vw, 2.15rem);
-      line-height: 1.05;
-      letter-spacing: -0.045em;
-      font-weight: 1000;
-      max-width: 90%;
-    }
-
-    .outfit-name-sub {
-      margin-top: 9px;
-      color: var(--muted);
-      font-size: 0.78rem;
-      font-weight: 800;
     }
 
     /* ---------------- TRAITS ---------------- */
@@ -487,7 +577,9 @@
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      transition: transform 0.15s ease, background 0.15s ease;
+      transition:
+        transform 0.15s ease,
+        background 0.15s ease;
     }
 
     .link-card:hover {
@@ -594,8 +686,7 @@
 
       .timer-card,
       .details,
-      .about,
-      .outfit-name-card {
+      .about {
         padding: 20px;
       }
 
@@ -608,16 +699,30 @@
 </head>
 
 <body>
+
   <div class="wrap">
 
     <!-- HEADER -->
+
     <header>
       <div>
         <div class="eyebrow">Daily Chonk</div>
-        <h1>A NEW OUTFIT.<br>DAILY.</h1>
+
+        <h1 class="animated-title">
+          <span
+            id="animated-title-line-1"
+            class="title-line">
+          </span>
+
+          <span
+            id="animated-title-line-2"
+            class="title-line">
+          </span>
+        </h1>
       </div>
 
       <div class="header-right">
+
         <button
           class="theme-toggle"
           id="theme-toggle"
@@ -626,16 +731,22 @@
           ☾
         </button>
 
-        <div class="tag">● LIVE · ONCHAIN</div>
+        <div class="tag">
+          ● LIVE · ONCHAIN
+        </div>
+
       </div>
     </header>
 
+
     <!-- HERO -->
+
     <main>
 
       <section class="card chonk-card">
 
         <div class="hero-top">
+
           <div>
             <strong>Chonk #30000</strong>
           </div>
@@ -643,11 +754,15 @@
           <div class="today-pill">
             Daily fit
           </div>
+
         </div>
+
 
         <div class="image-wrap">
 
-          <div id="loading" class="loading">
+          <div
+            id="loading"
+            class="loading">
             Loading today’s outfit…
           </div>
 
@@ -659,67 +774,94 @@
 
         </div>
 
+
+        <!-- GENERATED OUTFIT NAME -->
+
+        <div class="outfit-name">
+
+          <div class="outfit-name-label">
+            Today's Chonk is called
+          </div>
+
+          <h2 id="outfit-name">
+            Naming the fit…
+          </h2>
+
+        </div>
+
       </section>
+
 
       <aside class="side">
 
         <!-- TIMER -->
+
         <section class="card timer-card">
 
           <div class="timer-heading">
-            <div class="label">Next fit in</div>
-            <div class="live-dot" title="Live"></div>
+
+            <div class="label">
+              Next fit in
+            </div>
+
+            <div
+              class="live-dot"
+              title="Live">
+            </div>
+
           </div>
+
 
           <div id="countdown">
             00:00:00
           </div>
 
+
           <div class="countdown-caption">
             The wardrobe rolls again soon.
           </div>
+
 
           <div class="progress">
             <div id="progress"></div>
           </div>
 
-          <div id="status" class="status">
+
+          <div
+            id="status"
+            class="status">
             Syncing with the daily cycle…
           </div>
 
         </section>
 
-        <!-- GENERATED NAME -->
-        <section class="card outfit-name-card">
-
-          <div class="section-kicker">
-            Today's fit
-          </div>
-
-          <div id="outfit-name" class="outfit-name">
-            Thinking up a name…
-          </div>
-
-          <div class="outfit-name-sub">
-            Named from today's Top, Head, Face & Accessory.
-          </div>
-
-        </section>
 
         <!-- TRAITS -->
+
         <section class="card details">
 
           <div class="section-kicker">
             The current fit
           </div>
 
-          <h2>Today's traits</h2>
+          <h2>
+            Today's traits
+          </h2>
 
-          <div id="traits" class="traits">
+          <div
+            id="traits"
+            class="traits">
 
             <div class="trait">
-              <span>Status</span>
-              <span>Loading…</span>
+
+              <span>
+                Status
+              </span>
+
+              <span>
+                Loading…
+              </span>
+
             </div>
 
           </div>
@@ -730,7 +872,9 @@
 
     </main>
 
+
     <!-- ABOUT -->
+
     <section class="card about">
 
       <div class="about-inner">
@@ -767,7 +911,9 @@
 
     </section>
 
+
     <!-- LINKS -->
+
     <div class="links">
 
       <a
@@ -776,10 +922,16 @@
         target="_blank"
         rel="noopener">
 
-        <span>View Chonk #30000</span>
-        <span>↗</span>
+        <span>
+          View Chonk #30000
+        </span>
+
+        <span>
+          ↗
+        </span>
 
       </a>
+
 
       <a
         class="link-card"
@@ -787,10 +939,16 @@
         target="_blank"
         rel="noopener">
 
-        <span>Made by @jpegsonbase</span>
-        <span>↗</span>
+        <span>
+          Made by @jpegsonbase
+        </span>
+
+        <span>
+          ↗
+        </span>
 
       </a>
+
 
       <a
         class="link-card"
@@ -798,14 +956,21 @@
         target="_blank"
         rel="noopener">
 
-        <span>Learn more about Chonks</span>
-        <span>↗</span>
+        <span>
+          Learn more about Chonks
+        </span>
+
+        <span>
+          ↗
+        </span>
 
       </a>
 
     </div>
 
+
     <!-- FOOTER -->
+
     <footer>
 
       <span>
@@ -813,16 +978,28 @@
       </span>
 
       <div class="footer-links">
-        <span>ERC-6551</span>
-        <span>·</span>
-        <span>Daily Chonk</span>
+
+        <span>
+          ERC-6551
+        </span>
+
+        <span>
+          ·
+        </span>
+
+        <span>
+          Daily Chonk
+        </span>
+
       </div>
 
     </footer>
 
   </div>
 
+
   <script>
+
     (() => {
 
       const CHONK_ID = 30000;
@@ -833,7 +1010,10 @@
       const RPC =
         "https://mainnet.base.org";
 
-      // Current cycle start
+      /*
+       * Current cycle start
+       */
+
       const LAST_CHANGE =
         Date.parse("2026-09-06T18:33:04Z");
 
@@ -843,19 +1023,22 @@
       const TRAIT_PAGE_BASE =
         "https://www.chonks.xyz/traits/";
 
+
       /*
-        TraitCategory.Name:
-        None=0
-        Head=1
-        Hair=2
-        Face=3
-        Accessory=4
-        Top=5
-        Bottom=6
-        Shoes=7
-      */
+       * TraitCategory.Name
+       *
+       * None      = 0
+       * Head      = 1
+       * Hair      = 2
+       * Face      = 3
+       * Accessory = 4
+       * Top       = 5
+       * Bottom    = 6
+       * Shoes     = 7
+       */
 
       const CATEGORY_NUM = {
+
         head: 1,
         hair: 2,
         face: 3,
@@ -866,9 +1049,17 @@
         pants: 6,
         shoes: 7,
         shoe: 7
+
       };
 
+
+      /*
+       * Map attribute trait_type
+       * to StoredChonk field.
+       */
+
       const CATEGORY_TO_FIELD = {
+
         head: "headId",
         hair: "hairId",
         face: "faceId",
@@ -879,7 +1070,13 @@
         pants: "bottomId",
         shoes: "shoesId",
         shoe: "shoesId"
+
       };
+
+
+      /*
+       * Contract ABI
+       */
 
       const abi = [
 
@@ -891,6 +1088,7 @@
 
       ];
 
+
       const provider =
         new ethers.JsonRpcProvider(RPC);
 
@@ -900,6 +1098,11 @@
           abi,
           provider
         );
+
+
+      /*
+       * DOM elements
+       */
 
       const image =
         document.getElementById("chonk-image");
@@ -926,16 +1129,120 @@
         document.getElementById("outfit-name");
 
 
-      // --------------------------------------------------
-      // LOCAL STORAGE
-      // --------------------------------------------------
+      /* ==================================================
+       * ANIMATED HEADER
+       * ================================================== */
+
+      function animateHeadline() {
+
+        const line1 =
+          document.getElementById(
+            "animated-title-line-1"
+          );
+
+        const line2 =
+          document.getElementById(
+            "animated-title-line-2"
+          );
+
+
+        const text1 =
+          "A NEW OUTFIT.";
+
+        const text2 =
+          "EVERY DAY.";
+
+
+        line1.innerHTML = "";
+        line2.innerHTML = "";
+
+
+        function addLetters(
+          element,
+          text,
+          startDelay
+        ) {
+
+          let delay = startDelay;
+
+          [...text].forEach(char => {
+
+            if (char === " ") {
+
+              const space =
+                document.createElement("span");
+
+              space.className =
+                "title-space";
+
+              element.appendChild(space);
+
+              delay += 45;
+
+              return;
+            }
+
+
+            const letter =
+              document.createElement("span");
+
+            letter.className =
+              "title-letter";
+
+            letter.textContent =
+              char;
+
+            letter.style.animationDelay =
+              `${delay}ms`;
+
+            element.appendChild(letter);
+
+            delay += 55;
+
+          });
+
+
+          return delay;
+
+        }
+
+
+        const finish =
+          addLetters(
+            line1,
+            text1,
+            100
+          );
+
+
+        addLetters(
+          line2,
+          text2,
+          finish + 100
+        );
+
+      }
+
+
+      animateHeadline();
+
+
+      /* ==================================================
+       * LOCAL STORAGE
+       * ================================================== */
 
       function getStoredTheme() {
 
         try {
-          return localStorage.getItem("chonk-theme");
+
+          return localStorage.getItem(
+            "chonk-theme"
+          );
+
         } catch (e) {
+
           return null;
+
         }
 
       }
@@ -944,20 +1251,26 @@
       function setStoredTheme(theme) {
 
         try {
+
           localStorage.setItem(
             "chonk-theme",
             theme
           );
+
         } catch (e) {
-          // Ignore restricted environments
+
+          /*
+           * Ignore restricted environments.
+           */
+
         }
 
       }
 
 
-      // --------------------------------------------------
-      // THEME
-      // --------------------------------------------------
+      /* ==================================================
+       * THEME
+       * ================================================== */
 
       function applyTheme(theme) {
 
@@ -967,7 +1280,9 @@
         );
 
         themeToggle.textContent =
-          theme === "dark" ? "☀" : "☾";
+          theme === "dark"
+            ? "☀"
+            : "☾";
 
         setStoredTheme(theme);
 
@@ -977,6 +1292,7 @@
       const savedTheme =
         getStoredTheme() || "light";
 
+
       applyTheme(savedTheme);
 
 
@@ -985,9 +1301,8 @@
         () => {
 
           const current =
-            document.documentElement.getAttribute(
-              "data-theme"
-            );
+            document.documentElement
+              .getAttribute("data-theme");
 
           applyTheme(
             current === "dark"
@@ -999,9 +1314,9 @@
       );
 
 
-      // --------------------------------------------------
-      // HELPERS
-      // --------------------------------------------------
+      /* ==================================================
+       * HELPERS
+       * ================================================== */
 
       function decodeDataUri(uri) {
 
@@ -1009,14 +1324,18 @@
           return uri;
         }
 
+
         const comma =
           uri.indexOf(",");
+
 
         const meta =
           uri.slice(0, comma);
 
+
         const data =
           uri.slice(comma + 1);
+
 
         return meta.includes(";base64")
           ? atob(data)
@@ -1042,9 +1361,9 @@
       }
 
 
-      // --------------------------------------------------
-      // TRAIT LINKS
-      // --------------------------------------------------
+      /* ==================================================
+       * TRAIT LINKS
+       * ================================================== */
 
       function traitSlug(value) {
 
@@ -1069,19 +1388,24 @@
             .toLowerCase()
             .replace(/[^a-z]/g, "");
 
+
         const category =
           CATEGORY_NUM[key];
+
 
         if (!category) {
           return null;
         }
 
+
         const slug =
           traitSlug(value);
+
 
         if (!slug) {
           return null;
         }
+
 
         return (
           `${TRAIT_PAGE_BASE}` +
@@ -1092,21 +1416,21 @@
       }
 
 
-      // --------------------------------------------------
-      // OUTFIT NAME GENERATOR
-      // --------------------------------------------------
-      /*
-        IMPORTANT:
+      /* ==================================================
+       * OUTFIT NAME GENERATOR
+       *
+       * IMPORTANT:
+       *
+       * Only these are used:
+       *
+       * TOP
+       * HEAD
+       * FACE
+       * ACCESSORY
+       *
+       * Bottoms and shoes are deliberately ignored.
+       * ================================================== */
 
-        Only these four categories are used:
-
-        TOP
-        HEAD
-        FACE
-        ACCESSORY
-
-        Bottoms and Shoes are deliberately ignored.
-      */
 
       function cleanTrait(value) {
 
@@ -1117,717 +1441,980 @@
       }
 
 
-      function containsAny(
-        text,
-        words
-      ) {
-
-        return words.some(
-          word => text.includes(word)
-        );
-
-      }
-
+      /*
+       * Simple deterministic hash.
+       *
+       * This means:
+       *
+       * Same traits = same name
+       *
+       * Different traits = usually different name.
+       */
 
       function hashString(str) {
 
-        let hash = 0;
+        let hash = 2166136261;
+
 
         for (let i = 0; i < str.length; i++) {
 
-          hash =
-            ((hash << 5) - hash) +
-            str.charCodeAt(i);
+          hash ^= str.charCodeAt(i);
 
-          hash |= 0;
+          hash +=
+            (hash << 1) +
+            (hash << 4) +
+            (hash << 7) +
+            (hash << 8) +
+            (hash << 24);
 
         }
 
-        return Math.abs(hash);
+
+        return hash >>> 0;
 
       }
 
 
-      function seededPick(
-        array,
-        seed
-      ) {
-
-        if (!array.length) {
-          return "";
-        }
+      function pick(array, seed) {
 
         return array[
-          Math.abs(seed) % array.length
+          seed % array.length
         ];
 
       }
 
 
-      function generateOutfitName(attrs) {
+      /*
+       * Detect colours from trait names.
+       */
 
-        /*
-          Pull ONLY the four traits we care about.
-        */
+      function detectColor(traits) {
 
-        const traits = {};
+        const colors = [
 
-        attrs.forEach(attr => {
+          ["pink", "Pink"],
+          ["blue", "Blue"],
+          ["green", "Green"],
+          ["red", "Red"],
+          ["orange", "Orange"],
+          ["yellow", "Yellow"],
+          ["purple", "Purple"],
+          ["violet", "Violet"],
+          ["black", "Black"],
+          ["white", "White"],
+          ["grey", "Grey"],
+          ["gray", "Grey"],
+          ["brown", "Brown"],
+          ["gold", "Golden"],
+          ["silver", "Silver"],
+          ["cream", "Cream"],
+          ["beige", "Beige"]
 
-          const type =
-            cleanTrait(attr.trait_type);
+        ];
 
-          const value =
-            String(attr.value ?? "");
+
+        const combined =
+          traits
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase();
+
+
+        for (const [key, value] of colors) {
+
+          if (combined.includes(key)) {
+            return value;
+          }
+
+        }
+
+
+        return null;
+
+      }
+
+
+      /*
+       * Find a recognisable accessory.
+       */
+
+      function accessoryWord(accessory) {
+
+        const value =
+          cleanTrait(accessory);
+
+
+        if (!value) {
+          return null;
+        }
+
+
+        const rules = [
+
+          {
+            words: ["bird", "duck", "chicken", "pigeon"],
+            result: "Bird"
+          },
+
+          {
+            words: ["flower", "rose", "tulip", "daisy"],
+            result: "Flower"
+          },
+
+          {
+            words: ["sword", "blade"],
+            result: "Blade"
+          },
+
+          {
+            words: ["cigar", "cigarette", "smoke"],
+            result: "Smoker"
+          },
+
+          {
+            words: ["pipe"],
+            result: "Pipe"
+          },
+
+          {
+            words: ["chain", "necklace"],
+            result: "Chain"
+          },
+
+          {
+            words: ["earring", "earrings"],
+            result: "Earring"
+          },
+
+          {
+            words: ["bow", "ribbon"],
+            result: "Bow"
+          },
+
+          {
+            words: ["bag", "backpack"],
+            result: "Bag"
+          },
+
+          {
+            words: ["camera"],
+            result: "Camera"
+          },
+
+          {
+            words: ["star"],
+            result: "Star"
+          },
+
+          {
+            words: ["heart"],
+            result: "Heart"
+          },
+
+          {
+            words: ["balloon"],
+            result: "Balloon"
+          },
+
+          {
+            words: ["flower"],
+            result: "Flower"
+          },
+
+          {
+            words: ["halo"],
+            result: "Halo"
+          }
+
+        ];
+
+
+        for (const rule of rules) {
 
           if (
-            type === "top" ||
-            type === "head" ||
-            type === "face" ||
-            type === "accessory"
+            rule.words.some(
+              word =>
+                value.includes(word)
+            )
           ) {
 
-            traits[type] = value;
+            return rule.result;
 
+          }
+
+        }
+
+
+        /*
+         * Generic fallback.
+         *
+         * Remove numbers and common filler words.
+         */
+
+        const ignored = new Set([
+
+          "01",
+          "02",
+          "03",
+          "04",
+          "05",
+          "06",
+          "07",
+          "08",
+          "09",
+          "10",
+          "the",
+          "a",
+          "an",
+          "accessory"
+
+        ]);
+
+
+        const words =
+          value
+            .replace(/[0-9]+/g, "")
+            .split(/\s+/)
+            .filter(
+              word =>
+                word &&
+                !ignored.has(word)
+            );
+
+
+        if (!words.length) {
+          return null;
+        }
+
+
+        const word =
+          words[words.length - 1];
+
+
+        return (
+          word.charAt(0).toUpperCase() +
+          word.slice(1)
+        );
+
+      }
+
+
+      /*
+       * Identify the vibe of the face.
+       */
+
+      function faceVibe(face) {
+
+        const value =
+          cleanTrait(face);
+
+
+        if (!value) {
+          return "Mystery";
+
+        }
+
+
+        if (
+          value.includes("glass") ||
+          value.includes("shade") ||
+          value.includes("spectacle")
+        ) {
+
+          return pick(
+            [
+              "Dreamer",
+              "Visionary",
+              "Cool Cat",
+              "Lookout"
+            ],
+            hashString(value)
+          );
+
+        }
+
+
+        if (
+          value.includes("mask")
+        ) {
+
+          return pick(
+            [
+              "Bandit",
+              "Outlaw",
+              "Mystery",
+              "Rogue"
+            ],
+            hashString(value)
+          );
+
+        }
+
+
+        if (
+          value.includes("smile") ||
+          value.includes("happy")
+        ) {
+
+          return "Happy";
+
+        }
+
+
+        if (
+          value.includes("sad") ||
+          value.includes("frown")
+        ) {
+
+          return "Mope";
+
+        }
+
+
+        if (
+          value.includes("angry") ||
+          value.includes("mad")
+        ) {
+
+          return "Menace";
+
+        }
+
+
+        return pick(
+          [
+            "Dreamer",
+            "Maverick",
+            "Legend",
+            "Wildcard",
+            "Character"
+          ],
+          hashString(value)
+        );
+
+      }
+
+
+      /*
+       * Identify the headwear vibe.
+       */
+
+      function headVibe(head) {
+
+        const value =
+          cleanTrait(head);
+
+
+        if (!value) {
+          return null;
+        }
+
+
+        if (
+          value.includes("cap") ||
+          value.includes("baseball")
+        ) {
+
+          return pick(
+            [
+              "Cap",
+              "Captain",
+              "Ballplayer",
+              "Rookie"
+            ],
+            hashString(value)
+          );
+
+        }
+
+
+        if (
+          value.includes("crown")
+        ) {
+
+          return pick(
+            [
+              "Royal",
+              "King",
+              "Boss",
+              "Monarch"
+            ],
+            hashString(value)
+          );
+
+        }
+
+
+        if (
+          value.includes("beanie")
+        ) {
+
+          return "Beanie";
+
+        }
+
+
+        if (
+          value.includes("helmet")
+        ) {
+
+          return "Helmet Hero";
+
+        }
+
+
+        if (
+          value.includes("hat")
+        ) {
+
+          return pick(
+            [
+              "Hat",
+              "Hatter",
+              "Headliner"
+            ],
+            hashString(value)
+          );
+
+        }
+
+
+        if (
+          value.includes("hood")
+        ) {
+
+          return "Hood";
+
+        }
+
+
+        return null;
+
+      }
+
+
+      /*
+       * Identify the top style.
+       */
+
+      function topVibe(top) {
+
+        const value =
+          cleanTrait(top);
+
+
+        if (!value) {
+          return null;
+        }
+
+
+        if (
+          value.includes("dress")
+        ) {
+
+          return pick(
+            [
+              "Diva",
+              "Duchess",
+              "Showstopper",
+              "Star"
+            ],
+            hashString(value)
+          );
+
+        }
+
+
+        if (
+          value.includes("suit") ||
+          value.includes("tux")
+        ) {
+
+          return pick(
+            [
+              "Boss",
+              "Gentleman",
+              "Executive",
+              "Big Shot"
+            ],
+            hashString(value)
+          );
+
+        }
+
+
+        if (
+          value.includes("hoodie") ||
+          value.includes("hood")
+        ) {
+
+          return pick(
+            [
+              "Hoodlum",
+              "Rebel",
+              "Street Boss",
+              "Wildcard"
+            ],
+            hashString(value)
+          );
+
+        }
+
+
+        if (
+          value.includes("jacket")
+        ) {
+
+          return pick(
+            [
+              "Rocker",
+              "Racer",
+              "Rebel",
+              "Troublemaker"
+            ],
+            hashString(value)
+          );
+
+        }
+
+
+        if (
+          value.includes("shirt") ||
+          value.includes("tee")
+        ) {
+
+          return pick(
+            [
+              "Daydreamer",
+              "Trendsetter",
+              "Weekend Hero",
+              "Local Legend"
+            ],
+            hashString(value)
+          );
+
+        }
+
+
+        if (
+          value.includes("coat")
+        ) {
+
+          return pick(
+            [
+              "Detective",
+              "Drifter",
+              "Night Walker",
+              "Gentleman"
+            ],
+            hashString(value)
+          );
+
+        }
+
+
+        return null;
+
+      }
+
+
+      /*
+       * Main outfit-name generator.
+       *
+       * ONLY:
+       *
+       * top
+       * head
+       * face
+       * accessory
+       */
+
+      function generateOutfitName(
+        top,
+        head,
+        face,
+        accessory
+      ) {
+
+        const traits = [
+
+          cleanTrait(top),
+          cleanTrait(head),
+          cleanTrait(face),
+          cleanTrait(accessory)
+
+        ].filter(Boolean);
+
+
+        if (!traits.length) {
+
+          return "THE MYSTERY CHONK";
+
+        }
+
+
+        const seedString =
+          traits.join("|");
+
+
+        const seed =
+          hashString(seedString);
+
+
+        const color =
+          detectColor(traits);
+
+
+        const accessoryName =
+          accessoryWord(accessory);
+
+
+        const faceName =
+          faceVibe(face);
+
+
+        const headName =
+          headVibe(head);
+
+
+        const topName =
+          topVibe(top);
+
+
+        /*
+         * Build a list of names that make
+         * contextual sense.
+         *
+         * We don't simply concatenate every
+         * trait because that can create silly
+         * names.
+         */
+
+        const names = [];
+
+
+        if (
+          color &&
+          accessoryName
+        ) {
+
+          names.push(
+            `THE ${color.toUpperCase()} ${accessoryName.toUpperCase()}`
+          );
+
+
+          names.push(
+            `THE ${accessoryName.toUpperCase()} IN ${color.toUpperCase()}`
+          );
+
+
+          names.push(
+            `${color.toUpperCase()} ${accessoryName.toUpperCase()}`
+          );
+
+        }
+
+
+        if (
+          accessoryName &&
+          faceName
+        ) {
+
+          names.push(
+            `THE ${accessoryName.toUpperCase()} ${faceName.toUpperCase()}`
+          );
+
+        }
+
+
+        if (
+          headName &&
+          accessoryName
+        ) {
+
+          names.push(
+            `THE ${headName.toUpperCase()} ${accessoryName.toUpperCase()}`
+          );
+
+        }
+
+
+        if (
+          topName &&
+          accessoryName
+        ) {
+
+          names.push(
+            `THE ${topName.toUpperCase()} WITH THE ${accessoryName.toUpperCase()}`
+          );
+
+        }
+
+
+        if (
+          color &&
+          topName
+        ) {
+
+          names.push(
+            `THE ${color.toUpperCase()} ${topName.toUpperCase()}`
+          );
+
+        }
+
+
+        if (
+          headName &&
+          faceName
+        ) {
+
+          names.push(
+            `THE ${headName.toUpperCase()} ${faceName.toUpperCase()}`
+          );
+
+        }
+
+
+        if (faceName) {
+
+          names.push(
+            `THE ${faceName.toUpperCase()}`
+          );
+
+        }
+
+
+        if (topName) {
+
+          names.push(
+            `THE ${topName.toUpperCase()}`
+          );
+
+        }
+
+
+        if (accessoryName) {
+
+          names.push(
+            `THE ${accessoryName.toUpperCase()}`
+          );
+
+        }
+
+
+        /*
+         * Generic fallback based on the actual
+         * trait names if none of our recognisers
+         * matched.
+         */
+
+        if (!names.length) {
+
+          const meaningful =
+            traits
+              .map(value => {
+
+                const words =
+                  value
+                    .replace(/[0-9]+/g, "")
+                    .split(/\s+/)
+                    .filter(Boolean);
+
+                return words[words.length - 1];
+
+              })
+              .filter(Boolean);
+
+
+          if (meaningful.length) {
+
+            const word =
+              meaningful[
+                seed % meaningful.length
+              ];
+
+
+            return (
+              "THE " +
+              word
+                .charAt(0)
+                .toUpperCase() +
+              word
+                .slice(1)
+                .toUpperCase()
+            );
+
+          }
+
+
+          return "THE MYSTERY CHONK";
+
+        }
+
+
+        return names[
+          seed % names.length
+        ];
+
+      }
+
+
+      /*
+       * Update generated name.
+       */
+
+      function updateOutfitName(attrs) {
+
+        /*
+         * IMPORTANT:
+         *
+         * We intentionally only read:
+         *
+         * Top
+         * Head
+         * Face
+         * Accessory
+         *
+         * Shoes and Bottom are NOT passed
+         * into the generator.
+         */
+
+        let top = "";
+        let head = "";
+        let face = "";
+        let accessory = "";
+
+
+        attrs.forEach(attribute => {
+
+          const type =
+            String(
+              attribute.trait_type || ""
+            )
+              .trim()
+              .toLowerCase();
+
+
+          const value =
+            String(
+              attribute.value || ""
+            ).trim();
+
+
+          if (type === "top") {
+            top = value;
+          }
+
+
+          if (type === "head") {
+            head = value;
+          }
+
+
+          if (type === "face") {
+            face = value;
+          }
+
+
+          if (type === "accessory") {
+            accessory = value;
           }
 
         });
 
 
-        const top =
-          cleanTrait(traits.top);
-
-        const head =
-          cleanTrait(traits.head);
-
-        const face =
-          cleanTrait(traits.face);
-
-        const accessory =
-          cleanTrait(traits.accessory);
-
-
-        /*
-          Create one stable seed from the
-          actual outfit.
-
-          This means everybody sees the
-          same name for the same outfit.
-        */
-
-        const outfitKey =
-          [
-            traits.top || "",
-            traits.head || "",
-            traits.face || "",
-            traits.accessory || ""
-          ].join("|");
-
-
-        const seed =
-          hashString(outfitKey);
-
-
-        /*
-          Detect themes.
-        */
-
-        const isPink =
-          containsAny(
-            top + " " + head + " " + face + " " + accessory,
-            ["pink", "rose", "magenta", "salmon"]
-          );
-
-        const isGreen =
-          containsAny(
-            top + " " + head + " " + face + " " + accessory,
-            ["green", "lime", "mint", "olive"]
-          );
-
-        const isBlue =
-          containsAny(
-            top + " " + head + " " + face + " " + accessory,
-            ["blue", "cyan", "navy", "aqua"]
-          );
-
-        const isRed =
-          containsAny(
-            top + " " + head + " " + face + " " + accessory,
-            ["red", "crimson", "scarlet"]
-          );
-
-        const isPurple =
-          containsAny(
-            top + " " + head + " " + face + " " + accessory,
-            ["purple", "violet", "lilac"]
-          );
-
-        const isBlack =
-          containsAny(
-            top + " " + head + " " + face + " " + accessory,
-            ["black", "dark"]
-          );
-
-        const isWhite =
-          containsAny(
-            top + " " + head + " " + face + " " + accessory,
-            ["white", "cream", "ivory"]
-          );
-
-
-        /*
-          Detect notable objects/styles.
-        */
-
-        const bird =
-          containsAny(
-            accessory,
-            ["bird", "chick", "duck", "crow", "raven", "eagle", "parrot"]
-          );
-
-        const glasses =
-          containsAny(
-            face,
-            ["glasses", "spectacles", "3d", "shades", "sunglasses"]
-          );
-
-        const cap =
-          containsAny(
+        const name =
+          generateOutfitName(
+            top,
             head,
-            ["cap", "hat", "beanie", "helmet", "bucket"]
-          );
-
-        const dress =
-          containsAny(
-            top,
-            ["dress", "gown", "robe"]
-          );
-
-        const suit =
-          containsAny(
-            top,
-            ["suit", "tux", "formal", "jacket", "blazer"]
-          );
-
-        const hoodie =
-          containsAny(
-            top,
-            ["hoodie", "hood"]
-          );
-
-        const shirt =
-          containsAny(
-            top,
-            ["shirt", "tee", "t-shirt", "sweater", "jumper"]
-          );
-
-        const flower =
-          containsAny(
-            accessory,
-            ["flower", "rose", "floral", "leaf"]
-          );
-
-        const chain =
-          containsAny(
-            accessory,
-            ["chain", "necklace", "gold", "silver"]
-          );
-
-        const mask =
-          containsAny(
             face,
-            ["mask", "visor"]
+            accessory
           );
 
-        /*
-          Special combinations get the
-          most interesting names.
-        */
 
-        if (bird && dress) {
-
-          const names = [
-            "The Birdwatcher",
-            "Feathered Formal",
-            "The Fancy Flock",
-            "Birds & Boudoir",
-            "The Dressed-Up Bird",
-            "Avian Elegance",
-            "The Feathered Socialite"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        if (bird && cap) {
-
-          const names = [
-            "The Bird Boss",
-            "Captain Feather",
-            "The Flock Leader",
-            "Bird on Duty",
-            "The Feathered Cap",
-            "The Bird Scout",
-            "Captain Chirp"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        if (bird && glasses) {
-
-          const names = [
-            "The Bird Scholar",
-            "Professor Feathers",
-            "The Aviator",
-            "Bird Vision",
-            "The Feathered Thinker",
-            "Optical Flock",
-            "The Wise Bird"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        if (dress && glasses) {
-
-          const names = [
-            "The Fashion Professor",
-            "Dress Code",
-            "The Glam Scholar",
-            "Runway Vision",
-            "The Optical Icon",
-            "High Fashion Vision",
-            "The Dressed-Up Dreamer"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        if (dress && cap) {
-
-          const names = [
-            "The Casual Couture",
-            "Cap & Gown",
-            "The Streetwear Socialite",
-            "Backyard Royalty",
-            "The Weekend Icon",
-            "Couture on the Corner",
-            "The Casual Duchess"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        if (suit && glasses) {
-
-          const names = [
-            "The Boardroom Boss",
-            "Executive Vision",
-            "The Sharp Operator",
-            "Business Casualty",
-            "The Big Meeting",
-            "Corporate Chonk",
-            "The Suit Specialist"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        if (mask && cap) {
-
-          const names = [
-            "The Mystery Chonk",
-            "Undercover Casual",
-            "The Masked Wanderer",
-            "Incognito Mode",
-            "The Secret Fit",
-            "Classified",
-            "Nobody Knows"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        /*
-          Colour-based names.
-        */
-
-        if (isPink && bird) {
-
-          const names = [
-            "Pink Feathers",
-            "The Pink Flock",
-            "Rose & Feathers",
-            "Pretty in Pink",
-            "The Pink Bird",
-            "Pink Plumage"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        if (isGreen && bird) {
-
-          const names = [
-            "The Garden Bird",
-            "Green Feathers",
-            "The Emerald Flock",
-            "Bird in the Bush",
-            "The Greenwing",
-            "Nature's Chonk"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        if (isBlue && glasses) {
-
-          const names = [
-            "Blue Vision",
-            "The Blue Lens",
-            "Cool Vision",
-            "Blue Light",
-            "The Azure Look"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        if (isPink && glasses) {
-
-          const names = [
-            "Pink Vision",
-            "Rose-Coloured Glasses",
-            "The Pink Lens",
-            "Pretty Vision",
-            "Pink Perspective"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        if (isGreen && cap) {
-
-          const names = [
-            "The Green Scout",
-            "Fresh Off the Field",
-            "The Green Cap",
-            "Park Day",
-            "The Emerald Casual"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        /*
-          More general combinations.
-        */
-
-        if (bird) {
-
-          const names = [
-            "Feathered Friend",
-            "The Flock",
-            "Bird Business",
-            "Chonk & Chirp",
-            "A Little Birdie",
-            "The Bird Look",
-            "Feather Mode"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        if (glasses) {
-
-          const names = [
-            "Vision Mode",
-            "The Look",
-            "Clear Vision",
-            "Optical Energy",
-            "The Glasses Era",
-            "Four Eyes",
-            "Future Vision"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        if (cap) {
-
-          const names = [
-            "Cap Day",
-            "Top of the Class",
-            "The Casual Cap",
-            "Headwear Hero",
-            "Cap Season",
-            "The Hat Guy",
-            "Peak Chonk"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        if (flower) {
-
-          const names = [
-            "Garden Party",
-            "Flower Power",
-            "Bloom Mode",
-            "The Garden Chonk",
-            "Freshly Picked",
-            "Petal Push"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        if (chain) {
-
-          const names = [
-            "Chain Reaction",
-            "Heavy Metal",
-            "The Icebreaker",
-            "Neck Level",
-            "Chonk With Benefits",
-            "The Chain Game"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        /*
-          Colour fallback.
-        */
-
-        if (isPink) {
-
-          const names = [
-            "Pretty in Pink",
-            "Pink Season",
-            "Pink Energy",
-            "The Pink Fit",
-            "Pink on Pink",
-            "Rose Mode"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        if (isGreen) {
-
-          const names = [
-            "Green Machine",
-            "Going Green",
-            "Emerald Energy",
-            "Green Day",
-            "Fresh Fit",
-            "The Green Look"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        if (isBlue) {
-
-          const names = [
-            "Blue Mood",
-            "Blue Hour",
-            "The Blue Fit",
-            "Ocean Energy",
-            "Cool Chonk",
-            "Blue Period"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        if (isRed) {
-
-          const names = [
-            "Seeing Red",
-            "Red Alert",
-            "The Red Fit",
-            "Hot Chonk",
-            "Red Energy",
-            "Fire Mode"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        if (isPurple) {
-
-          const names = [
-            "Purple Reign",
-            "Royal Purple",
-            "The Violet Fit",
-            "Purple Haze",
-            "Royal Energy",
-            "The Purple Era"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        if (isBlack) {
-
-          const names = [
-            "After Dark",
-            "Blackout",
-            "Dark Mode",
-            "The Midnight Fit",
-            "Noir Chonk",
-            "Shadow Mode"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        if (isWhite) {
-
-          const names = [
-            "Clean Slate",
-            "White Noise",
-            "Pure Chonk",
-            "The Clean Fit",
-            "Fresh Pressed",
-            "Snow Day"
-          ];
-
-          return seededPick(names, seed);
-
-        }
-
-
-        /*
-          Generic fallback.
-
-          Still deterministic, so the same
-          combination always gets the same name.
-        */
-
-        const genericNames = [
-          "The Daily Fit",
-          "Chonk in Style",
-          "Freshly Dressed",
-          "Fit Check",
-          "Today's Look",
-          "The New Look",
-          "Daily Drip",
-          "Chonk Couture",
-          "Wardrobe Mode",
-          "The Outfit",
-          "Fresh Fit",
-          "Dressed to Chonk",
-          "The Casual Chonk",
-          "Style Mode",
-          "Today's Drip"
-        ];
-
-        return seededPick(
-          genericNames,
-          seed
+        outfitNameEl.classList.add(
+          "changing"
         );
 
-      }
 
+        setTimeout(() => {
 
-      // --------------------------------------------------
-      // UPDATE OUTFIT NAME
-      // --------------------------------------------------
+          outfitNameEl.textContent =
+            name;
 
-      function updateOutfitName(json) {
+          requestAnimationFrame(() => {
 
-        const attrs =
-          Array.isArray(json.attributes)
-            ? json.attributes
-            : [];
+            outfitNameEl.classList.remove(
+              "changing"
+            );
 
-        const name =
-          generateOutfitName(attrs);
+          });
 
-        outfitNameEl.textContent =
-          name;
+        }, 160);
+
 
         console.log(
-          "[Daily Chonk] Generated outfit name:",
+          "[Daily Chonk] Outfit name:",
           name
         );
 
+
+        console.log(
+          "[Daily Chonk] Naming traits:",
+          {
+            top,
+            head,
+            face,
+            accessory
+          }
+        );
+
       }
 
 
-      // --------------------------------------------------
-      // TRAITS
-      // --------------------------------------------------
+      /* ==================================================
+       * TRAITS DISPLAY
+       * ================================================== */
 
       function showTraits(json) {
 
         traitsEl.innerHTML = "";
 
+
         const attrs =
           Array.isArray(json.attributes)
             ? json.attributes
             : [];
 
+
+        /*
+         * Generate the outfit name from
+         * the currently equipped traits.
+         */
+
+        updateOutfitName(attrs);
+
+
         if (!attrs.length) {
 
           traitsEl.innerHTML = `
+
             <div class="trait">
-              <span>Source</span>
-              <span>Onchain</span>
+
+              <span>
+                Source
+              </span>
+
+              <span>
+                Onchain
+              </span>
+
             </div>
+
           `;
 
           return;
+
         }
 
 
@@ -1836,14 +2423,17 @@
           const type =
             a.trait_type ?? "Trait";
 
+
           const value =
             String(a.value ?? "—");
+
 
           const href =
             resolveTraitPageUrl(
               type,
               value
             );
+
 
           console.log(
             "[Daily Chonk] trait row",
@@ -1859,28 +2449,45 @@
             const link =
               document.createElement("a");
 
+
             link.className =
               "trait";
+
 
             link.href =
               href;
 
+
             link.target =
               "_blank";
+
 
             link.rel =
               "noopener";
 
+
             link.title =
               `Browse ${value} traits on Chonks`;
 
+
             link.innerHTML = `
-              <span>${escapeHtml(type)}</span>
-              <span class="trait-value">
-                ${escapeHtml(value)}
-                <span class="trait-arrow">↗</span>
+
+              <span>
+                ${escapeHtml(type)}
               </span>
+
+              <span class="trait-value">
+
+                ${escapeHtml(value)}
+
+                <span class="trait-arrow">
+                  ↗
+                </span>
+
+              </span>
+
             `;
+
 
             traitsEl.appendChild(link);
 
@@ -1889,13 +2496,23 @@
             const row =
               document.createElement("div");
 
+
             row.className =
               "trait";
 
+
             row.innerHTML = `
-              <span>${escapeHtml(type)}</span>
-              <span>${escapeHtml(value)}</span>
+
+              <span>
+                ${escapeHtml(type)}
+              </span>
+
+              <span>
+                ${escapeHtml(value)}
+              </span>
+
             `;
+
 
             traitsEl.appendChild(row);
 
@@ -1906,9 +2523,9 @@
       }
 
 
-      // --------------------------------------------------
-      // LOAD CHONK
-      // --------------------------------------------------
+      /* ==================================================
+       * LOAD CHONK
+       * ================================================== */
 
       async function loadChonk() {
 
@@ -1928,18 +2545,18 @@
               CHONK_ID
             ),
 
-            contract.getChonk(
-              CHONK_ID
-            ).catch(err => {
+            contract
+              .getChonk(CHONK_ID)
+              .catch(err => {
 
-              console.error(
-                "[Daily Chonk] getChonk failed",
-                err
-              );
+                console.error(
+                  "[Daily Chonk] getChonk failed",
+                  err
+                );
 
-              return null;
+                return null;
 
-            })
+              })
 
           ]);
 
@@ -1960,8 +2577,10 @@
                 sourceUri
               );
 
+
             metadata =
               JSON.parse(decoded);
+
 
             imageUri =
               metadata.image || null;
@@ -1991,7 +2610,9 @@
           }
 
 
-          // Animate outfit refresh
+          /*
+           * Animate outfit refresh.
+           */
 
           image.classList.add(
             "changing"
@@ -2003,11 +2624,14 @@
             image.src =
               imageUri;
 
+
             image.hidden =
               false;
 
+
             loading.hidden =
               true;
+
 
             requestAnimationFrame(() => {
 
@@ -2020,52 +2644,53 @@
           }, 220);
 
 
-          // Show traits
+          /*
+           * Display traits and generate
+           * the outfit name.
+           */
 
-          showTraits(
-            metadata
-          );
-
-
-          // Generate outfit name
-
-          updateOutfitName(
-            metadata
-          );
+          showTraits(metadata);
 
 
           statusEl.textContent =
             "Live — refreshing directly from the Base chain.";
 
-
         } catch (err) {
 
           console.error(err);
 
+
           loading.textContent =
             "Unable to load today’s outfit.";
+
 
           statusEl.textContent =
             "RPC or contract request failed. Retrying shortly.";
 
-          outfitNameEl.textContent =
-            "Name unavailable";
 
           traitsEl.innerHTML = `
+
             <div class="error">
+
               Could not fetch on-chain data.
               Please try again in a moment.
+
             </div>
+
           `;
+
+
+          outfitNameEl.textContent =
+            "THE MYSTERY CHONK";
 
         }
 
       }
 
 
-      // --------------------------------------------------
-      // COUNTDOWN
-      // --------------------------------------------------
+      /* ==================================================
+       * COUNTDOWN
+       * ================================================== */
 
       let lastRemaining =
         Infinity;
@@ -2082,7 +2707,9 @@
 
 
         if (elapsed < 0) {
+
           elapsed += CYCLE;
+
         }
 
 
@@ -2111,8 +2738,11 @@
 
 
         countdownEl.textContent =
+
           `${String(h).padStart(2, "0")}:` +
+
           `${String(m).padStart(2, "0")}:` +
+
           `${String(s).padStart(2, "0")}`;
 
 
@@ -2121,17 +2751,15 @@
 
 
         /*
-          Detect new daily cycle.
-
-          When the outfit changes,
-          loadChonk() will fetch the new
-          traits and automatically generate
-          the new outfit name.
-        */
+         * Detect new daily cycle.
+         */
 
         if (
+
           remaining > lastRemaining &&
+
           lastRemaining < 5000
+
         ) {
 
           loadChonk();
@@ -2148,7 +2776,9 @@
           statusEl.textContent =
             "The wardrobe is about to roll…";
 
-        } else if (remaining < 3600000) {
+        } else if (
+          remaining < 3600000
+        ) {
 
           statusEl.textContent =
             "Less than an hour until the next fit.";
@@ -2163,25 +2793,40 @@
       }
 
 
-      // --------------------------------------------------
-      // INITIAL LOAD
-      // --------------------------------------------------
+      /* ==================================================
+       * INITIAL LOAD
+       * ================================================== */
 
       loadChonk();
 
       tick();
+
+
+      /*
+       * Update countdown every second.
+       */
 
       setInterval(
         tick,
         1000
       );
 
+
+      /*
+       * Check the chain every minute.
+       *
+       * This means if the outfit changes,
+       * the name changes too.
+       */
+
       setInterval(
         loadChonk,
         60000
       );
 
+
     })();
+
   </script>
 
 </body>
