@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Chonk 30000 — Daily Wardrobe</title>
+  <title>Daily Chonk</title>
   <meta name="description" content="A live wardrobe display for Chonk #30000." />
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
   <style>
@@ -60,7 +60,7 @@
   <header>
     <div>
       <div class="eyebrow">The Chonk Wardrobe</div>
-      <h1>CHONK<br>#30000</h1>
+      <h1>Daily Chonk</h1>
     </div>
     <div class="tag">LIVE • ONCHAIN</div>
   </header>
@@ -147,7 +147,7 @@
   }
 
   function escapeHtml(s) {
-    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+    return s.replace(/[&<>\"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
   }
 
   async function loadChonk() {
