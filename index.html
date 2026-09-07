@@ -243,6 +243,28 @@
       text-align: right;
     }
 
+    /* About section */
+    .about {
+      margin-top: 32px;
+      padding: 32px;
+    }
+
+    .about h2 {
+      margin: 0 0 16px;
+      font-size: 1.6rem;
+      letter-spacing: -0.02em;
+    }
+
+    .about p {
+      margin: 0 0 14px;
+      line-height: 1.55;
+      font-size: 1.05rem;
+    }
+
+    .about p:last-child {
+      margin-bottom: 0;
+    }
+
     footer {
       margin-top: 34px;
       color: var(--muted);
@@ -341,12 +363,12 @@
       <aside class="side">
         <section class="card timer-card">
           <div class="label">Next wardrobe change</div>
-          <div id="countdown">00:44:00</div>
+          <div id="countdown">00:00:00</div>
           <div class="progress">
             <div id="progress"></div>
           </div>
           <div id="status" class="status">
-            Wardrobe change imminent…
+            Syncing with the daily cycle…
           </div>
         </section>
 
@@ -361,6 +383,25 @@
         </section>
       </aside>
     </main>
+
+    <!-- About section -->
+    <section class="card about">
+      <h2>About Daily Chonk</h2>
+      <p>What if your Chonk got a new outfit every day?</p>
+      <p>
+        Daily Chonk is an onchain experiment that gives a Chonk a fresh look every 24 hours.
+        A bot randomly selects from a wardrobe made up of the original base traits,
+        mixed with a growing collection of face, head, and accessory traits —
+        creating a new combination every day.
+      </p>
+      <p>
+        No manual outfit changes. No two days are quite the same.
+        Just one Chonk, getting dressed up and doing its thing.
+      </p>
+      <p>
+        Check back tomorrow. The Chonk will be wearing something new.
+      </p>
+    </section>
 
     <footer>
       <span>
@@ -383,6 +424,7 @@
       const CONTRACT = "0x07152bfde079b5319e5308c43fb1dbc9c76cb4f9";
       const RPC = "https://mainnet.base.org";
 
+      // Edit this timestamp to control when the current cycle started
       const LAST_CHANGE = Date.parse("2026-09-06T18:33:04Z");
       const CYCLE = 24 * 60 * 60 * 1000;
 
@@ -519,6 +561,9 @@
         }
       }
 
+      // ---------- Countdown + auto-refresh on reset ----------
+      let lastRemaining = Infinity;
+
       function tick() {
         const now = Date.now();
         let elapsed = (now - LAST_CHANGE) % CYCLE;
@@ -535,6 +580,12 @@
           `${String(s).padStart(2, "0")}`;
 
         progressEl.style.width = `${(elapsed / CYCLE) * 100}%`;
+
+        // Detect when the timer resets (new cycle starts)
+        if (remaining > lastRemaining && lastRemaining < 5000) {
+          loadChonk(); // Force refresh of the Chonk
+        }
+        lastRemaining = remaining;
 
         statusEl.textContent =
           remaining < 60000
