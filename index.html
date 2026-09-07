@@ -3,19 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
   <title>Daily Chonk</title>
+  <meta name="description" content="Daily Chonk — an onchain experiment. A new outfit every 24 hours." />
 
-  <meta
-    name="description"
-    content="Daily Chonk — an onchain experiment. A new outfit every 24 hours."
-  />
-
-  <link
-    rel="icon"
-    type="image/png"
-    href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAABAElEQVR4nO2asQ3CMBBF75CrMAIbsABMQRNKNmCD9DAJJTQsQOsJsgEjQHu02I7kGNn6nHSvSxT78vRt2ZHDRCT0je+pFNlci9tMwczFbRZVKgMxATRMvpf8YyG1xnyOOXNCfQImgMYE0JgAGvUCPy1k/4T6BEwADcvYBXOAL68qHcthGRaq1C+dww2e+gRMAI16ATdncskpvE6+lIZ0LWzVb4z6BEwAjWu14MgqHM/8bLNnVJ+ACaBRL2C7UTQmgIYpOmKSsQO9Sgqv39ln1CdgAmhccueRH3et4GN5G/UJmAAa9QIu/jeC7xNnwLt9m+pxLR/V2d6yXahPwATQfABRGTZIW+9a2QAAAABJRU5ErkJggg=="
-  >
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAABAElEQVR4nO2asQ3CMBBF75CrMAIbsABMQRNKNmCD9DAJJTQsQOsJsgEjQHu02I7kGNn6nHSvSxT78vRt2ZHDRCT0je+pFNlci9tMwczFbRZVKgMxATRMvpf8YyG1xnyOOXNCfQImgMYE0JgAGvUCPy1k/4T6BEwADcvYBXOAL68qHcthGRaq1C+dww2e+gRMAI16ATdncskpvE6+lIZ0LWzVb4z6BEwAjWu14MgqHM/8bLNnVJ+ACaBRL2C7UTQmgIYpOmKSsQO9Sgqv39ln1CdgAmhccueRH3et4GN5G/UJmAAa9QIu/jeC7xNnwLt9m+pxLR/V2d6yXahPwATQfABRGTZIW+9a2QAAAABJRU5ErkJggg==">
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
 
@@ -59,21 +50,11 @@
       min-height: 100vh;
       color: var(--ink);
       background:
-        radial-gradient(
-          circle at 15% 5%,
-          rgba(255, 207, 74, 0.20),
-          transparent 28%
-        ),
-        radial-gradient(
-          circle at 90% 80%,
-          rgba(255, 170, 120, 0.12),
-          transparent 25%
-        ),
+        radial-gradient(circle at 15% 5%, rgba(255, 207, 74, 0.20), transparent 28%),
+        radial-gradient(circle at 90% 80%, rgba(255, 170, 120, 0.12), transparent 25%),
         var(--paper);
       font-family: ui-rounded, "Trebuchet MS", system-ui, sans-serif;
-      transition:
-        background 0.25s ease,
-        color 0.25s ease;
+      transition: background 0.25s ease, color 0.25s ease;
     }
 
     a {
@@ -119,62 +100,54 @@
       line-height: 0.9;
       margin: 0.25rem 0 0;
       letter-spacing: -0.055em;
+      overflow: hidden;
     }
 
-    /* Animated headline */
-
-    .animated-title {
-      display: block;
-      min-height: 1.8em;
-    }
+    /*
+     * ---------------- HEADER TEXT ANIMATION ----------------
+     *
+     * The two lines animate independently when the page loads.
+     */
 
     .title-line {
       display: block;
-      min-height: 0.9em;
-    }
-
-    .title-letter {
-      display: inline-block;
       opacity: 0;
-      transform: translateY(12px) rotate(3deg) scale(0.92);
-      animation: letterPop 0.32s cubic-bezier(.2,.8,.2,1) forwards;
+      transform: translateY(35px);
+      animation: titleReveal 0.75s cubic-bezier(.2,.8,.2,1) forwards;
     }
 
-    .title-space {
-      display: inline-block;
-      width: 0.28em;
+    .title-line:nth-child(1) {
+      animation-delay: 0.08s;
     }
 
-    @keyframes letterPop {
+    .title-line:nth-child(2) {
+      animation-delay: 0.22s;
+    }
+
+    @keyframes titleReveal {
       0% {
         opacity: 0;
-        transform:
-          translateY(12px)
-          rotate(3deg)
-          scale(0.92);
-      }
-
-      70% {
-        opacity: 1;
-        transform:
-          translateY(-3px)
-          rotate(-1deg)
-          scale(1.03);
+        transform: translateY(35px);
       }
 
       100% {
         opacity: 1;
-        transform:
-          translateY(0)
-          rotate(0)
-          scale(1);
+        transform: translateY(0);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .title-line {
+        opacity: 1;
+        transform: none;
+        animation: none;
       }
     }
 
     .header-right {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
     }
 
     .tag {
@@ -189,27 +162,153 @@
       white-space: nowrap;
     }
 
-    .theme-toggle {
-      border: 3px solid var(--line);
-      background: var(--card);
-      color: var(--ink);
-      width: 46px;
-      height: 46px;
-      border-radius: 12px;
-      font-size: 1.2rem;
-      cursor: pointer;
-      display: grid;
-      place-items: center;
-      box-shadow: 4px 4px 0 var(--line);
-      transition:
-        transform 0.15s ease,
-        background 0.2s ease;
+    /* ---------------- THEME SWITCH ---------------- */
+
+    .theme-switch {
+      font-size: 17px;
+      position: relative;
+      display: inline-block;
+      width: 4em;
+      height: 2.2em;
+      flex: 0 0 auto;
     }
 
-    .theme-toggle:hover {
-      background: var(--accent);
-      color: #191919;
-      transform: translate(-2px, -2px);
+    .theme-switch__checkbox {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .theme-switch__container {
+      width: 100%;
+      height: 100%;
+      border-radius: 30px;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      background-color: #f7f1e7;
+      border: 3px solid var(--line);
+      box-shadow: 4px 4px 0 var(--line);
+      transition:
+        background-color 0.4s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+    }
+
+    .theme-switch__clouds {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 60px;
+      height: 12px;
+      transform: translate(-50%, -50%);
+      background: #ffffff;
+      border-radius: 50px;
+      opacity: 0.95;
+      transition: 0.4s ease;
+      box-shadow:
+        -16px 2px 0 3px #ffffff,
+        12px 3px 0 2px #ffffff;
+    }
+
+    .theme-switch__stars-container {
+      position: absolute;
+      inset: 0;
+      color: #ffcf4a;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: 0.4s ease;
+    }
+
+    .theme-switch__stars-container svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .theme-switch__circle-container {
+      position: absolute;
+      top: 50%;
+      left: 0.15em;
+      transform: translateY(-50%);
+      width: 1.7em;
+      height: 1.7em;
+      transition: 0.5s cubic-bezier(.68,-0.55,.27,1.55);
+    }
+
+    .theme-switch__sun-moon-container {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #ffcf4a;
+      display: grid;
+      place-items: center;
+      border: 2px solid var(--line);
+      transition: 0.4s ease;
+      overflow: hidden;
+    }
+
+    .theme-switch__moon {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #e8eef7;
+      position: relative;
+      transform: translateX(100%);
+      transition: 0.4s ease;
+    }
+
+    .theme-switch__spot {
+      position: absolute;
+      border-radius: 50%;
+      background: #cbd5e1;
+    }
+
+    .theme-switch__spot:nth-child(1) {
+      width: 5px;
+      height: 5px;
+      top: 25%;
+      left: 30%;
+    }
+
+    .theme-switch__spot:nth-child(2) {
+      width: 4px;
+      height: 4px;
+      top: 55%;
+      left: 60%;
+    }
+
+    .theme-switch__spot:nth-child(3) {
+      width: 3px;
+      height: 3px;
+      top: 68%;
+      left: 35%;
+    }
+
+    .theme-switch__checkbox:checked + .theme-switch__container {
+      background-color: #0f172a;
+    }
+
+    .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__clouds {
+      opacity: 0;
+      transform: translate(-50%, -50%) translateY(-10px);
+    }
+
+    .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__stars-container {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container {
+      left: calc(100% - 1.85em);
+    }
+
+    .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__sun-moon-container {
+      background: #dbeafe;
+    }
+
+    .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__moon {
+      transform: translateX(0);
     }
 
     /* ---------------- COMMON ---------------- */
@@ -237,9 +336,7 @@
 
     main {
       display: grid;
-      grid-template-columns:
-        minmax(0, 1.35fr)
-        minmax(300px, 0.65fr);
+      grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
       gap: 24px;
       align-items: stretch;
     }
@@ -273,6 +370,35 @@
       letter-spacing: 0.08em;
     }
 
+    /* ---------------- OUTFIT NAME ---------------- */
+
+    .outfit-name-wrap {
+      margin: 0 0 14px;
+      padding: 14px 16px;
+      border: 3px solid var(--line);
+      background: var(--accent);
+      color: #191919;
+      border-radius: 12px;
+      box-shadow: 4px 4px 0 var(--line);
+    }
+
+    .outfit-name-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-weight: 950;
+      opacity: 0.65;
+      margin-bottom: 3px;
+    }
+
+    #outfit-name {
+      margin: 0;
+      font-size: clamp(1.25rem, 3vw, 1.8rem);
+      line-height: 1.05;
+      letter-spacing: -0.035em;
+      font-weight: 1000;
+    }
+
     .image-wrap {
       flex: 1;
       min-height: 540px;
@@ -282,11 +408,7 @@
       border: 3px dashed var(--line);
       border-radius: 14px;
       background:
-        radial-gradient(
-          circle at 50% 45%,
-          rgba(255, 207, 74, 0.15),
-          transparent 42%
-        ),
+        radial-gradient(circle at 50% 45%, rgba(255, 207, 74, 0.15), transparent 42%),
         var(--progress-bg);
       position: relative;
     }
@@ -315,9 +437,7 @@
 
     #chonk-image.changing {
       opacity: 0;
-      transform:
-        scale(0.96)
-        rotate(-2deg);
+      transform: scale(0.96) rotate(-2deg);
     }
 
     .loading {
@@ -328,46 +448,6 @@
       padding: 30px;
       text-align: center;
       color: var(--muted);
-    }
-
-    /* ---------------- OUTFIT NAME ---------------- */
-
-    .outfit-name {
-      margin-top: 18px;
-      border: 3px solid var(--line);
-      background: var(--accent);
-      color: #191919;
-      padding: 17px 18px;
-      box-shadow: 5px 5px 0 var(--line);
-      border-radius: 13px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .outfit-name-label {
-      font-size: 0.65rem;
-      font-weight: 950;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      opacity: 0.65;
-      margin-bottom: 4px;
-    }
-
-    #outfit-name {
-      margin: 0;
-      font-size: clamp(1.25rem, 3vw, 2rem);
-      line-height: 1;
-      letter-spacing: -0.035em;
-      font-weight: 1000;
-      text-transform: uppercase;
-      transition:
-        opacity 0.2s ease,
-        transform 0.2s ease;
-    }
-
-    #outfit-name.changing {
-      opacity: 0;
-      transform: translateY(6px);
     }
 
     /* ---------------- SIDE ---------------- */
@@ -402,13 +482,11 @@
 
     @keyframes pulse {
       0%, 100% {
-        box-shadow:
-          0 0 0 0 rgba(99, 211, 145, 0.45);
+        box-shadow: 0 0 0 0 rgba(99, 211, 145, 0.45);
       }
 
       50% {
-        box-shadow:
-          0 0 0 7px rgba(99, 211, 145, 0);
+        box-shadow: 0 0 0 7px rgba(99, 211, 145, 0);
       }
     }
 
@@ -471,63 +549,80 @@
     }
 
     .trait {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 14px;
-      border: 2px solid var(--line);
-      border-radius: 10px;
-      padding: 10px 11px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      display: block;
+      font-size: 15px;
+      line-height: 15px;
+      padding: 18px 18px 17px;
+      text-decoration: none;
+      cursor: pointer;
       background: var(--progress-bg);
-      transition:
-        background 0.15s ease,
-        transform 0.15s ease,
-        border-color 0.15s ease;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      border-radius: 10px;
+      min-height: 52px;
     }
 
     .trait span:first-child {
-      color: var(--muted);
-      font-weight: 850;
-      font-size: 0.82rem;
+      position: relative;
+      transition:
+        color 600ms cubic-bezier(0.48, 0, 0.12, 1);
+      z-index: 10;
+      font-weight: 950;
     }
 
     .trait span:last-child {
+      color: white;
+      display: block;
+      position: absolute;
+      bottom: 0;
+      transition:
+        all 500ms cubic-bezier(0.48, 0, 0.12, 1);
+      z-index: 100;
+      opacity: 0;
+      top: 50%;
+      left: 50%;
+      transform: translateY(225%) translateX(-50%);
+      height: 14px;
+      line-height: 13px;
       font-weight: 950;
-      text-align: right;
-      font-size: 0.88rem;
+      white-space: nowrap;
     }
 
-    a.trait {
-      text-decoration: none;
-      color: inherit;
-      cursor: pointer;
+    .trait:after {
+      content: "";
+      position: absolute;
+      bottom: -50%;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--accent);
+      transform-origin: bottom center;
+      transition:
+        transform 600ms cubic-bezier(0.48, 0, 0.12, 1);
+      transform: skewY(9.3deg) scaleY(0);
+      z-index: 50;
     }
 
-    a.trait:hover {
-      background: var(--accent);
+    .trait:hover:after {
+      transform-origin: bottom center;
+      transform: skewY(9.3deg) scaleY(2);
+    }
+
+    .trait:hover span:last-child {
       color: #191919;
-      transform: translate(-2px, -2px);
-      box-shadow: 3px 3px 0 var(--line);
-      text-decoration: none;
-    }
-
-    a.trait:hover span:first-child {
-      color: #191919;
-    }
-
-    a.trait .trait-value {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    a.trait .trait-arrow {
-      font-size: 0.85rem;
-      opacity: 0.7;
-    }
-
-    a.trait:hover .trait-arrow {
+      transform: translateX(-50%) translateY(-50%);
       opacity: 1;
+      transition:
+        all 900ms cubic-bezier(0.48, 0, 0.12, 1);
+    }
+
+    .trait:hover span:first-child {
+      color: #191919;
     }
 
     /* ---------------- ABOUT ---------------- */
@@ -694,6 +789,10 @@
         align-items: flex-start;
         flex-direction: column;
       }
+
+      .outfit-name-wrap {
+        padding: 12px 14px;
+      }
     }
   </style>
 </head>
@@ -708,28 +807,64 @@
       <div>
         <div class="eyebrow">Daily Chonk</div>
 
-        <h1 class="animated-title">
-          <span
-            id="animated-title-line-1"
-            class="title-line">
-          </span>
-
-          <span
-            id="animated-title-line-2"
-            class="title-line">
-          </span>
+        <h1>
+          <span class="title-line">A NEW OUTFIT.</span>
+          <span class="title-line">DAILY.</span>
         </h1>
       </div>
 
       <div class="header-right">
 
-        <button
-          class="theme-toggle"
-          id="theme-toggle"
-          title="Toggle light/dark mode"
-          aria-label="Toggle theme">
-          ☾
-        </button>
+        <!-- GALAHHAD THEME SWITCH -->
+
+        <label class="theme-switch">
+
+          <input
+            type="checkbox"
+            class="theme-switch__checkbox"
+            id="theme-checkbox"
+          >
+
+          <div class="theme-switch__container">
+
+            <div class="theme-switch__clouds"></div>
+
+            <div class="theme-switch__stars-container">
+
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 144 55"
+                fill="none"
+              >
+
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 34.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6075 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z"
+                  fill="currentColor"
+                ></path>
+
+              </svg>
+
+            </div>
+
+            <div class="theme-switch__circle-container">
+
+              <div class="theme-switch__sun-moon-container">
+
+                <div class="theme-switch__moon">
+                  <div class="theme-switch__spot"></div>
+                  <div class="theme-switch__spot"></div>
+                  <div class="theme-switch__spot"></div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </label>
 
         <div class="tag">
           ● LIVE · ONCHAIN
@@ -737,7 +872,6 @@
 
       </div>
     </header>
-
 
     <!-- HERO -->
 
@@ -757,12 +891,23 @@
 
         </div>
 
+        <!-- GENERATED OUTFIT NAME -->
+
+        <div class="outfit-name-wrap">
+
+          <div class="outfit-name-label">
+            Today's outfit
+          </div>
+
+          <h2 id="outfit-name">
+            Finding today's fit…
+          </h2>
+
+        </div>
 
         <div class="image-wrap">
 
-          <div
-            id="loading"
-            class="loading">
+          <div id="loading" class="loading">
             Loading today’s outfit…
           </div>
 
@@ -774,23 +919,7 @@
 
         </div>
 
-
-        <!-- GENERATED OUTFIT NAME -->
-
-        <div class="outfit-name">
-
-          <div class="outfit-name-label">
-            Today's Chonk is called
-          </div>
-
-          <h2 id="outfit-name">
-            Naming the fit…
-          </h2>
-
-        </div>
-
       </section>
-
 
       <aside class="side">
 
@@ -811,30 +940,23 @@
 
           </div>
 
-
           <div id="countdown">
             00:00:00
           </div>
-
 
           <div class="countdown-caption">
             The wardrobe rolls again soon.
           </div>
 
-
           <div class="progress">
             <div id="progress"></div>
           </div>
 
-
-          <div
-            id="status"
-            class="status">
+          <div id="status" class="status">
             Syncing with the daily cycle…
           </div>
 
         </section>
-
 
         <!-- TRAITS -->
 
@@ -848,20 +970,11 @@
             Today's traits
           </h2>
 
-          <div
-            id="traits"
-            class="traits">
+          <div id="traits" class="traits">
 
             <div class="trait">
-
-              <span>
-                Status
-              </span>
-
-              <span>
-                Loading…
-              </span>
-
+              <span>Status</span>
+              <span>Loading…</span>
             </div>
 
           </div>
@@ -871,7 +984,6 @@
       </aside>
 
     </main>
-
 
     <!-- ABOUT -->
 
@@ -911,7 +1023,6 @@
 
     </section>
 
-
     <!-- LINKS -->
 
     <div class="links">
@@ -932,7 +1043,6 @@
 
       </a>
 
-
       <a
         class="link-card"
         href="https://x.com/jpegsonbase"
@@ -948,7 +1058,6 @@
         </span>
 
       </a>
-
 
       <a
         class="link-card"
@@ -968,7 +1077,6 @@
 
     </div>
 
-
     <!-- FOOTER -->
 
     <footer>
@@ -978,28 +1086,16 @@
       </span>
 
       <div class="footer-links">
-
-        <span>
-          ERC-6551
-        </span>
-
-        <span>
-          ·
-        </span>
-
-        <span>
-          Daily Chonk
-        </span>
-
+        <span>ERC-6551</span>
+        <span>·</span>
+        <span>Daily Chonk</span>
       </div>
 
     </footer>
 
   </div>
 
-
   <script>
-
     (() => {
 
       const CHONK_ID = 30000;
@@ -1010,10 +1106,7 @@
       const RPC =
         "https://mainnet.base.org";
 
-      /*
-       * Current cycle start
-       */
-
+      // Current cycle start
       const LAST_CHANGE =
         Date.parse("2026-09-06T18:33:04Z");
 
@@ -1023,22 +1116,19 @@
       const TRAIT_PAGE_BASE =
         "https://www.chonks.xyz/traits/";
 
-
       /*
-       * TraitCategory.Name
+       * Trait categories:
        *
-       * None      = 0
-       * Head      = 1
-       * Hair      = 2
-       * Face      = 3
-       * Accessory = 4
-       * Top       = 5
-       * Bottom    = 6
-       * Shoes     = 7
+       * 1 = Head
+       * 2 = Hair
+       * 3 = Face
+       * 4 = Accessory
+       * 5 = Top
+       * 6 = Bottom
+       * 7 = Shoes
        */
 
       const CATEGORY_NUM = {
-
         head: 1,
         hair: 2,
         face: 3,
@@ -1049,34 +1139,7 @@
         pants: 6,
         shoes: 7,
         shoe: 7
-
       };
-
-
-      /*
-       * Map attribute trait_type
-       * to StoredChonk field.
-       */
-
-      const CATEGORY_TO_FIELD = {
-
-        head: "headId",
-        hair: "hairId",
-        face: "faceId",
-        accessory: "accessoryId",
-        top: "topId",
-        bottoms: "bottomId",
-        bottom: "bottomId",
-        pants: "bottomId",
-        shoes: "shoesId",
-        shoe: "shoesId"
-
-      };
-
-
-      /*
-       * Contract ABI
-       */
 
       const abi = [
 
@@ -1088,7 +1151,6 @@
 
       ];
 
-
       const provider =
         new ethers.JsonRpcProvider(RPC);
 
@@ -1098,11 +1160,6 @@
           abi,
           provider
         );
-
-
-      /*
-       * DOM elements
-       */
 
       const image =
         document.getElementById("chonk-image");
@@ -1122,114 +1179,16 @@
       const statusEl =
         document.getElementById("status");
 
-      const themeToggle =
-        document.getElementById("theme-toggle");
+      const themeCheckbox =
+        document.getElementById("theme-checkbox");
 
       const outfitNameEl =
         document.getElementById("outfit-name");
 
 
-      /* ==================================================
-       * ANIMATED HEADER
-       * ================================================== */
-
-      function animateHeadline() {
-
-        const line1 =
-          document.getElementById(
-            "animated-title-line-1"
-          );
-
-        const line2 =
-          document.getElementById(
-            "animated-title-line-2"
-          );
-
-
-        const text1 =
-          "A NEW OUTFIT.";
-
-        const text2 =
-          "EVERY DAY.";
-
-
-        line1.innerHTML = "";
-        line2.innerHTML = "";
-
-
-        function addLetters(
-          element,
-          text,
-          startDelay
-        ) {
-
-          let delay = startDelay;
-
-          [...text].forEach(char => {
-
-            if (char === " ") {
-
-              const space =
-                document.createElement("span");
-
-              space.className =
-                "title-space";
-
-              element.appendChild(space);
-
-              delay += 45;
-
-              return;
-            }
-
-
-            const letter =
-              document.createElement("span");
-
-            letter.className =
-              "title-letter";
-
-            letter.textContent =
-              char;
-
-            letter.style.animationDelay =
-              `${delay}ms`;
-
-            element.appendChild(letter);
-
-            delay += 55;
-
-          });
-
-
-          return delay;
-
-        }
-
-
-        const finish =
-          addLetters(
-            line1,
-            text1,
-            100
-          );
-
-
-        addLetters(
-          line2,
-          text2,
-          finish + 100
-        );
-
-      }
-
-
-      animateHeadline();
-
-
-      /* ==================================================
-       * LOCAL STORAGE
-       * ================================================== */
+      // --------------------------------------------------
+      // LOCAL STORAGE
+      // --------------------------------------------------
 
       function getStoredTheme() {
 
@@ -1259,18 +1218,16 @@
 
         } catch (e) {
 
-          /*
-           * Ignore restricted environments.
-           */
+          // Ignore restricted environments
 
         }
 
       }
 
 
-      /* ==================================================
-       * THEME
-       * ================================================== */
+      // --------------------------------------------------
+      // THEME
+      // --------------------------------------------------
 
       function applyTheme(theme) {
 
@@ -1279,10 +1236,8 @@
           theme
         );
 
-        themeToggle.textContent =
-          theme === "dark"
-            ? "☀"
-            : "☾";
+        themeCheckbox.checked =
+          theme === "dark";
 
         setStoredTheme(theme);
 
@@ -1292,31 +1247,26 @@
       const savedTheme =
         getStoredTheme() || "light";
 
-
       applyTheme(savedTheme);
 
 
-      themeToggle.addEventListener(
-        "click",
+      themeCheckbox.addEventListener(
+        "change",
         () => {
 
-          const current =
-            document.documentElement
-              .getAttribute("data-theme");
-
           applyTheme(
-            current === "dark"
-              ? "light"
-              : "dark"
+            themeCheckbox.checked
+              ? "dark"
+              : "light"
           );
 
         }
       );
 
 
-      /* ==================================================
-       * HELPERS
-       * ================================================== */
+      // --------------------------------------------------
+      // HELPERS
+      // --------------------------------------------------
 
       function decodeDataUri(uri) {
 
@@ -1324,18 +1274,14 @@
           return uri;
         }
 
-
         const comma =
           uri.indexOf(",");
-
 
         const meta =
           uri.slice(0, comma);
 
-
         const data =
           uri.slice(comma + 1);
-
 
         return meta.includes(";base64")
           ? atob(data)
@@ -1361,9 +1307,9 @@
       }
 
 
-      /* ==================================================
-       * TRAIT LINKS
-       * ================================================== */
+      // --------------------------------------------------
+      // TRAIT SLUG
+      // --------------------------------------------------
 
       function traitSlug(value) {
 
@@ -1388,24 +1334,19 @@
             .toLowerCase()
             .replace(/[^a-z]/g, "");
 
-
         const category =
           CATEGORY_NUM[key];
-
 
         if (!category) {
           return null;
         }
 
-
         const slug =
           traitSlug(value);
-
 
         if (!slug) {
           return null;
         }
-
 
         return (
           `${TRAIT_PAGE_BASE}` +
@@ -1416,618 +1357,56 @@
       }
 
 
-      /* ==================================================
-       * OUTFIT NAME GENERATOR
-       *
-       * IMPORTANT:
-       *
-       * Only these are used:
-       *
-       * TOP
-       * HEAD
-       * FACE
-       * ACCESSORY
-       *
-       * Bottoms and shoes are deliberately ignored.
-       * ================================================== */
+      // --------------------------------------------------
+      // OUTFIT NAME GENERATOR
+      // --------------------------------------------------
 
-
-      function cleanTrait(value) {
+      function cleanTraitName(value) {
 
         return String(value || "")
           .trim()
-          .toLowerCase();
+          .replace(/\s+/g, " ");
 
       }
 
 
-      /*
-       * Simple deterministic hash.
-       *
-       * This means:
-       *
-       * Same traits = same name
-       *
-       * Different traits = usually different name.
-       */
+      function getTraitPart(
+        attrs,
+        wantedType
+      ) {
 
-      function hashString(str) {
+        const found =
+          attrs.find(a => {
 
-        let hash = 2166136261;
+            const type =
+              String(
+                a.trait_type || ""
+              )
+                .trim()
+                .toLowerCase();
 
+            return type === wantedType;
 
-        for (let i = 0; i < str.length; i++) {
+          });
 
-          hash ^= str.charCodeAt(i);
-
-          hash +=
-            (hash << 1) +
-            (hash << 4) +
-            (hash << 7) +
-            (hash << 8) +
-            (hash << 24);
-
-        }
-
-
-        return hash >>> 0;
+        return found
+          ? cleanTraitName(found.value)
+          : "";
 
       }
 
 
-      function pick(array, seed) {
+      function simplifyTrait(value) {
 
-        return array[
-          seed % array.length
-        ];
+        if (!value) return "";
 
-      }
-
-
-      /*
-       * Detect colours from trait names.
-       */
-
-      function detectColor(traits) {
-
-        const colors = [
-
-          ["pink", "Pink"],
-          ["blue", "Blue"],
-          ["green", "Green"],
-          ["red", "Red"],
-          ["orange", "Orange"],
-          ["yellow", "Yellow"],
-          ["purple", "Purple"],
-          ["violet", "Violet"],
-          ["black", "Black"],
-          ["white", "White"],
-          ["grey", "Grey"],
-          ["gray", "Grey"],
-          ["brown", "Brown"],
-          ["gold", "Golden"],
-          ["silver", "Silver"],
-          ["cream", "Cream"],
-          ["beige", "Beige"]
-
-        ];
-
-
-        const combined =
-          traits
-            .filter(Boolean)
-            .join(" ")
-            .toLowerCase();
-
-
-        for (const [key, value] of colors) {
-
-          if (combined.includes(key)) {
-            return value;
-          }
-
-        }
-
-
-        return null;
+        return value
+          .replace(/\b(color|colours?)\b/gi, "")
+          .replace(/\s+/g, " ")
+          .trim();
 
       }
 
-
-      /*
-       * Find a recognisable accessory.
-       */
-
-      function accessoryWord(accessory) {
-
-        const value =
-          cleanTrait(accessory);
-
-
-        if (!value) {
-          return null;
-        }
-
-
-        const rules = [
-
-          {
-            words: ["bird", "duck", "chicken", "pigeon"],
-            result: "Bird"
-          },
-
-          {
-            words: ["flower", "rose", "tulip", "daisy"],
-            result: "Flower"
-          },
-
-          {
-            words: ["sword", "blade"],
-            result: "Blade"
-          },
-
-          {
-            words: ["cigar", "cigarette", "smoke"],
-            result: "Smoker"
-          },
-
-          {
-            words: ["pipe"],
-            result: "Pipe"
-          },
-
-          {
-            words: ["chain", "necklace"],
-            result: "Chain"
-          },
-
-          {
-            words: ["earring", "earrings"],
-            result: "Earring"
-          },
-
-          {
-            words: ["bow", "ribbon"],
-            result: "Bow"
-          },
-
-          {
-            words: ["bag", "backpack"],
-            result: "Bag"
-          },
-
-          {
-            words: ["camera"],
-            result: "Camera"
-          },
-
-          {
-            words: ["star"],
-            result: "Star"
-          },
-
-          {
-            words: ["heart"],
-            result: "Heart"
-          },
-
-          {
-            words: ["balloon"],
-            result: "Balloon"
-          },
-
-          {
-            words: ["flower"],
-            result: "Flower"
-          },
-
-          {
-            words: ["halo"],
-            result: "Halo"
-          }
-
-        ];
-
-
-        for (const rule of rules) {
-
-          if (
-            rule.words.some(
-              word =>
-                value.includes(word)
-            )
-          ) {
-
-            return rule.result;
-
-          }
-
-        }
-
-
-        /*
-         * Generic fallback.
-         *
-         * Remove numbers and common filler words.
-         */
-
-        const ignored = new Set([
-
-          "01",
-          "02",
-          "03",
-          "04",
-          "05",
-          "06",
-          "07",
-          "08",
-          "09",
-          "10",
-          "the",
-          "a",
-          "an",
-          "accessory"
-
-        ]);
-
-
-        const words =
-          value
-            .replace(/[0-9]+/g, "")
-            .split(/\s+/)
-            .filter(
-              word =>
-                word &&
-                !ignored.has(word)
-            );
-
-
-        if (!words.length) {
-          return null;
-        }
-
-
-        const word =
-          words[words.length - 1];
-
-
-        return (
-          word.charAt(0).toUpperCase() +
-          word.slice(1)
-        );
-
-      }
-
-
-      /*
-       * Identify the vibe of the face.
-       */
-
-      function faceVibe(face) {
-
-        const value =
-          cleanTrait(face);
-
-
-        if (!value) {
-          return "Mystery";
-
-        }
-
-
-        if (
-          value.includes("glass") ||
-          value.includes("shade") ||
-          value.includes("spectacle")
-        ) {
-
-          return pick(
-            [
-              "Dreamer",
-              "Visionary",
-              "Cool Cat",
-              "Lookout"
-            ],
-            hashString(value)
-          );
-
-        }
-
-
-        if (
-          value.includes("mask")
-        ) {
-
-          return pick(
-            [
-              "Bandit",
-              "Outlaw",
-              "Mystery",
-              "Rogue"
-            ],
-            hashString(value)
-          );
-
-        }
-
-
-        if (
-          value.includes("smile") ||
-          value.includes("happy")
-        ) {
-
-          return "Happy";
-
-        }
-
-
-        if (
-          value.includes("sad") ||
-          value.includes("frown")
-        ) {
-
-          return "Mope";
-
-        }
-
-
-        if (
-          value.includes("angry") ||
-          value.includes("mad")
-        ) {
-
-          return "Menace";
-
-        }
-
-
-        return pick(
-          [
-            "Dreamer",
-            "Maverick",
-            "Legend",
-            "Wildcard",
-            "Character"
-          ],
-          hashString(value)
-        );
-
-      }
-
-
-      /*
-       * Identify the headwear vibe.
-       */
-
-      function headVibe(head) {
-
-        const value =
-          cleanTrait(head);
-
-
-        if (!value) {
-          return null;
-        }
-
-
-        if (
-          value.includes("cap") ||
-          value.includes("baseball")
-        ) {
-
-          return pick(
-            [
-              "Cap",
-              "Captain",
-              "Ballplayer",
-              "Rookie"
-            ],
-            hashString(value)
-          );
-
-        }
-
-
-        if (
-          value.includes("crown")
-        ) {
-
-          return pick(
-            [
-              "Royal",
-              "King",
-              "Boss",
-              "Monarch"
-            ],
-            hashString(value)
-          );
-
-        }
-
-
-        if (
-          value.includes("beanie")
-        ) {
-
-          return "Beanie";
-
-        }
-
-
-        if (
-          value.includes("helmet")
-        ) {
-
-          return "Helmet Hero";
-
-        }
-
-
-        if (
-          value.includes("hat")
-        ) {
-
-          return pick(
-            [
-              "Hat",
-              "Hatter",
-              "Headliner"
-            ],
-            hashString(value)
-          );
-
-        }
-
-
-        if (
-          value.includes("hood")
-        ) {
-
-          return "Hood";
-
-        }
-
-
-        return null;
-
-      }
-
-
-      /*
-       * Identify the top style.
-       */
-
-      function topVibe(top) {
-
-        const value =
-          cleanTrait(top);
-
-
-        if (!value) {
-          return null;
-        }
-
-
-        if (
-          value.includes("dress")
-        ) {
-
-          return pick(
-            [
-              "Diva",
-              "Duchess",
-              "Showstopper",
-              "Star"
-            ],
-            hashString(value)
-          );
-
-        }
-
-
-        if (
-          value.includes("suit") ||
-          value.includes("tux")
-        ) {
-
-          return pick(
-            [
-              "Boss",
-              "Gentleman",
-              "Executive",
-              "Big Shot"
-            ],
-            hashString(value)
-          );
-
-        }
-
-
-        if (
-          value.includes("hoodie") ||
-          value.includes("hood")
-        ) {
-
-          return pick(
-            [
-              "Hoodlum",
-              "Rebel",
-              "Street Boss",
-              "Wildcard"
-            ],
-            hashString(value)
-          );
-
-        }
-
-
-        if (
-          value.includes("jacket")
-        ) {
-
-          return pick(
-            [
-              "Rocker",
-              "Racer",
-              "Rebel",
-              "Troublemaker"
-            ],
-            hashString(value)
-          );
-
-        }
-
-
-        if (
-          value.includes("shirt") ||
-          value.includes("tee")
-        ) {
-
-          return pick(
-            [
-              "Daydreamer",
-              "Trendsetter",
-              "Weekend Hero",
-              "Local Legend"
-            ],
-            hashString(value)
-          );
-
-        }
-
-
-        if (
-          value.includes("coat")
-        ) {
-
-          return pick(
-            [
-              "Detective",
-              "Drifter",
-              "Night Walker",
-              "Gentleman"
-            ],
-            hashString(value)
-          );
-
-        }
-
-
-        return null;
-
-      }
-
-
-      /*
-       * Main outfit-name generator.
-       *
-       * ONLY:
-       *
-       * top
-       * head
-       * face
-       * accessory
-       */
 
       function generateOutfitName(
         top,
@@ -2036,291 +1415,181 @@
         accessory
       ) {
 
-        const traits = [
+        top =
+          simplifyTrait(top);
 
-          cleanTrait(top),
-          cleanTrait(head),
-          cleanTrait(face),
-          cleanTrait(accessory)
+        head =
+          simplifyTrait(head);
 
-        ].filter(Boolean);
+        face =
+          simplifyTrait(face);
+
+        accessory =
+          simplifyTrait(accessory);
 
 
-        if (!traits.length) {
+        const words = [
+          top,
+          head,
+          face,
+          accessory
+        ]
+          .filter(Boolean);
 
-          return "THE MYSTERY CHONK";
 
+        if (!words.length) {
+          return "The Daily Chonk";
         }
 
 
-        const seedString =
-          traits.join("|");
-
-
-        const seed =
-          hashString(seedString);
-
-
-        const color =
-          detectColor(traits);
-
-
-        const accessoryName =
-          accessoryWord(accessory);
-
-
-        const faceName =
-          faceVibe(face);
-
-
-        const headName =
-          headVibe(head);
-
-
-        const topName =
-          topVibe(top);
-
-
-        /*
-         * Build a list of names that make
-         * contextual sense.
-         *
-         * We don't simply concatenate every
-         * trait because that can create silly
-         * names.
-         */
-
-        const names = [];
+        const lower =
+          words.join(" ").toLowerCase();
 
 
         if (
-          color &&
-          accessoryName
+          lower.includes("3d glasses") &&
+          lower.includes("baseball cap")
         ) {
 
-          names.push(
-            `THE ${color.toUpperCase()} ${accessoryName.toUpperCase()}`
-          );
-
-
-          names.push(
-            `THE ${accessoryName.toUpperCase()} IN ${color.toUpperCase()}`
-          );
-
-
-          names.push(
-            `${color.toUpperCase()} ${accessoryName.toUpperCase()}`
-          );
+          return accessory
+            ? `${accessory} Street Legend`
+            : "The Street Legend";
 
         }
 
 
         if (
-          accessoryName &&
-          faceName
+          lower.includes("dress") &&
+          lower.includes("glasses")
         ) {
 
-          names.push(
-            `THE ${accessoryName.toUpperCase()} ${faceName.toUpperCase()}`
-          );
+          return head
+            ? `${head} After Dark`
+            : "After Dark";
 
         }
 
 
         if (
-          headName &&
-          accessoryName
+          lower.includes("shag") &&
+          lower.includes("dress")
         ) {
 
-          names.push(
-            `THE ${headName.toUpperCase()} ${accessoryName.toUpperCase()}`
-          );
+          return "The Shaggy Icon";
 
         }
 
 
-        if (
-          topName &&
-          accessoryName
+        let hash = 0;
+
+        const source =
+          [
+            top,
+            head,
+            face,
+            accessory
+          ]
+            .join("|")
+            .toLowerCase();
+
+
+        for (
+          let i = 0;
+          i < source.length;
+          i++
         ) {
 
-          names.push(
-            `THE ${topName.toUpperCase()} WITH THE ${accessoryName.toUpperCase()}`
-          );
+          hash =
+            (
+              (hash << 5) -
+              hash +
+              source.charCodeAt(i)
+            ) |
+            0;
 
         }
 
 
-        if (
-          color &&
-          topName
-        ) {
+        const styles = [
 
-          names.push(
-            `THE ${color.toUpperCase()} ${topName.toUpperCase()}`
-          );
+          () =>
+            top
+              ? `The ${top} Rebel`
+              : `The Chonk Rebel`,
 
-        }
+          () =>
+            head
+              ? `${head} Energy`
+              : `Chonk Energy`,
 
+          () =>
+            face
+              ? `The ${face} Icon`
+              : `The Daily Icon`,
 
-        if (
-          headName &&
-          faceName
-        ) {
+          () =>
+            accessory
+              ? `${accessory} After Hours`
+              : `After Hours`,
 
-          names.push(
-            `THE ${headName.toUpperCase()} ${faceName.toUpperCase()}`
-          );
+          () =>
+            top && head
+              ? `${head} in ${top}`
+              : `The Daily Fit`,
 
-        }
+          () =>
+            accessory && face
+              ? `${accessory} & ${face}`
+              : `The Chonk Look`,
 
+          () =>
+            head && accessory
+              ? `${head} ${accessory} Club`
+              : `The Chonk Club`,
 
-        if (faceName) {
+          () =>
+            top && accessory
+              ? `${accessory} in ${top}`
+              : `Today's Main Character`
 
-          names.push(
-            `THE ${faceName.toUpperCase()}`
-          );
-
-        }
-
-
-        if (topName) {
-
-          names.push(
-            `THE ${topName.toUpperCase()}`
-          );
-
-        }
-
-
-        if (accessoryName) {
-
-          names.push(
-            `THE ${accessoryName.toUpperCase()}`
-          );
-
-        }
-
-
-        /*
-         * Generic fallback based on the actual
-         * trait names if none of our recognisers
-         * matched.
-         */
-
-        if (!names.length) {
-
-          const meaningful =
-            traits
-              .map(value => {
-
-                const words =
-                  value
-                    .replace(/[0-9]+/g, "")
-                    .split(/\s+/)
-                    .filter(Boolean);
-
-                return words[words.length - 1];
-
-              })
-              .filter(Boolean);
-
-
-          if (meaningful.length) {
-
-            const word =
-              meaningful[
-                seed % meaningful.length
-              ];
-
-
-            return (
-              "THE " +
-              word
-                .charAt(0)
-                .toUpperCase() +
-              word
-                .slice(1)
-                .toUpperCase()
-            );
-
-          }
-
-
-          return "THE MYSTERY CHONK";
-
-        }
-
-
-        return names[
-          seed % names.length
         ];
+
+
+        const index =
+          Math.abs(hash) %
+          styles.length;
+
+
+        return styles[index]();
 
       }
 
 
-      /*
-       * Update generated name.
-       */
-
       function updateOutfitName(attrs) {
 
-        /*
-         * IMPORTANT:
-         *
-         * We intentionally only read:
-         *
-         * Top
-         * Head
-         * Face
-         * Accessory
-         *
-         * Shoes and Bottom are NOT passed
-         * into the generator.
-         */
+        const top =
+          getTraitPart(
+            attrs,
+            "top"
+          );
 
-        let top = "";
-        let head = "";
-        let face = "";
-        let accessory = "";
+        const head =
+          getTraitPart(
+            attrs,
+            "head"
+          );
 
+        const face =
+          getTraitPart(
+            attrs,
+            "face"
+          );
 
-        attrs.forEach(attribute => {
-
-          const type =
-            String(
-              attribute.trait_type || ""
-            )
-              .trim()
-              .toLowerCase();
-
-
-          const value =
-            String(
-              attribute.value || ""
-            ).trim();
-
-
-          if (type === "top") {
-            top = value;
-          }
-
-
-          if (type === "head") {
-            head = value;
-          }
-
-
-          if (type === "face") {
-            face = value;
-          }
-
-
-          if (type === "accessory") {
-            accessory = value;
-          }
-
-        });
+        const accessory =
+          getTraitPart(
+            attrs,
+            "accessory"
+          );
 
 
         const name =
@@ -2332,54 +1601,19 @@
           );
 
 
-        outfitNameEl.classList.add(
-          "changing"
-        );
-
-
-        setTimeout(() => {
-
-          outfitNameEl.textContent =
-            name;
-
-          requestAnimationFrame(() => {
-
-            outfitNameEl.classList.remove(
-              "changing"
-            );
-
-          });
-
-        }, 160);
-
-
-        console.log(
-          "[Daily Chonk] Outfit name:",
-          name
-        );
-
-
-        console.log(
-          "[Daily Chonk] Naming traits:",
-          {
-            top,
-            head,
-            face,
-            accessory
-          }
-        );
+        outfitNameEl.textContent =
+          name;
 
       }
 
 
-      /* ==================================================
-       * TRAITS DISPLAY
-       * ================================================== */
+      // --------------------------------------------------
+      // SHOW TRAITS
+      // --------------------------------------------------
 
       function showTraits(json) {
 
         traitsEl.innerHTML = "";
-
 
         const attrs =
           Array.isArray(json.attributes)
@@ -2387,30 +1621,16 @@
             : [];
 
 
-        /*
-         * Generate the outfit name from
-         * the currently equipped traits.
-         */
-
         updateOutfitName(attrs);
 
 
         if (!attrs.length) {
 
           traitsEl.innerHTML = `
-
             <div class="trait">
-
-              <span>
-                Source
-              </span>
-
-              <span>
-                Onchain
-              </span>
-
+              <span>Source</span>
+              <span>Onchain</span>
             </div>
-
           `;
 
           return;
@@ -2421,11 +1641,13 @@
         attrs.forEach(a => {
 
           const type =
-            a.trait_type ?? "Trait";
-
+            a.trait_type ??
+            "Trait";
 
           const value =
-            String(a.value ?? "—");
+            String(
+              a.value ?? "—"
+            );
 
 
           const href =
@@ -2433,15 +1655,6 @@
               type,
               value
             );
-
-
-          console.log(
-            "[Daily Chonk] trait row",
-            type,
-            value,
-            "→",
-            href || "(no link)"
-          );
 
 
           if (href) {
@@ -2471,21 +1684,13 @@
 
 
             link.innerHTML = `
+              <span>
+                ${escapeHtml(value)}
+              </span>
 
               <span>
-                ${escapeHtml(type)}
+                Buy Trait
               </span>
-
-              <span class="trait-value">
-
-                ${escapeHtml(value)}
-
-                <span class="trait-arrow">
-                  ↗
-                </span>
-
-              </span>
-
             `;
 
 
@@ -2501,8 +1706,11 @@
               "trait";
 
 
-            row.innerHTML = `
+            row.style.cursor =
+              "default";
 
+
+            row.innerHTML = `
               <span>
                 ${escapeHtml(type)}
               </span>
@@ -2510,8 +1718,15 @@
               <span>
                 ${escapeHtml(value)}
               </span>
-
             `;
+
+
+            row.style.overflow =
+              "visible";
+
+
+            row.style.background =
+              "var(--progress-bg)";
 
 
             traitsEl.appendChild(row);
@@ -2523,9 +1738,9 @@
       }
 
 
-      /* ==================================================
-       * LOAD CHONK
-       * ================================================== */
+      // --------------------------------------------------
+      // LOAD CHONK
+      // --------------------------------------------------
 
       async function loadChonk() {
 
@@ -2535,30 +1750,31 @@
             uri,
             svgUri,
             chonk
-          ] = await Promise.all([
+          ] =
+            await Promise.all([
 
-            contract.tokenURI(
-              CHONK_ID
-            ),
+              contract.tokenURI(
+                CHONK_ID
+              ),
 
-            contract.renderAsDataUri2D(
-              CHONK_ID
-            ),
+              contract.renderAsDataUri2D(
+                CHONK_ID
+              ),
 
-            contract
-              .getChonk(CHONK_ID)
-              .catch(err => {
+              contract
+                .getChonk(CHONK_ID)
+                .catch(err => {
 
-                console.error(
-                  "[Daily Chonk] getChonk failed",
-                  err
-                );
+                  console.error(
+                    "[Daily Chonk] getChonk failed",
+                    err
+                  );
 
-                return null;
+                  return null;
 
-              })
+                })
 
-          ]);
+            ]);
 
 
           const sourceUri =
@@ -2579,11 +1795,15 @@
 
 
             metadata =
-              JSON.parse(decoded);
+              JSON.parse(
+                decoded
+              );
 
 
             imageUri =
-              metadata.image || null;
+              metadata.image ||
+              null;
+
 
           } catch (_) {
 
@@ -2610,10 +1830,6 @@
           }
 
 
-          /*
-           * Animate outfit refresh.
-           */
-
           image.classList.add(
             "changing"
           );
@@ -2624,10 +1840,8 @@
             image.src =
               imageUri;
 
-
             image.hidden =
               false;
-
 
             loading.hidden =
               true;
@@ -2644,16 +1858,14 @@
           }, 220);
 
 
-          /*
-           * Display traits and generate
-           * the outfit name.
-           */
-
-          showTraits(metadata);
+          showTraits(
+            metadata
+          );
 
 
           statusEl.textContent =
             "Live — refreshing directly from the Base chain.";
+
 
         } catch (err) {
 
@@ -2669,28 +1881,24 @@
 
 
           traitsEl.innerHTML = `
-
             <div class="error">
-
               Could not fetch on-chain data.
               Please try again in a moment.
-
             </div>
-
           `;
 
 
           outfitNameEl.textContent =
-            "THE MYSTERY CHONK";
+            "Today's Chonk";
 
         }
 
       }
 
 
-      /* ==================================================
-       * COUNTDOWN
-       * ================================================== */
+      // --------------------------------------------------
+      // COUNTDOWN
+      // --------------------------------------------------
 
       let lastRemaining =
         Infinity;
@@ -2703,63 +1911,71 @@
 
 
         let elapsed =
-          (now - LAST_CHANGE) % CYCLE;
+          (
+            now -
+            LAST_CHANGE
+          ) %
+          CYCLE;
 
 
         if (elapsed < 0) {
 
-          elapsed += CYCLE;
+          elapsed +=
+            CYCLE;
 
         }
 
 
         const remaining =
-          CYCLE - elapsed;
+          CYCLE -
+          elapsed;
 
 
         const h =
           Math.floor(
-            remaining / 3600000
+            remaining /
+            3600000
           );
 
 
         const m =
           Math.floor(
-            (remaining % 3600000) /
+            (
+              remaining %
+              3600000
+            ) /
             60000
           );
 
 
         const s =
           Math.floor(
-            (remaining % 60000) /
+            (
+              remaining %
+              60000
+            ) /
             1000
           );
 
 
         countdownEl.textContent =
-
           `${String(h).padStart(2, "0")}:` +
-
           `${String(m).padStart(2, "0")}:` +
-
           `${String(s).padStart(2, "0")}`;
 
 
         progressEl.style.width =
-          `${(elapsed / CYCLE) * 100}%`;
+          `${(
+            elapsed /
+            CYCLE
+          ) * 100}%`;
 
-
-        /*
-         * Detect new daily cycle.
-         */
 
         if (
-
-          remaining > lastRemaining &&
-
-          lastRemaining < 5000
-
+          remaining >
+            lastRemaining &&
+          lastRemaining <
+            5000
         ) {
 
           loadChonk();
@@ -2771,13 +1987,17 @@
           remaining;
 
 
-        if (remaining < 60000) {
+        if (
+          remaining <
+          60000
+        ) {
 
           statusEl.textContent =
             "The wardrobe is about to roll…";
 
         } else if (
-          remaining < 3600000
+          remaining <
+          3600000
         ) {
 
           statusEl.textContent =
@@ -2793,18 +2013,14 @@
       }
 
 
-      /* ==================================================
-       * INITIAL LOAD
-       * ================================================== */
+      // --------------------------------------------------
+      // INITIAL LOAD
+      // --------------------------------------------------
 
       loadChonk();
 
       tick();
 
-
-      /*
-       * Update countdown every second.
-       */
 
       setInterval(
         tick,
@@ -2812,21 +2028,12 @@
       );
 
 
-      /*
-       * Check the chain every minute.
-       *
-       * This means if the outfit changes,
-       * the name changes too.
-       */
-
       setInterval(
         loadChonk,
         60000
       );
 
-
     })();
-
   </script>
 
 </body>
