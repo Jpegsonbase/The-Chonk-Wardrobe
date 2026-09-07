@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Chonk 30000 — Daily Wardrobe</title>
+  <meta name="description" content="A live wardrobe display for Chonk #30000." />
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
+  <style>
+    :root {
+      --ink:#191919; --paper:#f7f1e7; --card:#fffaf1;
+      --line:#191919; --accent:#ffcf4a; --muted:#6d665d;
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0; min-height:100vh; color:var(--ink);
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255,207,74,.45), transparent 28%),
+        radial-gradient(circle at 90% 80%, rgba(255,170,120,.3), transparent 25%),
+        var(--paper);
+      font-family: ui-rounded, "Trebuchet MS", system-ui, sans-serif;
+    }
+    .wrap { width:min(1080px, calc(100% - 32px)); margin:auto; padding:38px 0 60px; }
+    header { display:flex; justify-content:space-between; gap:20px; align-items:end; margin-bottom:26px; }
+    .eyebrow { font-weight:900; letter-spacing:.14em; text-transform:uppercase; font-size:.78rem; }
+    h1 { font-size:clamp(2.3rem,7vw,5.8rem); line-height:.88; margin:.2rem 0 0; letter-spacing:-.07em; }
+    .tag { border:3px solid var(--line); padding:10px 14px; background:var(--accent); font-weight:900; box-shadow:5px 5px 0 var(--line); }
+    main { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr); gap:24px; }
+    .card { border:3px solid var(--line); background:var(--card); box-shadow:8px 8px 0 var(--line); border-radius:18px; }
+    .chonk-card { padding:22px; min-height:650px; display:flex; flex-direction:column; }
+    .image-wrap { flex:1; min-height:520px; display:grid; place-items:center; overflow:hidden; border:3px dashed var(--line); border-radius:14px; background:#fff; }
+    #chonk-image { width:min(100%,620px); height:auto; image-rendering:auto; }
+    .loading { font-weight:900; font-size:1.1rem; padding:30px; text-align:center; }
+    .side { display:flex; flex-direction:column; gap:24px; }
+    .timer-card { padding:26px; }
+    .label { color:var(--muted); text-transform:uppercase; font-weight:900; letter-spacing:.12em; font-size:.75rem; }
+    #countdown { font-variant-numeric:tabular-nums; font-size:clamp(2.5rem,6vw,4.8rem); font-weight:1000; letter-spacing:-.06em; margin:8px 0 18px; }
+    .progress { height:16px; border:3px solid var(--line); border-radius:99px; overflow:hidden; background:#fff; }
+    #progress { width:0%; height:100%; background:var(--accent); transition:width .5s linear; }
+    .status { margin-top:14px; font-weight:800; }
+    .details { padding:24px; }
+    .details h2 { margin:0 0 16px; font-size:1.5rem; }
+    .traits { display:grid; gap:10px; }
+    .trait { display:flex; justify-content:space-between; gap:14px; border-top:2px solid #d8d0c4; padding-top:10px; }
+    .trait span:first-child { color:var(--muted); font-weight:800; }
+    .trait span:last-child { font-weight:950; text-align:right; }
+    footer { margin-top:34px; color:var(--muted); font-size:.9rem; display:flex; justify-content:space-between; gap:15px; flex-wrap:wrap; }
+    a { color:inherit; font-weight:900; }
+    .error { padding:24px; color:#8b1e1e; font-weight:900; }
+    @media (max-width:820px) {
+      header { align-items:start; flex-direction:column; }
+      main { grid-template-columns:1fr; }
+      .chonk-card { min-height:0; }
+      .image-wrap { min-height:360px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">The Chonk Wardrobe</div>
+      <h1>CHONK<br>#30000</h1>
+    </div>
+    <div class="tag">LIVE • ONCHAIN</div>
+  </header>
+
+  <main>
+    <section class="card chonk-card">
+      <div id="loading" class="loading">Fetching Chonk 30000…</div>
+      <div class="image-wrap">
+        <img id="chonk-image" alt="Chonk #30000" hidden />
+      </div>
+    </section>
+
+    <aside class="side">
+      <section class="card timer-card">
+        <div class="label">Next wardrobe change</div>
+        <div id="countdown">24:00:00</div>
+        <div class="progress"><div id="progress"></div></div>
+        <div id="status" class="status">Waiting for the wardrobe clock…</div>
+      </section>
+
+      <section class="card details">
+        <h2>Today's fit</h2>
+        <div id="traits" class="traits">
+          <div class="trait"><span>Status</span><span>Loading…</span></div>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <footer>
+    <span>Chonk #30000 is read directly from the Base blockchain.</span>
+    <span><a href="https://www.chonks.xyz/chonks/30000" target="_blank" rel="noopener">Open on Chonks ↗</a></span>
+  </footer>
+</div>
+
+<script>
+(() => {
+  const CHONK_ID = 30000;
+  const CONTRACT = "0x07152bfde079b5319e5308c43fb1dbc9c76cb4f9";
+  const RPC = "https://mainnet.base.org";
+
+  // Set this to the exact timestamp (milliseconds) when your bot last changed
+  // the outfit. The site then counts down in 24-hour cycles.
+  // Example: const LAST_CHANGE = Date.parse("2026-09-07T00:00:00Z");
+  const LAST_CHANGE = Date.parse("2026-09-07T00:00:00Z");
+  const CYCLE = 24 * 60 * 60 * 1000;
+
+  const abi = [
+    "function tokenURI(uint256) view returns (string)",
+    "function renderAsDataUri2D(uint256) view returns (string)"
+  ];
+
+  const provider = new ethers.JsonRpcProvider(RPC);
+  const contract = new ethers.Contract(CONTRACT, abi, provider);
+
+  const image = document.getElementById("chonk-image");
+  const loading = document.getElementById("loading");
+  const traitsEl = document.getElementById("traits");
+  const countdownEl = document.getElementById("countdown");
+  const progressEl = document.getElementById("progress");
+  const statusEl = document.getElementById("status");
+
+  function decodeDataUri(uri) {
+    if (!uri.startsWith("data:")) return uri;
+    const comma = uri.indexOf(",");
+    const meta = uri.slice(0, comma);
+    const data = uri.slice(comma + 1);
+    return meta.includes(";base64") ? atob(data) : decodeURIComponent(data);
+  }
+
+  function showTraits(json) {
+    traitsEl.innerHTML = "";
+    const attrs = Array.isArray(json.attributes) ? json.attributes : [];
+    if (!attrs.length) {
+      traitsEl.innerHTML = '<div class="trait"><span>Metadata</span><span>Onchain</span></div>';
+      return;
+    }
+    attrs.forEach(a => {
+      const row = document.createElement("div");
+      row.className = "trait";
+      row.innerHTML = `<span>${escapeHtml(a.trait_type ?? "Trait")}</span><span>${escapeHtml(String(a.value ?? "—"))}</span>`;
+      traitsEl.appendChild(row);
+    });
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  }
+
+  async function loadChonk() {
+    try {
+      // tokenURI is the canonical NFT metadata source. The 2D renderer is
+      // used directly from the Chonks contract, so no image-host dependency
+      // is required.
+      const [uri, svgUri] = await Promise.all([
+        contract.tokenURI(CHONK_ID),
+        contract.renderAsDataUri2D(CHONK_ID)
+      ]);
+
+      let metadata = {};
+      try { metadata = JSON.parse(decodeDataUri(uri)); } catch (_) {}
+
+      const imageUri = svgUri || metadata.image;
+      if (imageUri) {
+        image.src = imageUri;
+        image.hidden = false;
+        loading.hidden = true;
+      }
+
+      showTraits(metadata);
+      statusEl.textContent = "Live — checking the chain every 60 seconds.";
+    } catch (err) {
+      console.error(err);
+      loading.textContent = "Couldn't load Chonk 30000.";
+      statusEl.textContent = "Check the browser console and your RPC connection.";
+      traitsEl.innerHTML = '<div class="error">The blockchain request failed. Try again in a moment.</div>';
+    }
+  }
+
+  function tick() {
+    const now = Date.now();
+    let elapsed = (now - LAST_CHANGE) % CYCLE;
+    if (elapsed < 0) elapsed += CYCLE;
+
+    const remaining = CYCLE - elapsed;
+    const h = Math.floor(remaining / 3600000);
+    const m = Math.floor((remaining % 3600000) / 60000);
+    const s = Math.floor((remaining % 60000) / 1000);
+    countdownEl.textContent =
+      `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+
+    const pct = (elapsed / CYCLE) * 100;
+    progressEl.style.width = `${pct}%`;
+    statusEl.textContent = remaining < 60000
+      ? "Wardrobe change imminent…"
+      : "Next outfit change is on the clock.";
+  }
+
+  loadChonk();
+  tick();
+  setInterval(tick, 1000);
+
+  // Re-read the onchain image/metadata periodically so a wardrobe change
+  // made by the bot is reflected without refreshing the page.
+  setInterval(loadChonk, 60000);
+})();
+</script>
+</body>
+</html>
