@@ -5,7 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Daily Chonk</title>
   <meta name="description" content="Live onchain wardrobe — a new outfit daily." />
+
+  <!-- Favicon (your Chonk) -->
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAABAElEQVR4nO2asQ3CMBBF75CrMAIbsABMQRNKNmCD9DAJJTQsQOsJsgEjQHu02I7kGNn6nHSvSxT78vRt2ZHDRCT0je+pFNlci9tMwczFbRZVKgMxATRMvpf8YyG1xnyOOXNCfQImgMYE0JgAGvUCPy1k/4T6BEwADcvYBXOAL68qHcthGRaq1C+dww2e+gRMAI16ATdncskpvE6+lIZ0LWzVb4z6BEwAjWu14MgqHM/8bLNnVJ+ACaBRL2C7UTQmgIYpOmKSsQO9Sgqv39ln1CdgAmhccueRH3et4GN5G/UJmAAa9QIu/jeC7xNnwLt9m+pxLR/V2d6yXahPwATQfABRGTZIW+9a2QAAAABJRU5ErkJggg==">
+
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
+
   <style>
     :root {
       --ink: #191919;
@@ -14,6 +19,17 @@
       --line: #191919;
       --accent: #ffcf4a;
       --muted: #6d665d;
+      --progress-bg: #ffffff;
+    }
+
+    [data-theme="dark"] {
+      --ink: #e8eef7;
+      --paper: #0f172a;
+      --card: #1e293b;
+      --line: #334155;
+      --accent: #ffcf4a;
+      --muted: #94a3b8;
+      --progress-bg: #0f172a;
     }
 
     * {
@@ -25,10 +41,11 @@
       min-height: 100vh;
       color: var(--ink);
       background:
-        radial-gradient(circle at 20% 10%, rgba(255, 207, 74, 0.45), transparent 28%),
-        radial-gradient(circle at 90% 80%, rgba(255, 170, 120, 0.3), transparent 25%),
+        radial-gradient(circle at 20% 10%, rgba(255, 207, 74, 0.18), transparent 28%),
+        radial-gradient(circle at 90% 80%, rgba(255, 170, 120, 0.12), transparent 25%),
         var(--paper);
       font-family: ui-rounded, "Trebuchet MS", system-ui, sans-serif;
+      transition: background 0.25s ease, color 0.25s ease;
     }
 
     .wrap {
@@ -60,15 +77,42 @@
       letter-spacing: -0.04em;
     }
 
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
     .tag {
       border: 3px solid var(--line);
       padding: 10px 14px;
       background: var(--accent);
+      color: #191919;
       font-weight: 900;
       font-size: 0.85rem;
       letter-spacing: 0.04em;
       box-shadow: 5px 5px 0 var(--line);
       white-space: nowrap;
+    }
+
+    .theme-toggle {
+      border: 3px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      box-shadow: 4px 4px 0 var(--line);
+      transition: background 0.2s ease;
+    }
+
+    .theme-toggle:hover {
+      background: var(--accent);
+      color: #191919;
     }
 
     main {
@@ -82,6 +126,7 @@
       background: var(--card);
       box-shadow: 8px 8px 0 var(--line);
       border-radius: 18px;
+      transition: background 0.25s ease, border-color 0.25s ease;
     }
 
     .chonk-card {
@@ -99,7 +144,7 @@
       overflow: hidden;
       border: 3px dashed var(--line);
       border-radius: 14px;
-      background: #fff;
+      background: var(--progress-bg);
     }
 
     #chonk-image {
@@ -148,7 +193,7 @@
       border: 3px solid var(--line);
       border-radius: 99px;
       overflow: hidden;
-      background: #fff;
+      background: var(--progress-bg);
     }
 
     #progress {
@@ -184,7 +229,7 @@
       display: flex;
       justify-content: space-between;
       gap: 14px;
-      border-top: 2px solid #d8d0c4;
+      border-top: 2px solid var(--line);
       padding-top: 10px;
     }
 
@@ -228,7 +273,7 @@
 
     .error {
       padding: 8px 0;
-      color: #8b1e1e;
+      color: #f87171;
       font-weight: 900;
       font-size: 0.95rem;
     }
@@ -275,7 +320,12 @@
         <div class="eyebrow">Daily Chonk</div>
         <h1>A NEW OUTFIT DAILY</h1>
       </div>
-      <div class="tag">Live · Onchain</div>
+      <div class="header-right">
+        <button class="theme-toggle" id="theme-toggle" title="Toggle light/dark mode" aria-label="Toggle theme">
+          ☾
+        </button>
+        <div class="tag">Live · Onchain</div>
+      </div>
     </header>
 
     <main>
@@ -333,10 +383,6 @@
       const CONTRACT = "0x07152bfde079b5319e5308c43fb1dbc9c76cb4f9";
       const RPC = "https://mainnet.base.org";
 
-      /*
-        Set so that ~44 minutes remain from now (2026-09-07 ~17:49 UTC).
-        Next change ≈ 18:33 UTC.
-      */
       const LAST_CHANGE = Date.parse("2026-09-06T18:33:00Z");
       const CYCLE = 24 * 60 * 60 * 1000;
 
@@ -354,7 +400,41 @@
       const countdownEl = document.getElementById("countdown");
       const progressEl = document.getElementById("progress");
       const statusEl = document.getElementById("status");
+      const themeToggle = document.getElementById("theme-toggle");
 
+      // ---------- Safe localStorage helpers ----------
+      function getStoredTheme() {
+        try {
+          return localStorage.getItem("chonk-theme");
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function setStoredTheme(theme) {
+        try {
+          localStorage.setItem("chonk-theme", theme);
+        } catch (e) {
+          // Sandboxed environment – just ignore
+        }
+      }
+
+      // ---------- Theme ----------
+      function applyTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        themeToggle.textContent = theme === "dark" ? "☀" : "☾";
+        setStoredTheme(theme);
+      }
+
+      const savedTheme = getStoredTheme() || "light";
+      applyTheme(savedTheme);
+
+      themeToggle.addEventListener("click", () => {
+        const current = document.documentElement.getAttribute("data-theme");
+        applyTheme(current === "dark" ? "light" : "dark");
+      });
+
+      // ---------- Helpers ----------
       function decodeDataUri(uri) {
         if (!uri.startsWith("data:")) return uri;
         const comma = uri.indexOf(",");
@@ -403,7 +483,6 @@
             contract.renderAsDataUri2D(CHONK_ID)
           ]);
 
-          // Prefer the forced 2D render
           const sourceUri = svgUri || uri;
           let metadata = {};
           let imageUri = null;
@@ -467,10 +546,7 @@
       loadChonk();
       tick();
 
-      // Countdown every second
       setInterval(tick, 1000);
-
-      // Re-read the chain every 60 seconds
       setInterval(loadChonk, 60000);
     })();
   </script>
