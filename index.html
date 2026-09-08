@@ -3,47 +3,56 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Daily Chonk</title>
-  <meta name="description" content="Daily Chonk — an onchain experiment. A new outfit every 24 hours." />
 
-  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAABAElEQVR4nO2asQ3CMBBF75CrMAIbsABMQRNKNmCD9DAJJTQsQOsJsgEjQHu02I7kGNn6nHSvSxT78vRt2ZHDRCT0je+pFNlci9tMwczFbRZVKgMxATRMvpf8YyG1xnyOOXNCfQImgMYE0JgAGvUCPy1k/4T6BEwADcvYBXOAL68qHcthGRaq1C+dww2e+gRMAI16ATdncskpvE6+lIZ0LWzVb4z6BEwAjWu14MgqHM/8bLNnVJ+ACaBRL2C7UTQmgIYpOmKSsQO9Sgqv39ln1CdgAmhccueRH3et4GN5G/UJmAAa9QIu/jeC7xNnwLt9m+pxLR/V2d6yXahPwATQfABRGTZIW+9a2QAAAABJRU5ErkJggg==">
+  <title>Daily Chonk</title>
+
+  <meta
+    name="description"
+    content="Daily Chonk — an onchain experiment. A new outfit every 24 hours."
+  />
+
+  <link
+    rel="icon"
+    type="image/png"
+    href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAABAElEQVR4nO2asQ3CMBBF75CrMAIbsABMQRNKNmCD9DAJJTQsQOsJsgEjQHu02I7kGNn6nHSvSxT78vRt2ZHDRCT0je+pFNlci9tMwczFbRZVKgMxATRMvpf8YyG1xnyOOXNCfQImgMYE0JgAGvUCPy1k/4T6BEwADcvYBXOAL68qHcthGRaq1C+dww2e+gRMAI16ATdncskpvE6+lIZ0LWzVb4z6BEwAjWu14MgqHM/8bLNnVJ+ACaBRL2C7UTQmgIYpOmKSsQO9Sgqv39ln1CdgAmhccueRH3et4GN5G/UJmAAa9QIu/jeC7xNnwLt9m+pxLR/V2d6yXahPwATQfABRGTZIW+9a2QAAAABJRU5ErkJggg=="
+  >
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
 
- <style>
-  :root {
-    --ink: #191919;
-    --paper: #f7f1e7;
-    --card: #fffaf1;
-    --line: #191919;
-    --accent: #ffcf4a;
-    --accent-soft: #ffe9a3;
-    --muted: #6d665d;
-    --progress-bg: #ffffff;
-    --green: #63d391;
+  <style>
 
-    /* Background image opacity */
-    --pattern-opacity: 0.03;
+    :root {
+      --ink: #191919;
+      --paper: #f7f1e7;
+      --card: #fffaf1;
+      --line: #191919;
+      --accent: #ffcf4a;
+      --accent-soft: #ffe9a3;
+      --muted: #6d665d;
+      --progress-bg: #ffffff;
+      --green: #63d391;
 
-    --shadow: 8px 8px 0 var(--line);
-  }
+      --shadow: 8px 8px 0 var(--line);
+    }
 
-  [data-theme="dark"] {
-    --ink: #e8eef7;
-    --paper: #0f172a;
-    --card: #1e293b;
-    --line: #334155;
-    --accent: #ffcf4a;
-    --accent-soft: #493d18;
-    --muted: #94a3b8;
-    --progress-bg: #0f172a;
-    --green: #63d391;
 
-    /* Background image opacity in dark mode */
-    --pattern-opacity: 0.6;
+    /* =========================================================
+       DARK THEME
+       ========================================================= */
 
-    --shadow: 8px 8px 0 var(--line);
-  }
+    [data-theme="dark"] {
+      --ink: #e8eef7;
+      --paper: #0f172a;
+      --card: #1e293b;
+      --line: #334155;
+      --accent: #ffcf4a;
+      --accent-soft: #493d18;
+      --muted: #94a3b8;
+      --progress-bg: #0f172a;
+      --green: #63d391;
+
+      --shadow: 8px 8px 0 var(--line);
+    }
 
 
     /* =========================================================
@@ -69,18 +78,7 @@
 
       color: var(--ink);
 
-      background:
-        radial-gradient(
-          circle at 15% 5%,
-          rgba(255, 207, 74, 0.20),
-          transparent 28%
-        ),
-        radial-gradient(
-          circle at 90% 80%,
-          rgba(255, 170, 120, 0.12),
-          transparent 25%
-        ),
-        var(--paper);
+      background: var(--paper);
 
       font-family:
         ui-rounded,
@@ -95,13 +93,18 @@
 
 
     /* =========================================================
-       BACKGROUND IMAGE
+       BACKGROUND PNG
        =========================================================
-       
-       IMPORTANT:
-       Put background.png in the same folder as index.html.
 
-       The image is displayed as a 1000px x 1000px tile.
+       Put background.png in the SAME folder as index.html.
+
+       The PNG repeats evenly in a perfect grid.
+
+       Each tile is exactly:
+       1000px x 1000px
+
+       Opacity affects ONLY the PNG.
+       It does NOT change the PNG's colour.
        ========================================================= */
 
     body::before {
@@ -117,17 +120,15 @@
 
       background-repeat: repeat;
 
-      /* EXACTLY 1000px x 1000px */
       background-size: 1000px 1000px;
 
       background-position: center top;
 
-      /* Clearly visible */
-      opacity: 0.58;
+      /* PNG transparency */
+      opacity: 0.10;
 
       transition:
-        opacity 0.3s ease,
-        filter 0.3s ease;
+        opacity 0.3s ease;
     }
 
 
@@ -136,21 +137,24 @@
        ========================================================= */
 
     [data-theme="dark"] body::before {
-      /*
-       * Converts the original image toward a
-       * dark blue / grey appearance.
-       */
-      filter:
-        brightness(0.48)
-        saturate(0.65)
-        hue-rotate(175deg);
+      background-image: url("./background.png");
 
-      opacity: 0.52;
+      background-repeat: repeat;
+
+      background-size: 1000px 1000px;
+
+      background-position: center top;
+
+      /* Subtle in dark mode */
+      opacity: 0.08;
+
+      /* No colour shifting */
+      filter: none;
     }
 
 
     /* =========================================================
-       BACKGROUND OVERLAY
+       NO BACKGROUND OVERLAY
        ========================================================= */
 
     body::after {
@@ -162,22 +166,15 @@
       z-index: 0;
       pointer-events: none;
 
-      background:
-        rgba(247, 241, 231, 0.08);
-
-      transition:
-        background 0.25s ease;
+      background: transparent;
     }
 
     [data-theme="dark"] body::after {
-      background:
-        rgba(15, 23, 42, 0.25);
+      background: transparent;
     }
 
 
-    /*
-     * Everything else sits above the background.
-     */
+    /* Everything sits above the background */
 
     .wrap {
       position: relative;
@@ -468,7 +465,8 @@
       background-color: #0f172a;
     }
 
-    .theme-switch__checkbox:checked + .theme-switch__container
+    .theme-switch__checkbox:checked
+    + .theme-switch__container
     .theme-switch__clouds {
       opacity: 0;
 
@@ -477,23 +475,27 @@
         translateY(-10px);
     }
 
-    .theme-switch__checkbox:checked + .theme-switch__container
+    .theme-switch__checkbox:checked
+    + .theme-switch__container
     .theme-switch__stars-container {
       opacity: 1;
       transform: translateY(0);
     }
 
-    .theme-switch__checkbox:checked + .theme-switch__container
+    .theme-switch__checkbox:checked
+    + .theme-switch__container
     .theme-switch__circle-container {
       left: calc(100% - 1.85em);
     }
 
-    .theme-switch__checkbox:checked + .theme-switch__container
+    .theme-switch__checkbox:checked
+    + .theme-switch__container
     .theme-switch__sun-moon-container {
       background: #dbeafe;
     }
 
-    .theme-switch__checkbox:checked + .theme-switch__container
+    .theme-switch__checkbox:checked
+    + .theme-switch__container
     .theme-switch__moon {
       transform: translateX(0);
     }
@@ -1171,7 +1173,6 @@
       .links {
         grid-template-columns: 1fr;
       }
-
     }
 
 
@@ -1217,7 +1218,6 @@
         padding:
           12px 14px;
       }
-
     }
 
   </style>
@@ -1227,6 +1227,7 @@
 <body>
 
   <div class="wrap">
+
 
     <!-- =====================================================
          HEADER
