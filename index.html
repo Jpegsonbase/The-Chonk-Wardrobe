@@ -1646,7 +1646,6 @@
 
         "function renderAsDataUri2D(uint256) view returns (string)",
 
-        "function getChonk(uint256) view returns (tuple(uint256 tokenId, uint256 headId, uint256 hairId, uint256 faceId, uint256 accessoryId, uint256 topId, uint256 bottomId, uint256 shoesId, uint8 bodyIndex, string backgroundColor, bool render3D))"
 
       ];
 
@@ -2263,35 +2262,20 @@
         try {
 
           const [
-            uri,
-            svgUri,
-            chonk
-          ] =
-            await Promise.all([
+  uri,
+  svgUri
+] =
+  await Promise.all([
 
-              contract.tokenURI(
-                CHONK_ID
-              ),
+    contract.tokenURI(
+      CHONK_ID
+    ),
 
-              contract.renderAsDataUri2D(
-                CHONK_ID
-              ),
+    contract.renderAsDataUri2D(
+      CHONK_ID
+    )
 
-              contract
-                .getChonk(CHONK_ID)
-                .catch(err => {
-
-                  console.error(
-                    "[Daily Chonk] getChonk failed",
-                    err
-                  );
-
-                  return null;
-
-                })
-
-            ]);
-
+  ]);
 
           const sourceUri =
             svgUri || uri;
@@ -2540,12 +2524,6 @@
       setInterval(
         tick,
         1000
-      );
-
-
-      setInterval(
-        loadChonk,
-        60000
       );
 
     })();
