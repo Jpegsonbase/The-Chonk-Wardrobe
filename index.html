@@ -3,39 +3,72 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Daily Chonk</title>
-  <meta name="description" content="Daily Chonk — an onchain experiment. A new outfit every 24 hours." />
 
-  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAABAElEQVR4nO2asQ3CMBBF75CrMAIbsABMQRNKNmCD9DAJJTQsQOsJsgEjQHu02I7kGNn6nHSvSxT78vRt2ZHDRCT0je+pFNlci9tMwczFbRZVKgMxATRMvpf8YyG1xnyOOXNCfQImgMYE0JgAGvUCPy1k/4T6BEwADcvYBXOAL68qHcthGRaq1C+dww2e+gRMAI16ATdncskpvE6+lIZ0LWzVb4z6BEwAjWu14MgqHM/8bLNnVJ+ACaBRL2C7UTQmgIYpOmKSsQO9Sgqv39ln1CdgAmhccueRH3et4GN5G/UJmAAa9QIu/jeC7xNnwLt9m+pxLR/V2d6yXahPwATQfABRGTZIW+9a2QAAAABJRU5ErkJggg==">
+  <title>Daily Chonk</title>
+
+  <meta
+    name="description"
+    content="Daily Chonk — an onchain experiment. A new outfit every 24 hours."
+  />
+
+  <link
+    rel="icon"
+    type="image/png"
+    href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAABAElEQVR4nO2asQ3CMBBF75CrMAIbsABMQRNKNmCD9DAJJTQsQOsJsgEjQHu02I7kGNn6nHSvSxT78vRt2ZHDRCT0je+pFNlci9tMwczFbRZVKgMxATRMvpf8YyG1xnyOOXNCfQImgMYE0JgAGvUCPy1k/4T6BEwADcvYBXOAL68qHcthGRaq1C+dww2e+gRMAI16ATdncskpvE6+lIZ0LWzVb4z6BEwAjWu14MgqHM/8bLNnVJ+ACaBRL2C7UTQmgIYpOmKSsQO9Sgqv39ln1CdgAmhccueRH3et4GN5G/UJmAAa9QIu/jeC7xNnwLt9m+pxLR/V2d6yXahPwATQfABRGTZIW+9a2QAAAABJRU5ErkJggg=="
+  >
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
 
   <style>
+
+    /* =========================================================
+       THEME
+       ========================================================= */
+
     :root {
       --ink: #191919;
       --paper: #f7f1e7;
-      --card: #fffaf1;
+      --card: rgba(255, 250, 241, 0.91);
       --line: #191919;
+
       --accent: #ffcf4a;
       --accent-soft: #ffe9a3;
+
       --muted: #6d665d;
       --progress-bg: #ffffff;
       --green: #63d391;
+
+      /*
+       * The background is intentionally quite visible.
+       */
+      --background-opacity: 0.50;
+
       --shadow: 8px 8px 0 var(--line);
     }
+
 
     [data-theme="dark"] {
       --ink: #e8eef7;
       --paper: #0f172a;
-      --card: #1e293b;
+      --card: rgba(30, 41, 59, 0.91);
       --line: #334155;
+
       --accent: #ffcf4a;
       --accent-soft: #493d18;
+
       --muted: #94a3b8;
       --progress-bg: #0f172a;
       --green: #63d391;
+
+      --background-opacity: 0.56;
+
       --shadow: 8px 8px 0 var(--line);
     }
+
+
+    /* =========================================================
+       RESET
+       ========================================================= */
 
     * {
       box-sizing: border-box;
@@ -45,17 +78,125 @@
       scroll-behavior: smooth;
     }
 
+
+    /* =========================================================
+       BODY
+       ========================================================= */
+
     body {
       margin: 0;
       min-height: 100vh;
+
       color: var(--ink);
-      background:
-        radial-gradient(circle at 15% 5%, rgba(255, 207, 74, 0.20), transparent 28%),
-        radial-gradient(circle at 90% 80%, rgba(255, 170, 120, 0.12), transparent 25%),
-        var(--paper);
-      font-family: ui-rounded, "Trebuchet MS", system-ui, sans-serif;
-      transition: background 0.25s ease, color 0.25s ease;
+      background: var(--paper);
+
+      font-family:
+        ui-rounded,
+        "Trebuchet MS",
+        system-ui,
+        sans-serif;
+
+      transition:
+        background 0.25s ease,
+        color 0.25s ease;
     }
+
+
+    /* =========================================================
+       UPLOADED CHONK BACKGROUND
+       ========================================================= */
+
+    body::before {
+      content: "";
+
+      position: fixed;
+      inset: 0;
+
+      z-index: 0;
+      pointer-events: none;
+
+      background-image:
+        url("chonk-background-1024.jpg");
+
+      background-repeat: repeat;
+
+      /*
+       * Your uploaded image is 1024x1024.
+       * 512px makes the individual Chonks clearly visible
+       * without overwhelming the page.
+       */
+      background-size: 512px 512px;
+      background-position: center top;
+
+      opacity: var(--background-opacity);
+
+      transition:
+        opacity 0.3s ease,
+        filter 0.3s ease;
+    }
+
+
+    /* =========================================================
+       DARK MODE BACKGROUND
+       ========================================================= */
+
+    [data-theme="dark"] body::before {
+      /*
+       * Turn the original orange/gold Chonks into
+       * blue / blue-grey while retaining the pixel art.
+       */
+      filter:
+        grayscale(0.55)
+        hue-rotate(155deg)
+        saturate(0.80)
+        brightness(0.55)
+        contrast(1.20);
+    }
+
+
+    /*
+     * Very light overlay.
+     *
+     * This is deliberately subtle so the background
+     * remains clearly visible.
+     */
+
+    body::after {
+      content: "";
+
+      position: fixed;
+      inset: 0;
+
+      z-index: 0;
+      pointer-events: none;
+
+      background:
+        rgba(247, 241, 231, 0.06);
+
+      transition:
+        background 0.25s ease;
+    }
+
+
+    [data-theme="dark"] body::after {
+      background:
+        rgba(15, 23, 42, 0.18);
+    }
+
+
+    /*
+     * Everything sits above the background.
+     */
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+    }
+
+
+    /* =========================================================
+       LINKS
+       ========================================================= */
 
     a {
       color: inherit;
@@ -71,19 +212,28 @@
       font-family: inherit;
     }
 
+
+    /* =========================================================
+       WRAPPER
+       ========================================================= */
+
     .wrap {
       width: min(1120px, calc(100% - 32px));
       margin: auto;
       padding: 34px 0 70px;
     }
 
-    /* ---------------- HEADER ---------------- */
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
 
     header {
       display: flex;
       justify-content: space-between;
       gap: 24px;
       align-items: end;
+
       margin-bottom: 22px;
     }
 
@@ -91,29 +241,40 @@
       font-weight: 950;
       letter-spacing: 0.16em;
       text-transform: uppercase;
+
       font-size: 0.75rem;
+
       color: var(--muted);
     }
 
     h1 {
       font-size: clamp(2.2rem, 6vw, 4.5rem);
+
       line-height: 0.9;
+
       margin: 0.25rem 0 0;
+
       letter-spacing: -0.055em;
+
       overflow: hidden;
     }
 
-    /*
-     * ---------------- HEADER TEXT ANIMATION ----------------
-     *
-     * The two lines animate independently when the page loads.
-     */
+
+    /* =========================================================
+       HEADER ANIMATION
+       ========================================================= */
 
     .title-line {
       display: block;
+
       opacity: 0;
+
       transform: translateY(35px);
-      animation: titleReveal 0.75s cubic-bezier(.2,.8,.2,1) forwards;
+
+      animation:
+        titleReveal 0.75s
+        cubic-bezier(.2,.8,.2,1)
+        forwards;
     }
 
     .title-line:nth-child(1) {
@@ -125,6 +286,7 @@
     }
 
     @keyframes titleReveal {
+
       0% {
         opacity: 0;
         transform: translateY(35px);
@@ -134,14 +296,17 @@
         opacity: 1;
         transform: translateY(0);
       }
+
     }
 
     @media (prefers-reduced-motion: reduce) {
+
       .title-line {
         opacity: 1;
         transform: none;
         animation: none;
       }
+
     }
 
     .header-right {
@@ -150,46 +315,76 @@
       gap: 16px;
     }
 
+
+    /* =========================================================
+       LIVE TAG
+       ========================================================= */
+
     .tag {
       border: 3px solid var(--line);
+
       padding: 10px 14px;
+
       background: var(--accent);
       color: #191919;
+
       font-weight: 950;
       font-size: 0.82rem;
+
       letter-spacing: 0.04em;
-      box-shadow: 5px 5px 0 var(--line);
+
+      box-shadow:
+        5px 5px 0 var(--line);
+
       white-space: nowrap;
     }
 
-    /* ---------------- THEME SWITCH ---------------- */
+
+    /* =========================================================
+       THEME SWITCH
+       ========================================================= */
 
     .theme-switch {
       font-size: 17px;
+
       position: relative;
+
       display: inline-block;
+
       width: 4em;
       height: 2.2em;
+
       flex: 0 0 auto;
     }
 
     .theme-switch__checkbox {
       opacity: 0;
+
       width: 0;
       height: 0;
+
       position: absolute;
     }
 
     .theme-switch__container {
       width: 100%;
       height: 100%;
+
       border-radius: 30px;
+
       overflow: hidden;
+
       cursor: pointer;
+
       position: relative;
+
       background-color: #f7f1e7;
+
       border: 3px solid var(--line);
-      box-shadow: 4px 4px 0 var(--line);
+
+      box-shadow:
+        4px 4px 0 var(--line);
+
       transition:
         background-color 0.4s ease,
         border-color 0.25s ease,
@@ -198,15 +393,24 @@
 
     .theme-switch__clouds {
       position: absolute;
+
       top: 50%;
       left: 50%;
+
       width: 60px;
       height: 12px;
-      transform: translate(-50%, -50%);
+
+      transform:
+        translate(-50%, -50%);
+
       background: #ffffff;
+
       border-radius: 50px;
+
       opacity: 0.95;
+
       transition: 0.4s ease;
+
       box-shadow:
         -16px 2px 0 3px #ffffff,
         12px 3px 0 2px #ffffff;
@@ -215,9 +419,14 @@
     .theme-switch__stars-container {
       position: absolute;
       inset: 0;
+
       color: #ffcf4a;
+
       opacity: 0;
-      transform: translateY(10px);
+
+      transform:
+        translateY(10px);
+
       transition: 0.4s ease;
     }
 
@@ -228,45 +437,66 @@
 
     .theme-switch__circle-container {
       position: absolute;
+
       top: 50%;
       left: 0.15em;
-      transform: translateY(-50%);
+
+      transform:
+        translateY(-50%);
+
       width: 1.7em;
       height: 1.7em;
-      transition: 0.5s cubic-bezier(.68,-0.55,.27,1.55);
+
+      transition:
+        0.5s cubic-bezier(.68,-0.55,.27,1.55);
     }
 
     .theme-switch__sun-moon-container {
       width: 100%;
       height: 100%;
+
       border-radius: 50%;
+
       background: #ffcf4a;
+
       display: grid;
       place-items: center;
+
       border: 2px solid var(--line);
+
       transition: 0.4s ease;
+
       overflow: hidden;
     }
 
     .theme-switch__moon {
       width: 100%;
       height: 100%;
+
       border-radius: 50%;
+
       background: #e8eef7;
+
       position: relative;
-      transform: translateX(100%);
+
+      transform:
+        translateX(100%);
+
       transition: 0.4s ease;
     }
 
     .theme-switch__spot {
       position: absolute;
+
       border-radius: 50%;
+
       background: #cbd5e1;
     }
 
     .theme-switch__spot:nth-child(1) {
       width: 5px;
       height: 5px;
+
       top: 25%;
       left: 30%;
     }
@@ -274,6 +504,7 @@
     .theme-switch__spot:nth-child(2) {
       width: 4px;
       height: 4px;
+
       top: 55%;
       left: 60%;
     }
@@ -281,43 +512,72 @@
     .theme-switch__spot:nth-child(3) {
       width: 3px;
       height: 3px;
+
       top: 68%;
       left: 35%;
     }
 
-    .theme-switch__checkbox:checked + .theme-switch__container {
+    .theme-switch__checkbox:checked
+    + .theme-switch__container {
       background-color: #0f172a;
     }
 
-    .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__clouds {
+    .theme-switch__checkbox:checked
+    + .theme-switch__container
+    .theme-switch__clouds {
       opacity: 0;
-      transform: translate(-50%, -50%) translateY(-10px);
+
+      transform:
+        translate(-50%, -50%)
+        translateY(-10px);
     }
 
-    .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__stars-container {
+    .theme-switch__checkbox:checked
+    + .theme-switch__container
+    .theme-switch__stars-container {
       opacity: 1;
-      transform: translateY(0);
+
+      transform:
+        translateY(0);
     }
 
-    .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container {
+    .theme-switch__checkbox:checked
+    + .theme-switch__container
+    .theme-switch__circle-container {
       left: calc(100% - 1.85em);
     }
 
-    .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__sun-moon-container {
+    .theme-switch__checkbox:checked
+    + .theme-switch__container
+    .theme-switch__sun-moon-container {
       background: #dbeafe;
     }
 
-    .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__moon {
-      transform: translateX(0);
+    .theme-switch__checkbox:checked
+    + .theme-switch__container
+    .theme-switch__moon {
+      transform:
+        translateX(0);
     }
 
-    /* ---------------- COMMON ---------------- */
+
+    /* =========================================================
+       CARDS
+       ========================================================= */
 
     .card {
       border: 3px solid var(--line);
+
+      /*
+       * Slight transparency lets the background integrate
+       * with the UI without hurting readability.
+       */
       background: var(--card);
+
       box-shadow: var(--shadow);
+
       border-radius: 18px;
+
       transition:
         background 0.25s ease,
         border-color 0.25s ease;
@@ -325,136 +585,228 @@
 
     .section-kicker {
       color: var(--muted);
+
       text-transform: uppercase;
+
       font-weight: 950;
+
       letter-spacing: 0.13em;
+
       font-size: 0.7rem;
+
       margin-bottom: 5px;
     }
 
-    /* ---------------- HERO ---------------- */
+
+    /* =========================================================
+       HERO
+       ========================================================= */
 
     main {
       display: grid;
-      grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+
+      grid-template-columns:
+        minmax(0, 1.35fr)
+        minmax(300px, 0.65fr);
+
       gap: 24px;
+
       align-items: stretch;
     }
 
     .chonk-card {
       padding: 20px;
+
       min-height: 690px;
+
       display: flex;
+
       flex-direction: column;
+
       position: relative;
+
       overflow: hidden;
     }
 
     .hero-top {
       display: flex;
+
       align-items: center;
+
       justify-content: space-between;
+
       gap: 12px;
+
       margin-bottom: 14px;
     }
 
     .today-pill {
       border: 2px solid var(--line);
+
       background: var(--accent);
       color: #191919;
+
       padding: 7px 10px;
+
       border-radius: 999px;
+
       font-size: 0.72rem;
+
       font-weight: 950;
+
       text-transform: uppercase;
+
       letter-spacing: 0.08em;
     }
 
-    /* ---------------- OUTFIT NAME ---------------- */
+
+    /* =========================================================
+       OUTFIT NAME
+       ========================================================= */
 
     .outfit-name-wrap {
       margin: 0 0 14px;
+
       padding: 14px 16px;
+
       border: 3px solid var(--line);
+
       background: var(--accent);
+
       color: #191919;
+
       border-radius: 12px;
-      box-shadow: 4px 4px 0 var(--line);
+
+      box-shadow:
+        4px 4px 0 var(--line);
     }
 
     .outfit-name-label {
       font-size: 0.65rem;
+
       text-transform: uppercase;
+
       letter-spacing: 0.14em;
+
       font-weight: 950;
+
       opacity: 0.65;
+
       margin-bottom: 3px;
     }
 
     #outfit-name {
       margin: 0;
-      font-size: clamp(1.25rem, 3vw, 1.8rem);
+
+      font-size:
+        clamp(1.25rem, 3vw, 1.8rem);
+
       line-height: 1.05;
+
       letter-spacing: -0.035em;
+
       font-weight: 1000;
     }
 
+
+    /* =========================================================
+       IMAGE
+       ========================================================= */
+
     .image-wrap {
       flex: 1;
+
       min-height: 540px;
+
       display: grid;
+
       place-items: center;
+
       overflow: hidden;
+
       border: 3px dashed var(--line);
+
       border-radius: 14px;
+
       background:
-        radial-gradient(circle at 50% 45%, rgba(255, 207, 74, 0.15), transparent 42%),
+        radial-gradient(
+          circle at 50% 45%,
+          rgba(255, 207, 74, 0.15),
+          transparent 42%
+        ),
         var(--progress-bg);
+
       position: relative;
     }
 
     .image-wrap::after {
       content: "ONCHAIN";
+
       position: absolute;
+
       bottom: 12px;
       right: 14px;
+
       font-size: 0.62rem;
+
       font-weight: 950;
+
       letter-spacing: 0.14em;
+
       color: var(--muted);
+
       pointer-events: none;
     }
 
     #chonk-image {
       width: min(100%, 650px);
+
       max-height: 580px;
+
       height: auto;
+
       image-rendering: pixelated;
+
       transition:
         opacity 0.35s ease,
-        transform 0.45s cubic-bezier(.2,.8,.2,1);
+        transform 0.45s
+        cubic-bezier(.2,.8,.2,1);
     }
 
     #chonk-image.changing {
       opacity: 0;
-      transform: scale(0.96) rotate(-2deg);
+
+      transform:
+        scale(0.96)
+        rotate(-2deg);
     }
 
     .loading {
       position: absolute;
+
       z-index: 2;
+
       font-weight: 950;
+
       font-size: 1rem;
+
       padding: 30px;
+
       text-align: center;
+
       color: var(--muted);
     }
 
-    /* ---------------- SIDE ---------------- */
+
+    /* =========================================================
+       SIDE
+       ========================================================= */
 
     .side {
       display: flex;
+
       flex-direction: column;
+
       gap: 24px;
     }
 
@@ -464,171 +816,275 @@
 
     .timer-heading {
       display: flex;
+
       justify-content: space-between;
+
       align-items: center;
+
       gap: 10px;
+
       margin-bottom: 4px;
     }
 
     .live-dot {
       width: 10px;
       height: 10px;
+
       border-radius: 50%;
+
       background: var(--green);
+
       border: 2px solid var(--line);
-      animation: pulse 1.8s infinite;
+
+      animation:
+        pulse 1.8s infinite;
+
       flex: 0 0 auto;
     }
 
     @keyframes pulse {
+
       0%, 100% {
-        box-shadow: 0 0 0 0 rgba(99, 211, 145, 0.45);
+        box-shadow:
+          0 0 0 0
+          rgba(99, 211, 145, 0.45);
       }
 
       50% {
-        box-shadow: 0 0 0 7px rgba(99, 211, 145, 0);
+        box-shadow:
+          0 0 0 7px
+          rgba(99, 211, 145, 0);
       }
+
     }
 
     #countdown {
-      font-variant-numeric: tabular-nums;
-      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-variant-numeric:
+        tabular-nums;
+
+      font-size:
+        clamp(2.5rem, 5vw, 4rem);
+
       font-weight: 1000;
+
       letter-spacing: -0.065em;
+
       margin: 7px 0 18px;
+
       line-height: 0.95;
     }
 
     .countdown-caption {
       font-weight: 900;
+
       font-size: 0.95rem;
+
       margin-bottom: 15px;
     }
 
     .progress {
       height: 15px;
+
       border: 3px solid var(--line);
+
       border-radius: 99px;
+
       overflow: hidden;
+
       background: var(--progress-bg);
     }
 
     #progress {
       width: 0%;
       height: 100%;
+
       background: var(--accent);
-      transition: width 0.5s linear;
+
+      transition:
+        width 0.5s linear;
     }
 
     .status {
       margin-top: 14px;
+
       color: var(--muted);
+
       font-weight: 850;
+
       font-size: 0.9rem;
+
       line-height: 1.35;
     }
 
-    /* ---------------- TRAITS ---------------- */
+
+    /* =========================================================
+       TRAITS
+       ========================================================= */
 
     .details {
       padding: 24px;
+
       flex: 1;
     }
 
     .details h2,
     .about h2 {
       margin: 0;
+
       font-size: 1.45rem;
+
       letter-spacing: -0.03em;
     }
 
     .traits {
       display: grid;
+
       gap: 9px;
+
       margin-top: 18px;
     }
 
     .trait {
       position: relative;
+
       overflow: hidden;
+
       border: 1px solid var(--line);
+
       color: var(--ink);
+
       display: block;
+
       font-size: 15px;
+
       line-height: 15px;
+
       padding: 18px 18px 17px;
+
       text-decoration: none;
+
       cursor: pointer;
+
       background: var(--progress-bg);
+
       user-select: none;
+
       -webkit-user-select: none;
+
       touch-action: manipulation;
+
       border-radius: 10px;
+
       min-height: 52px;
     }
 
     .trait span:first-child {
       position: relative;
+
       transition:
-        color 600ms cubic-bezier(0.48, 0, 0.12, 1);
+        color 600ms
+        cubic-bezier(0.48, 0, 0.12, 1);
+
       z-index: 10;
+
       font-weight: 950;
     }
 
     .trait span:last-child {
       color: white;
+
       display: block;
+
       position: absolute;
+
       bottom: 0;
+
       transition:
-        all 500ms cubic-bezier(0.48, 0, 0.12, 1);
+        all 500ms
+        cubic-bezier(0.48, 0, 0.12, 1);
+
       z-index: 100;
+
       opacity: 0;
+
       top: 50%;
       left: 50%;
-      transform: translateY(225%) translateX(-50%);
+
+      transform:
+        translateY(225%)
+        translateX(-50%);
+
       height: 14px;
+
       line-height: 13px;
+
       font-weight: 950;
+
       white-space: nowrap;
     }
 
     .trait:after {
       content: "";
+
       position: absolute;
+
       bottom: -50%;
       left: 0;
+
       width: 100%;
       height: 100%;
+
       background-color: var(--accent);
-      transform-origin: bottom center;
+
+      transform-origin:
+        bottom center;
+
       transition:
-        transform 600ms cubic-bezier(0.48, 0, 0.12, 1);
-      transform: skewY(9.3deg) scaleY(0);
+        transform 600ms
+        cubic-bezier(0.48, 0, 0.12, 1);
+
+      transform:
+        skewY(9.3deg)
+        scaleY(0);
+
       z-index: 50;
     }
 
     .trait:hover:after {
-      transform-origin: bottom center;
-      transform: skewY(9.3deg) scaleY(2);
+      transform-origin:
+        bottom center;
+
+      transform:
+        skewY(9.3deg)
+        scaleY(2);
     }
 
     .trait:hover span:last-child {
       color: #191919;
-      transform: translateX(-50%) translateY(-50%);
+
+      transform:
+        translateX(-50%)
+        translateY(-50%);
+
       opacity: 1;
+
       transition:
-        all 900ms cubic-bezier(0.48, 0, 0.12, 1);
+        all 900ms
+        cubic-bezier(0.48, 0, 0.12, 1);
     }
 
     .trait:hover span:first-child {
       color: #191919;
     }
 
-    /* ---------------- ABOUT ---------------- */
+
+    /* =========================================================
+       ABOUT
+       ========================================================= */
 
     .about {
       margin-top: 30px;
+
       padding: 30px;
     }
 
@@ -638,48 +1094,77 @@
 
     .about p {
       margin: 12px 0 0;
+
       line-height: 1.58;
+
       font-size: 1.03rem;
     }
 
     .about .statement {
       margin-top: 22px;
+
       padding: 18px 20px;
+
       border-left: 6px solid var(--line);
+
       background: var(--accent);
+
       color: #191919;
+
       font-size: 1.1rem;
+
       font-weight: 950;
+
       line-height: 1.4;
     }
 
-    /* ---------------- LINKS ---------------- */
+
+    /* =========================================================
+       LINKS
+       ========================================================= */
 
     .links {
       margin-top: 30px;
+
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+
+      grid-template-columns:
+        repeat(3, 1fr);
+
       gap: 14px;
     }
 
     .link-card {
       border: 3px solid var(--line);
+
       background: var(--card);
-      box-shadow: 5px 5px 0 var(--line);
+
+      box-shadow:
+        5px 5px 0 var(--line);
+
       border-radius: 13px;
+
       padding: 17px;
+
       display: flex;
+
       justify-content: space-between;
+
       align-items: center;
+
       gap: 12px;
+
       transition:
         transform 0.15s ease,
         background 0.15s ease;
     }
 
     .link-card:hover {
-      transform: translate(-2px, -2px);
+      transform:
+        translate(-2px, -2px);
+
       background: var(--accent);
+
       text-decoration: none;
     }
 
@@ -691,53 +1176,78 @@
       font-size: 1.1rem;
     }
 
-    /* ---------------- FOOTER ---------------- */
+
+    /* =========================================================
+       FOOTER
+       ========================================================= */
 
     footer {
       margin-top: 34px;
+
       color: var(--muted);
+
       font-size: 0.84rem;
+
       display: flex;
+
       justify-content: space-between;
+
       align-items: center;
+
       gap: 15px;
+
       flex-wrap: wrap;
     }
 
     .footer-links {
       display: flex;
+
       align-items: center;
+
       gap: 18px;
+
       flex-wrap: wrap;
     }
 
     .error {
       padding: 8px 0;
+
       color: #f87171;
+
       font-weight: 900;
+
       font-size: 0.95rem;
     }
 
-    /* ---------------- MOBILE ---------------- */
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
 
     @media (max-width: 820px) {
+
       .wrap {
-        width: min(100% - 22px, 700px);
+        width:
+          min(100% - 22px, 700px);
+
         padding-top: 22px;
       }
 
       header {
         align-items: start;
+
         flex-direction: column;
       }
 
       .header-right {
         width: 100%;
+
         justify-content: space-between;
       }
 
       h1 {
-        font-size: clamp(2.2rem, 12vw, 3.6rem);
+        font-size:
+          clamp(2.2rem, 12vw, 3.6rem);
       }
 
       main {
@@ -755,16 +1265,22 @@
       .links {
         grid-template-columns: 1fr;
       }
+
     }
 
+
     @media (max-width: 500px) {
+
       .wrap {
-        width: min(100% - 16px, 700px);
+        width:
+          min(100% - 16px, 700px);
       }
 
       .tag {
         font-size: 0.72rem;
-        padding: 8px 10px;
+
+        padding:
+          8px 10px;
       }
 
       .chonk-card {
@@ -787,35 +1303,55 @@
 
       footer {
         align-items: flex-start;
+
         flex-direction: column;
       }
 
       .outfit-name-wrap {
-        padding: 12px 14px;
+        padding:
+          12px 14px;
       }
+
     }
+
   </style>
 </head>
+
 
 <body>
 
   <div class="wrap">
 
-    <!-- HEADER -->
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
 
     <header>
+
       <div>
-        <div class="eyebrow">Daily Chonk</div>
+
+        <div class="eyebrow">
+          Daily Chonk
+        </div>
 
         <h1>
-          <span class="title-line">A NEW OUTFIT.</span>
-          <span class="title-line">DAILY.</span>
+
+          <span class="title-line">
+            A NEW OUTFIT.
+          </span>
+
+          <span class="title-line">
+            DAILY.
+          </span>
+
         </h1>
+
       </div>
+
 
       <div class="header-right">
 
-        <!-- GALAHHAD THEME SWITCH -->
+        <!-- THEME SWITCH -->
 
         <label class="theme-switch">
 
@@ -840,9 +1376,9 @@
                 <path
                   fill-rule="evenodd"
                   clip-rule="evenodd"
-                  d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 34.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6075 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z"
+                  d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 35.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6076 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6076 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z"
                   fill="currentColor"
-                ></path>
+                />
 
               </svg>
 
@@ -853,9 +1389,11 @@
               <div class="theme-switch__sun-moon-container">
 
                 <div class="theme-switch__moon">
+
                   <div class="theme-switch__spot"></div>
                   <div class="theme-switch__spot"></div>
                   <div class="theme-switch__spot"></div>
+
                 </div>
 
               </div>
@@ -866,14 +1404,19 @@
 
         </label>
 
+
         <div class="tag">
           ● LIVE · ONCHAIN
         </div>
 
       </div>
+
     </header>
 
-    <!-- HERO -->
+
+    <!-- =====================================================
+         HERO
+         ===================================================== -->
 
     <main>
 
@@ -882,7 +1425,9 @@
         <div class="hero-top">
 
           <div>
-            <strong>Chonk #30000</strong>
+            <strong>
+              Chonk #30000
+            </strong>
           </div>
 
           <div class="today-pill">
@@ -891,7 +1436,6 @@
 
         </div>
 
-        <!-- GENERATED OUTFIT NAME -->
 
         <div class="outfit-name-wrap">
 
@@ -904,6 +1448,7 @@
           </h2>
 
         </div>
+
 
         <div class="image-wrap">
 
@@ -921,6 +1466,7 @@
 
       </section>
 
+
       <aside class="side">
 
         <!-- TIMER -->
@@ -935,28 +1481,35 @@
 
             <div
               class="live-dot"
-              title="Live">
-            </div>
+              title="Live"
+            ></div>
 
           </div>
+
 
           <div id="countdown">
             00:00:00
           </div>
 
+
           <div class="countdown-caption">
             The wardrobe rolls again soon.
           </div>
 
+
           <div class="progress">
+
             <div id="progress"></div>
+
           </div>
+
 
           <div id="status" class="status">
             Syncing with the daily cycle…
           </div>
 
         </section>
+
 
         <!-- TRAITS -->
 
@@ -973,8 +1526,15 @@
           <div id="traits" class="traits">
 
             <div class="trait">
-              <span>Status</span>
-              <span>Loading…</span>
+
+              <span>
+                Status
+              </span>
+
+              <span>
+                Loading…
+              </span>
+
             </div>
 
           </div>
@@ -985,7 +1545,10 @@
 
     </main>
 
-    <!-- ABOUT -->
+
+    <!-- =====================================================
+         ABOUT
+         ===================================================== -->
 
     <section class="card about">
 
@@ -1023,7 +1586,10 @@
 
     </section>
 
-    <!-- LINKS -->
+
+    <!-- =====================================================
+         LINKS
+         ===================================================== -->
 
     <div class="links">
 
@@ -1031,8 +1597,8 @@
         class="link-card"
         href="https://www.chonks.xyz/chonks/30000"
         target="_blank"
-        rel="noopener">
-
+        rel="noopener"
+      >
         <span>
           View Chonk #30000
         </span>
@@ -1040,15 +1606,15 @@
         <span>
           ↗
         </span>
-
       </a>
+
 
       <a
         class="link-card"
         href="https://x.com/jpegsonbase"
         target="_blank"
-        rel="noopener">
-
+        rel="noopener"
+      >
         <span>
           Made by @jpegsonbase
         </span>
@@ -1056,15 +1622,15 @@
         <span>
           ↗
         </span>
-
       </a>
+
 
       <a
         class="link-card"
         href="https://www.chonks.xyz/"
         target="_blank"
-        rel="noopener">
-
+        rel="noopener"
+      >
         <span>
           Learn more about Chonks
         </span>
@@ -1072,12 +1638,14 @@
         <span>
           ↗
         </span>
-
       </a>
 
     </div>
 
-    <!-- FOOTER -->
+
+    <!-- =====================================================
+         FOOTER
+         ===================================================== -->
 
     <footer>
 
@@ -1086,16 +1654,32 @@
       </span>
 
       <div class="footer-links">
-        <span>ERC-6551</span>
-        <span>·</span>
-        <span>Daily Chonk</span>
+
+        <span>
+          ERC-6551
+        </span>
+
+        <span>
+          ·
+        </span>
+
+        <span>
+          Daily Chonk
+        </span>
+
       </div>
 
     </footer>
 
   </div>
 
+
+  <!-- =======================================================
+       JAVASCRIPT
+       ======================================================= -->
+
   <script>
+
     (() => {
 
       const CHONK_ID = 30000;
@@ -1106,29 +1690,22 @@
       const RPC =
         "https://mainnet.base.org";
 
-      // Current cycle start
+
       const LAST_CHANGE =
-        Date.parse("2026-09-06T18:33:04Z");
+        Date.parse(
+          "2026-09-06T18:33:04Z"
+        );
 
       const CYCLE =
         24 * 60 * 60 * 1000;
 
+
       const TRAIT_PAGE_BASE =
         "https://www.chonks.xyz/traits/";
 
-      /*
-       * Trait categories:
-       *
-       * 1 = Head
-       * 2 = Hair
-       * 3 = Face
-       * 4 = Accessory
-       * 5 = Top
-       * 6 = Bottom
-       * 7 = Shoes
-       */
 
       const CATEGORY_NUM = {
+
         head: 1,
         hair: 2,
         face: 3,
@@ -1139,7 +1716,9 @@
         pants: 6,
         shoes: 7,
         shoe: 7
+
       };
+
 
       const abi = [
 
@@ -1151,8 +1730,10 @@
 
       ];
 
+
       const provider =
         new ethers.JsonRpcProvider(RPC);
+
 
       const contract =
         new ethers.Contract(
@@ -1161,47 +1742,60 @@
           provider
         );
 
+
       const image =
-        document.getElementById("chonk-image");
+        document.getElementById(
+          "chonk-image"
+        );
 
       const loading =
-        document.getElementById("loading");
+        document.getElementById(
+          "loading"
+        );
 
       const traitsEl =
-        document.getElementById("traits");
+        document.getElementById(
+          "traits"
+        );
 
       const countdownEl =
-        document.getElementById("countdown");
+        document.getElementById(
+          "countdown"
+        );
 
       const progressEl =
-        document.getElementById("progress");
+        document.getElementById(
+          "progress"
+        );
 
       const statusEl =
-        document.getElementById("status");
+        document.getElementById(
+          "status"
+        );
 
       const themeCheckbox =
-        document.getElementById("theme-checkbox");
+        document.getElementById(
+          "theme-checkbox"
+        );
 
       const outfitNameEl =
-        document.getElementById("outfit-name");
+        document.getElementById(
+          "outfit-name"
+        );
 
 
-      // --------------------------------------------------
-      // LOCAL STORAGE
-      // --------------------------------------------------
+      /* =====================================================
+         THEME
+         ===================================================== */
 
       function getStoredTheme() {
 
         try {
-
           return localStorage.getItem(
             "chonk-theme"
           );
-
         } catch (e) {
-
           return null;
-
         }
 
       }
@@ -1210,24 +1804,14 @@
       function setStoredTheme(theme) {
 
         try {
-
           localStorage.setItem(
             "chonk-theme",
             theme
           );
-
-        } catch (e) {
-
-          // Ignore restricted environments
-
-        }
+        } catch (e) {}
 
       }
 
-
-      // --------------------------------------------------
-      // THEME
-      // --------------------------------------------------
 
       function applyTheme(theme) {
 
@@ -1244,10 +1828,9 @@
       }
 
 
-      const savedTheme =
-        getStoredTheme() || "light";
-
-      applyTheme(savedTheme);
+      applyTheme(
+        getStoredTheme() || "light"
+      );
 
 
       themeCheckbox.addEventListener(
@@ -1264,9 +1847,9 @@
       );
 
 
-      // --------------------------------------------------
-      // HELPERS
-      // --------------------------------------------------
+      /* =====================================================
+         HELPERS
+         ===================================================== */
 
       function decodeDataUri(uri) {
 
@@ -1306,10 +1889,6 @@
 
       }
 
-
-      // --------------------------------------------------
-      // TRAIT SLUG
-      // --------------------------------------------------
 
       function traitSlug(value) {
 
@@ -1357,9 +1936,9 @@
       }
 
 
-      // --------------------------------------------------
-      // OUTFIT NAME GENERATOR
-      // --------------------------------------------------
+      /* =====================================================
+         OUTFIT NAME
+         ===================================================== */
 
       function cleanTraitName(value) {
 
@@ -1401,7 +1980,10 @@
         if (!value) return "";
 
         return value
-          .replace(/\b(color|colours?)\b/gi, "")
+          .replace(
+            /\b(color|colours?)\b/gi,
+            ""
+          )
           .replace(/\s+/g, " ")
           .trim();
 
@@ -1433,8 +2015,7 @@
           head,
           face,
           accessory
-        ]
-          .filter(Boolean);
+        ].filter(Boolean);
 
 
         if (!words.length) {
@@ -1443,7 +2024,9 @@
 
 
         const lower =
-          words.join(" ").toLowerCase();
+          words
+            .join(" ")
+            .toLowerCase();
 
 
         if (
@@ -1504,8 +2087,7 @@
               (hash << 5) -
               hash +
               source.charCodeAt(i)
-            ) |
-            0;
+            ) | 0;
 
         }
 
@@ -1555,12 +2137,10 @@
         ];
 
 
-        const index =
+        return styles[
           Math.abs(hash) %
-          styles.length;
-
-
-        return styles[index]();
+          styles.length
+        ]();
 
       }
 
@@ -1592,7 +2172,7 @@
           );
 
 
-        const name =
+        outfitNameEl.textContent =
           generateOutfitName(
             top,
             head,
@@ -1600,16 +2180,12 @@
             accessory
           );
 
-
-        outfitNameEl.textContent =
-          name;
-
       }
 
 
-      // --------------------------------------------------
-      // SHOW TRAITS
-      // --------------------------------------------------
+      /* =====================================================
+         SHOW TRAITS
+         ===================================================== */
 
       function showTraits(json) {
 
@@ -1738,9 +2314,9 @@
       }
 
 
-      // --------------------------------------------------
-      // LOAD CHONK
-      // --------------------------------------------------
+      /* =====================================================
+         LOAD CHONK
+         ===================================================== */
 
       async function loadChonk() {
 
@@ -1748,8 +2324,7 @@
 
           const [
             uri,
-            svgUri,
-            chonk
+            svgUri
           ] =
             await Promise.all([
 
@@ -1759,20 +2334,7 @@
 
               contract.renderAsDataUri2D(
                 CHONK_ID
-              ),
-
-              contract
-                .getChonk(CHONK_ID)
-                .catch(err => {
-
-                  console.error(
-                    "[Daily Chonk] getChonk failed",
-                    err
-                  );
-
-                  return null;
-
-                })
+              )
 
             ]);
 
@@ -1782,7 +2344,6 @@
 
 
           let metadata = {};
-
           let imageUri = null;
 
 
@@ -1866,7 +2427,6 @@
           statusEl.textContent =
             "Live — refreshing directly from the Base chain.";
 
-
         } catch (err) {
 
           console.error(err);
@@ -1896,9 +2456,9 @@
       }
 
 
-      // --------------------------------------------------
-      // COUNTDOWN
-      // --------------------------------------------------
+      /* =====================================================
+         COUNTDOWN
+         ===================================================== */
 
       let lastRemaining =
         Infinity;
@@ -1919,10 +2479,7 @@
 
 
         if (elapsed < 0) {
-
-          elapsed +=
-            CYCLE;
-
+          elapsed += CYCLE;
         }
 
 
@@ -2013,9 +2570,9 @@
       }
 
 
-      // --------------------------------------------------
-      // INITIAL LOAD
-      // --------------------------------------------------
+      /* =====================================================
+         INITIAL LOAD
+         ===================================================== */
 
       loadChonk();
 
@@ -2034,6 +2591,7 @@
       );
 
     })();
+
   </script>
 
 </body>
