@@ -10,39 +10,41 @@
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
 
-  <style>
+ <style>
+  :root {
+    --ink: #191919;
+    --paper: #f7f1e7;
+    --card: #fffaf1;
+    --line: #191919;
+    --accent: #ffcf4a;
+    --accent-soft: #ffe9a3;
+    --muted: #6d665d;
+    --progress-bg: #ffffff;
+    --green: #63d391;
 
-    /* =========================================================
-       THEME
-       ========================================================= */
+    /* Background image opacity */
+    --pattern-opacity: 0.09;
 
-    :root {
-      --ink: #191919;
-      --paper: #f7f1e7;
-      --card: #fffaf1;
-      --line: #191919;
-      --accent: #ffcf4a;
-      --accent-soft: #ffe9a3;
-      --muted: #6d665d;
-      --progress-bg: #ffffff;
-      --green: #63d391;
+    --shadow: 8px 8px 0 var(--line);
+  }
 
-      --shadow: 8px 8px 0 var(--line);
-    }
+  [data-theme="dark"] {
+    --ink: #e8eef7;
+    --paper: #0f172a;
+    --card: #1e293b;
+    --line: #334155;
+    --accent: #ffcf4a;
+    --accent-soft: #493d18;
+    --muted: #94a3b8;
+    --progress-bg: #0f172a;
+    --green: #63d391;
 
-    [data-theme="dark"] {
-      --ink: #e8eef7;
-      --paper: #0f172a;
-      --card: #1e293b;
-      --line: #334155;
-      --accent: #ffcf4a;
-      --accent-soft: #493d18;
-      --muted: #94a3b8;
-      --progress-bg: #0f172a;
-      --green: #63d391;
+    /* Background image opacity in dark mode */
+    --pattern-opacity: 0.10;
 
-      --shadow: 8px 8px 0 var(--line);
-    }
+    --shadow: 8px 8px 0 var(--line);
+  }
+</style>
 
 
     /* =========================================================
