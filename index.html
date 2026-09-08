@@ -133,24 +133,27 @@
 
 
     /* =========================================================
-       DARK MODE BACKGROUND
-       ========================================================= */
+   DARK MODE BACKGROUND — BLUE-TINTED PNG
+   ========================================================= */
 
-    [data-theme="dark"] body::before {
-      background-image: url("./background.png");
+[data-theme="dark"] body::before {
+  background-image: url("./background.png");
 
-      background-repeat: repeat;
+  background-repeat: repeat;
 
-      background-size: 100px 100px;
+  background-size: 100px 100px;
 
-      background-position: center top;
+  background-position: center top;
 
-      /* Subtle in dark mode */
-      opacity: 0.08;
+  opacity: 0.10;
 
-      /* No colour shifting */
-      filter: none;
-    }
+  /* Blue tint applied directly to the PNG */
+  filter:
+    sepia(1)
+    saturate(5)
+    hue-rotate(175deg)
+    brightness(0.8);
+}
 
 
     /* =========================================================
