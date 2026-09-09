@@ -1028,13 +1028,64 @@
     }
 
     
-// Helper: keep only the first 1–2 meaningful words
-function short(value) {
-  if (!value) return "";
-  const words = value.trim().split(/\s+/);
-  const cleaned = words.filter(w => !/^(the|a|an|of|in|with|and)$/i.test(w));
-  if (cleaned.length <= 2) return cleaned.join(" ");
-  return cleaned.slice(0, 2).join(" ");
+/// ============================================================
+// DAILY CHONK — CURATED OUTFIT NAME GENERATOR
+// ============================================================
+
+const NAME_WORDS = {
+  vibe: [
+    "Electric", "Midnight", "Golden", "Dirty", "Dreamy",
+    "Wild", "Velvet", "Neon", "Cosmic", "Downtown",
+    "Afterparty", "Lucky", "Feral", "Cherry", "Chrome",
+    "Heavenly", "Reckless", "Playful", "Mystic", "Retro",
+    "Funky", "Dizzy", "Sweet", "Heavy", "Fever",
+    "Disco", "Rebel", "Sunday", "Plastic", "Romantic"
+  ],
+
+  fashion: [
+    "Satin", "Denim", "Leather", "Velvet", "Silk",
+    "Suede", "Lace", "Pleated", "Tailored", "Cropped",
+    "Oversized", "Vintage", "Sheer", "Rugged", "Polished",
+    "Striped", "Sporty", "Classic", "Glossy", "Fuzzy",
+    "Floral", "Utility", "Western", "Preppy", "Glam"
+  ],
+
+  detail: [
+    "Stitch", "Fringe", "Buckle", "Lace", "Collar",
+    "Chain", "Pocket", "Stripe", "Patch", "Bow",
+    "Cuff", "Hem", "Button", "Zip", "Seam",
+    "Charm", "Badge", "Pin", "Loop", "Ruffle",
+    "Sparkle", "Print", "Thread", "Stud", "Trim"
+  ],
+
+  place: [
+    "Downtown", "Motel", "Rooftop", "Backstage", "Club",
+    "Studio", "Arcade", "Diner", "Boardwalk", "Penthouse",
+    "Garage", "Runway", "Backstreet", "Poolside", "Afterparty"
+  ],
+
+  character: [
+    "Icon", "Legend", "Heartbreaker", "Rebel", "Star",
+    "Sweetheart", "Outlaw", "Showoff", "Dreamer", "Player",
+    "Rascal", "Rockstar", "Hotshot", "Wildcard", "Darling"
+  ]
+};
+
+function pickDeterministic(list, hash, offset = 0) {
+  return list[(hash + offset) % list.length];
+}
+
+function outfitHash(pieces) {
+  const source = pieces.join("|").toLowerCase();
+
+  let hash = 2166136261;
+
+  for (let i = 0; i < source.length; i++) {
+    hash ^= source.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  return hash >>> 0;
 }
 
 function generateOutfitName(top, head, face, accessory) {
@@ -1044,40 +1095,109 @@ function generateOutfitName(top, head, face, accessory) {
   accessory = simplifyTrait(accessory);
 
   const pieces = [top, head, face, accessory].filter(Boolean);
-  if (!pieces.length) return "Daily Chonk";
 
+  if (!pieces.length) {
+    return "Daily Chonk";
+  }
+
+  const hash = outfitHash(pieces);
   const lower = pieces.join(" ").toLowerCase();
 
-  // A few special short combos
-  if (lower.includes("3d glasses") && lower.includes("baseball cap")) {
+  // Specific combinations
+  if (
+    lower.includes("3d glasses") &&
+    lower.includes("baseball cap")
+  ) {
     return "Street Legend";
   }
-  if (lower.includes("dress") && lower.includes("glasses")) {
+
+  if (
+    lower.includes("dress") &&
+    lower.includes("glasses")
+  ) {
     return "After Dark";
   }
-  if (lower.includes("shag") && lower.includes("dress")) {
+
+  if (
+    lower.includes("shag") &&
+    lower.includes("dress")
+  ) {
     return "Shaggy Icon";
   }
 
-  let hash = 0;
-  const source = pieces.join("|").toLowerCase();
-  for (let i = 0; i < source.length; i++) {
-    hash = ((hash << 5) - hash + source.charCodeAt(i)) | 0;
-  }
-
-  // Always produce a short *creative* name (never just a raw trait)
+  // Curated naming styles
   const styles = [
-    () => top ? `${short(top)} Run` : "Daily Run",
-    () => head ? `${short(head)} Energy` : "Main Energy",
-    () => face ? `${short(face)} Mode` : "Focus Mode",
-    () => accessory ? `${short(accessory)} Club` : "Chonk Club",
-    () => top && head ? `${short(head)} Fit` : "Today's Fit",
-    () => accessory && face ? `${short(accessory)} Look` : "Clean Look",
-    () => head && accessory ? `${short(head)} Drop` : "Fresh Drop",
-    () => top ? `The ${short(top)}` : "Main Character"
+    () => {
+      const vibe = pickDeterministic(NAME_WORDS.vibe, hash, 11);
+      const fashion = pickDeterministic(NAME_WORDS.fashion, hash, 27);
+      return `${vibe} ${fashion}`;
+    },
+
+    () => {
+      const vibe = pickDeterministic(NAME_WORDS.vibe, hash, 41);
+      const detail = pickDeterministic(NAME_WORDS.detail, hash, 53);
+      return `${vibe} ${detail}`;
+    },
+
+    () => {
+      const fashion = pickDeterministic(NAME_WORDS.fashion, hash, 67);
+      const detail = pickDeterministic(NAME_WORDS.detail, hash, 71);
+      return `${fashion} ${detail}`;
+    },
+
+    () => {
+      const place = pickDeterministic(NAME_WORDS.place, hash, 83);
+      const character = pickDeterministic(NAME_WORDS.character, hash, 97);
+      return `${place} ${character}`;
+    },
+
+    () => {
+      const vibe = pickDeterministic(NAME_WORDS.vibe, hash, 101);
+      const character = pickDeterministic(NAME_WORDS.character, hash, 113);
+      return `${vibe} ${character}`;
+    },
+
+    () => {
+      const character = pickDeterministic(NAME_WORDS.character, hash, 127);
+      const detail = pickDeterministic(NAME_WORDS.detail, hash, 139);
+      return `${character} ${detail}`;
+    },
+
+    () => {
+      const place = pickDeterministic(NAME_WORDS.place, hash, 149);
+      const fashion = pickDeterministic(NAME_WORDS.fashion, hash, 157);
+      return `${place} ${fashion}`;
+    },
+
+    () => {
+      const character = pickDeterministic(NAME_WORDS.character, hash, 163);
+      return `The ${character}`;
+    },
+
+    () => {
+      const vibe = pickDeterministic(NAME_WORDS.vibe, hash, 173);
+      return `${vibe} Club`;
+    },
+
+    () => {
+      const fashion = pickDeterministic(NAME_WORDS.fashion, hash, 181);
+      return `${fashion} Drop`;
+    },
+
+    () => {
+      const vibe = pickDeterministic(NAME_WORDS.vibe, hash, 191);
+      return `${vibe} After Dark`;
+    },
+
+    () => {
+      const vibe = pickDeterministic(NAME_WORDS.vibe, hash, 199);
+      return `${vibe} Studios`;
+    }
   ];
 
-  return styles[Math.abs(hash) % styles.length]();
+  const styleIndex = hash % styles.length;
+
+  return styles[styleIndex]();
 }
 
     function updateOutfitName(attrs) {
