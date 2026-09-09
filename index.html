@@ -94,17 +94,6 @@
 
     /* =========================================================
        BACKGROUND PNG
-       =========================================================
-
-       Put background.png in the SAME folder as index.html.
-
-       The PNG repeats evenly in a perfect grid.
-
-       Each tile is exactly:
-       1000px x 1000px
-
-       Opacity affects ONLY the PNG.
-       It does NOT change the PNG's colour.
        ========================================================= */
 
     body::before {
@@ -124,7 +113,6 @@
 
       background-position: center top;
 
-      /* PNG transparency */
       opacity: 0.10;
 
       transition:
@@ -133,27 +121,26 @@
 
 
     /* =========================================================
-   DARK MODE BACKGROUND — BLUE-TINTED PNG
-   ========================================================= */
+       DARK MODE BACKGROUND
+       ========================================================= */
 
-[data-theme="dark"] body::before {
-  background-image: url("./background.png");
+    [data-theme="dark"] body::before {
+      background-image: url("./background.png");
 
-  background-repeat: repeat;
+      background-repeat: repeat;
 
-  background-size: 100px 100px;
+      background-size: 100px 100px;
 
-  background-position: center top;
+      background-position: center top;
 
-  opacity: 0.10;
+      opacity: 0.10;
 
-  /* Blue tint applied directly to the PNG */
-  filter:
-    sepia(1)
-    saturate(5)
-    hue-rotate(175deg)
-    brightness(0.8);
-}
+      filter:
+        sepia(1)
+        saturate(5)
+        hue-rotate(175deg)
+        brightness(0.8);
+    }
 
 
     /* =========================================================
@@ -176,8 +163,6 @@
       background: transparent;
     }
 
-
-    /* Everything sits above the background */
 
     .wrap {
       position: relative;
@@ -563,30 +548,28 @@
       overflow: hidden;
     }
 
-    .hero-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
 
-      gap: 12px;
+    /* =========================================================
+       HERO TOP
+       ========================================================= */
+
+    .hero-top {
+      display: grid;
+
+      grid-template-columns:
+        auto
+        minmax(0, 1fr)
+        auto;
+
+      align-items: center;
+
+      gap: 14px;
+
       margin-bottom: 14px;
     }
 
-    .today-pill {
-      border: 2px solid var(--line);
-
-      background: var(--accent);
-      color: #191919;
-
-      padding: 7px 10px;
-
-      border-radius: 999px;
-
-      font-size: 0.72rem;
-      font-weight: 950;
-
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+    .hero-top > strong {
+      white-space: nowrap;
     }
 
 
@@ -594,50 +577,145 @@
        OUTFIT NAME
        ========================================================= */
 
-    .outfit-name-wrap {
-      margin: 0 0 14px;
+  .outfit-name-wrap {
+  margin: 0;
 
-      padding: 14px 16px;
+  padding: 7px 14px;
 
-      border: 3px solid var(--line);
+  border: 3px solid var(--line);
 
-      background: var(--accent);
-      color: #191919;
+  background: var(--accent);
 
-      border-radius: 12px;
+  color: #191919;
 
-      box-shadow: 4px 4px 0 var(--line);
-    }
+  border-radius: 999px;
+
+  box-shadow: 4px 4px 0 var(--line);
+
+  min-width: 0;
+
+  text-align: center;
+
+  justify-self: center;
+}
+
 
     .outfit-name-label {
-      font-size: 0.65rem;
-
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-
-      font-weight: 950;
-
-      opacity: 0.65;
-
-      margin-bottom: 3px;
+      display: none;
     }
 
     #outfit-name {
       margin: 0;
 
       font-size:
-        clamp(1.25rem, 3vw, 1.8rem);
+        clamp(1rem, 2vw, 1.35rem);
 
       line-height: 1.05;
 
       letter-spacing: -0.035em;
 
       font-weight: 1000;
+
+      white-space: nowrap;
+
+      overflow: hidden;
+
+      text-overflow: ellipsis;
     }
 
 
     /* =========================================================
-       IMAGE
+       2D / 3D VIEW CONTROLS
+       ========================================================= */
+
+    .view-controls {
+      display: flex;
+      justify-content: flex-end;
+
+      margin: 0;
+    }
+
+    .view-toggle {
+      display: inline-flex;
+
+      align-items: center;
+
+      padding: 3px;
+
+      border:
+        3px solid
+        var(--line);
+
+      border-radius: 999px;
+
+      background:
+        var(--card);
+
+      box-shadow:
+        4px 4px 0
+        var(--line);
+    }
+
+    .view-button {
+      appearance: none;
+
+      border: 0;
+
+      background: transparent;
+
+      color: var(--ink);
+
+      padding:
+        7px 14px;
+
+      min-width: 50px;
+
+      border-radius: 999px;
+
+      cursor: pointer;
+
+      font-family: inherit;
+
+      font-size: 0.7rem;
+
+      font-weight: 950;
+
+      letter-spacing: 0.08em;
+
+      transition:
+        background 0.15s ease,
+        color 0.15s ease,
+        transform 0.12s ease;
+    }
+
+    .view-button:hover {
+      background:
+        var(--accent-soft);
+    }
+
+    .view-button.active {
+      background:
+        var(--accent);
+
+      color: #191919;
+    }
+
+    .view-button:active {
+      transform:
+        scale(0.95);
+    }
+
+    .view-button:focus-visible {
+      outline:
+        3px solid
+        var(--green);
+
+      outline-offset: 2px;
+    }
+
+
+    /* =========================================================
+       IMAGE / VIEWPORT
        ========================================================= */
 
     .image-wrap {
@@ -650,7 +728,9 @@
 
       overflow: hidden;
 
-      border: 3px dashed var(--line);
+      border:
+        3px dashed
+        var(--line);
 
       border-radius: 14px;
 
@@ -682,10 +762,13 @@
       color: var(--muted);
 
       pointer-events: none;
+
+      z-index: 10;
     }
 
     #chonk-image {
-      width: min(100%, 650px);
+      width:
+        min(100%, 650px);
 
       max-height: 580px;
 
@@ -707,10 +790,128 @@
         rotate(-2deg);
     }
 
+
+    /* =========================================================
+       3D VIEWER
+       ========================================================= */
+
+    .chonk-3d-viewer {
+      position: absolute;
+
+      inset: 0;
+
+      width: 100%;
+      height: 100%;
+
+      min-height: 540px;
+
+      border: 0;
+
+      background:
+        transparent;
+
+      border-radius: 11px;
+
+      opacity: 0;
+
+      transform:
+        scale(0.985);
+
+      transition:
+        opacity 0.4s ease,
+        transform 0.4s
+        cubic-bezier(.2,.8,.2,1);
+
+      z-index: 3;
+    }
+
+    .chonk-3d-viewer.loaded {
+      opacity: 1;
+
+      transform:
+        scale(1);
+    }
+
+
+    /* =========================================================
+       3D INTERACTION HINT
+       ========================================================= */
+
+    .rotate-hint {
+      position: absolute;
+
+      left: 50%;
+      bottom: 22px;
+
+      transform:
+        translateX(-50%)
+        translateY(10px);
+
+      z-index: 12;
+
+      padding:
+        8px 12px;
+
+      border:
+        2px solid
+        var(--line);
+
+      border-radius: 999px;
+
+      background:
+        rgba(255, 250, 241, 0.92);
+
+      color:
+        #191919;
+
+      font-size:
+        0.62rem;
+
+      font-weight:
+        950;
+
+      letter-spacing:
+        0.09em;
+
+      white-space:
+        nowrap;
+
+      pointer-events:
+        none;
+
+      opacity:
+        0;
+
+      transition:
+        opacity 0.4s ease,
+        transform 0.4s ease;
+    }
+
+    [data-theme="dark"] .rotate-hint {
+      background:
+        rgba(30, 41, 59, 0.92);
+
+      color:
+        #e8eef7;
+    }
+
+    .rotate-hint.visible {
+      opacity: 1;
+
+      transform:
+        translateX(-50%)
+        translateY(0);
+    }
+
+
+    /* =========================================================
+       3D LOADING
+       ========================================================= */
+
     .loading {
       position: absolute;
 
-      z-index: 2;
+      z-index: 20;
 
       font-weight: 950;
       font-size: 1rem;
@@ -720,6 +921,8 @@
       text-align: center;
 
       color: var(--muted);
+
+      pointer-events: none;
     }
 
 
@@ -818,7 +1021,8 @@
 
       background: var(--accent);
 
-      transition: width 0.5s linear;
+      transition:
+        width 0.5s linear;
     }
 
     .status {
@@ -1169,7 +1373,32 @@
         min-height: 0;
       }
 
+      .hero-top {
+        grid-template-columns:
+          auto
+          minmax(0, 1fr)
+          auto;
+
+        gap: 8px;
+      }
+
+      #outfit-name {
+        font-size:
+          clamp(0.85rem, 3vw, 1.15rem);
+      }
+
+      .view-button {
+        padding:
+          7px 11px;
+
+        min-width: 45px;
+      }
+
       .image-wrap {
+        min-height: 390px;
+      }
+
+      .chonk-3d-viewer {
         min-height: 390px;
       }
 
@@ -1197,7 +1426,39 @@
         padding: 12px;
       }
 
+      .hero-top {
+        gap: 7px;
+        margin-bottom: 12px;
+      }
+
+      .hero-top > strong {
+        font-size: 0.9rem;
+      }
+
+      #outfit-name {
+        font-size: 0.78rem;
+      }
+
+      .view-toggle {
+        box-shadow:
+          3px 3px 0
+          var(--line);
+      }
+
+      .view-button {
+        padding:
+          6px 8px;
+
+        min-width: 40px;
+
+        font-size: 0.62rem;
+      }
+
       .image-wrap {
+        min-height: 330px;
+      }
+
+      .chonk-3d-viewer {
         min-height: 330px;
       }
 
@@ -1217,10 +1478,15 @@
         flex-direction: column;
       }
 
-      .outfit-name-wrap {
+      .rotate-hint {
+        bottom: 18px;
+
+        font-size: 0.56rem;
+
         padding:
-          12px 14px;
+          7px 10px;
       }
+
     }
 
   </style>
@@ -1288,7 +1554,7 @@
                 <path
                   fill-rule="evenodd"
                   clip-rule="evenodd"
-                  d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 35.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6075 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z"
+                  d="M135.831 3.00688C135.055 3.85027 134.111 4.29946 133 4.35447C134.111 4.40947 135.055 4.85867 135.831 5.71123C136.607 6.55462 136.996 7.56303 136.996 8.72727C136.996 7.95722 137.172 7.25134 137.525 6.59129C137.886 5.93124 138.372 5.39954 138.98 5.00535C139.598 4.60199 140.268 4.39114 141 4.35447C139.88 4.2903 138.936 3.85027 138.16 3.00688C137.384 2.16348 136.996 1.16425 136.996 0C136.996 1.16425 136.607 2.16348 135.831 3.00688ZM31 23.3545C32.1114 23.2995 33.0551 22.8503 33.8313 22.0069C34.6075 21.1635 34.9956 20.1642 34.9956 19C34.9956 20.1642 35.3837 21.1635 36.1599 22.0069C36.9361 22.8503 37.8798 23.2903 39 23.3545C38.2679 23.3911 37.5976 23.602 36.9802 24.0053C36.3716 24.3995 35.8864 24.9312 35.5248 25.5913C35.172 26.2513 34.9956 26.9572 34.9956 27.7273C34.9956 26.563 34.6075 25.5546 33.8313 24.7112C33.0551 23.8587 32.1114 23.4095 31 23.3545ZM0 36.3545C1.11136 36.2995 2.05513 35.8503 2.83131 35.0069C3.6075 35.1635 3.99559 33.1642 3.99559 32C3.99559 33.1642 4.38368 34.1635 5.15987 35.0069C5.93605 35.8503 6.87982 36.2903 8 36.3545C7.26792 36.3911 6.59757 36.602 5.98015 37.0053C5.37155 37.3995 4.88644 37.9312 4.52481 38.5913C4.172 39.2513 3.99559 39.9572 3.99559 40.7273C3.99559 39.563 3.6075 38.5546 2.83131 37.7112C2.05513 36.8587 1.11136 36.4095 0 36.3545ZM56.8313 24.0069C56.0551 24.8503 55.1114 25.2995 54 25.3545C55.1114 25.4095 56.0551 25.8587 56.8313 26.7112C57.6075 27.5546 57.9956 28.563 57.9956 29.7273C57.9956 28.9572 58.172 28.2513 58.5248 27.5913C58.8864 26.9312 59.3716 26.3995 59.9802 26.0053C60.5976 25.602 61.2679 25.3911 62 25.3545C60.8798 25.2903 59.9361 24.8503 59.1599 24.0069C58.3837 23.1635 57.9956 22.1642 57.9956 21C57.9956 22.1642 57.6075 23.1635 56.8313 24.0069ZM81 25.3545C82.1114 25.2995 83.0551 24.8503 83.8313 24.0069C84.6075 23.1635 84.9956 22.1642 84.9956 21C84.9956 22.1642 85.3837 23.1635 86.1599 24.0069C86.9361 24.8503 87.8798 25.2903 89 25.3545C88.2679 25.3911 87.5976 25.602 86.9802 26.0053C86.3716 26.3995 85.8864 26.9312 85.5248 27.5913C85.172 28.2513 84.9956 28.9572 84.9956 29.7273C84.9956 28.563 84.6076 27.5546 83.8313 26.7112C83.0551 25.8587 82.1114 25.4095 81 25.3545ZM136 36.3545C137.111 36.2995 138.055 35.8503 138.831 35.0069C139.607 34.1635 139.996 33.1642 139.996 32C139.996 33.1642 140.384 34.1635 141.16 35.0069C141.936 35.8503 142.88 36.2903 144 36.3545C143.268 36.3911 142.598 36.602 141.98 37.0053C141.372 37.3995 140.886 37.9312 140.525 38.5913C140.172 39.2513 139.996 39.9572 139.996 40.7273C139.996 39.563 139.607 38.5546 138.831 37.7112C138.055 36.8587 137.111 36.4095 136 36.3545ZM101.831 49.0069C101.055 49.8503 100.111 50.2995 99 50.3545C100.111 50.4095 101.055 50.8587 101.831 51.7112C102.607 52.5546 102.996 53.563 102.996 54.7273C102.996 53.9572 103.172 53.2513 103.525 52.5913C103.886 51.9312 104.372 51.3995 104.98 51.0053C105.598 50.602 106.268 50.3911 107 50.3545C105.88 50.2903 104.936 49.8503 104.16 49.0069C103.384 48.1635 102.996 47.1642 102.996 46C102.996 47.1642 102.607 48.1635 101.831 49.0069Z"
                   fill="currentColor"
                 />
 
@@ -1337,43 +1603,94 @@
 
         <div class="hero-top">
 
-          <div>
-            <strong>
-              Chonk #30000
-            </strong>
+          <strong>
+            Chonk #30000
+          </strong>
+
+
+          <div class="outfit-name-wrap">
+
+            <h2 id="outfit-name">
+              Finding today's fit…
+            </h2>
+
           </div>
 
-          <div class="today-pill">
-            Daily fit
+
+          <!-- 2D / 3D TOGGLE -->
+
+          <div class="view-controls">
+
+            <div
+              class="view-toggle"
+              role="group"
+              aria-label="Chonk display mode"
+            >
+
+              <button
+                type="button"
+                class="view-button"
+                id="view-2d"
+                data-mode="2d"
+                aria-pressed="true"
+              >
+                2D
+              </button>
+
+              <button
+                type="button"
+                class="view-button"
+                id="view-3d"
+                data-mode="3d"
+                aria-pressed="false"
+              >
+                3D
+              </button>
+
+            </div>
+
           </div>
 
         </div>
 
 
-        <div class="outfit-name-wrap">
-
-          <div class="outfit-name-label">
-            Today's outfit
-          </div>
-
-          <h2 id="outfit-name">
-            Finding today's fit…
-          </h2>
-
-        </div>
-
+        <!-- =================================================
+             IMAGE / 3D VIEWPORT
+             ================================================= -->
 
         <div class="image-wrap">
 
-          <div id="loading" class="loading">
+          <div
+            id="loading"
+            class="loading"
+          >
             Loading today’s outfit…
           </div>
+
 
           <img
             id="chonk-image"
             alt="Today’s Daily Chonk outfit"
             hidden
           />
+
+
+          <iframe
+            id="chonk-3d-viewer"
+            class="chonk-3d-viewer"
+            title="Daily Chonk 3D viewer"
+            allow="fullscreen"
+            loading="eager"
+            referrerpolicy="no-referrer"
+          ></iframe>
+
+
+          <div
+            id="rotate-hint"
+            class="rotate-hint"
+          >
+            ↔ DRAG TO ROTATE · SCROLL TO ZOOM
+          </div>
 
         </div>
 
@@ -1602,6 +1919,10 @@
 
     (() => {
 
+      /* =====================================================
+         CONFIG
+         ===================================================== */
+
       const CHONK_ID = 30000;
 
       const CONTRACT =
@@ -1616,6 +1937,7 @@
           "2026-09-06T18:34:34Z"
         );
 
+
       const CYCLE =
         24 * 60 * 60 * 1000;
 
@@ -1623,6 +1945,10 @@
       const TRAIT_PAGE_BASE =
         "https://www.chonks.xyz/traits/";
 
+
+      /* =====================================================
+         TRAIT CATEGORIES
+         ===================================================== */
 
       const CATEGORY_NUM = {
 
@@ -1640,18 +1966,29 @@
       };
 
 
+      /* =====================================================
+         ABI
+         ===================================================== */
+
       const abi = [
 
         "function tokenURI(uint256) view returns (string)",
 
         "function renderAsDataUri2D(uint256) view returns (string)",
 
+        "function renderAsDataUri3D(uint256) view returns (string)"
 
       ];
 
 
+      /* =====================================================
+         ETHERS
+         ===================================================== */
+
       const provider =
-        new ethers.JsonRpcProvider(RPC);
+        new ethers.JsonRpcProvider(
+          RPC
+        );
 
 
       const contract =
@@ -1662,40 +1999,69 @@
         );
 
 
+      /* =====================================================
+         DOM
+         ===================================================== */
+
       const image =
         document.getElementById(
           "chonk-image"
         );
+
 
       const loading =
         document.getElementById(
           "loading"
         );
 
+
+      const imageWrap =
+        document.querySelector(
+          ".image-wrap"
+        );
+
+
+      const viewer3D =
+        document.getElementById(
+          "chonk-3d-viewer"
+        );
+
+
+      const rotateHint =
+        document.getElementById(
+          "rotate-hint"
+        );
+
+
       const traitsEl =
         document.getElementById(
           "traits"
         );
+
 
       const countdownEl =
         document.getElementById(
           "countdown"
         );
 
+
       const progressEl =
         document.getElementById(
           "progress"
         );
+
 
       const statusEl =
         document.getElementById(
           "status"
         );
 
+
       const themeCheckbox =
         document.getElementById(
           "theme-checkbox"
         );
+
 
       const outfitNameEl =
         document.getElementById(
@@ -1703,8 +2069,204 @@
         );
 
 
+      const button2D =
+        document.getElementById(
+          "view-2d"
+        );
+
+
+      const button3D =
+        document.getElementById(
+          "view-3d"
+        );
+
+
       /* =====================================================
-         LOCAL STORAGE
+         VIEW STATE
+         ===================================================== */
+
+      let currentMode =
+        "2d";
+
+
+      let cached2D =
+        null;
+
+
+      let cached3D =
+        null;
+
+
+      let viewerLoaded =
+        false;
+
+
+      /* =====================================================
+         VIEW MODE STORAGE
+         ===================================================== */
+
+      function getStoredViewMode() {
+
+        try {
+
+          const stored =
+            localStorage.getItem(
+              "chonk-view-mode"
+            );
+
+
+          if (
+            stored === "2d" ||
+            stored === "3d"
+          ) {
+
+            return stored;
+
+          }
+
+        } catch (e) {
+
+        }
+
+
+        return "2d";
+
+      }
+
+
+      function setStoredViewMode(
+        mode
+      ) {
+
+        try {
+
+          localStorage.setItem(
+            "chonk-view-mode",
+            mode
+          );
+
+        } catch (e) {
+
+        }
+
+      }
+
+
+      currentMode =
+        getStoredViewMode();
+
+
+      /* =====================================================
+         VIEW BUTTONS
+         ===================================================== */
+
+      function updateViewButtons() {
+
+        const is2D =
+          currentMode === "2d";
+
+
+        button2D.classList.toggle(
+          "active",
+          is2D
+        );
+
+
+        button3D.classList.toggle(
+          "active",
+          !is2D
+        );
+
+
+        button2D.setAttribute(
+          "aria-pressed",
+          String(is2D)
+        );
+
+
+        button3D.setAttribute(
+          "aria-pressed",
+          String(!is2D)
+        );
+
+      }
+
+
+      button2D.addEventListener(
+        "click",
+        () => {
+
+          if (
+            currentMode === "2d"
+          ) {
+
+            return;
+
+          }
+
+
+          currentMode =
+            "2d";
+
+
+          setStoredViewMode(
+            currentMode
+          );
+
+
+          updateViewButtons();
+
+          renderCurrentView();
+
+        }
+      );
+
+
+      button3D.addEventListener(
+        "click",
+        () => {
+
+          if (
+            currentMode === "3d"
+          ) {
+
+            return;
+
+          }
+
+
+          if (!cached3D) {
+
+            statusEl.textContent =
+              "3D rendering is not available yet.";
+
+            return;
+
+          }
+
+
+          currentMode =
+            "3d";
+
+
+          setStoredViewMode(
+            currentMode
+          );
+
+
+          updateViewButtons();
+
+          renderCurrentView();
+
+        }
+      );
+
+
+      updateViewButtons();
+
+
+      /* =====================================================
+         THEME
          ===================================================== */
 
       function getStoredTheme() {
@@ -1724,7 +2286,9 @@
       }
 
 
-      function setStoredTheme(theme) {
+      function setStoredTheme(
+        theme
+      ) {
 
         try {
 
@@ -1740,30 +2304,35 @@
       }
 
 
-      /* =====================================================
-         THEME
-         ===================================================== */
-
-      function applyTheme(theme) {
+      function applyTheme(
+        theme
+      ) {
 
         document.documentElement.setAttribute(
           "data-theme",
           theme
         );
 
+
         themeCheckbox.checked =
           theme === "dark";
 
-        setStoredTheme(theme);
+
+        setStoredTheme(
+          theme
+        );
 
       }
 
 
       const savedTheme =
-        getStoredTheme() || "light";
+        getStoredTheme() ||
+        "light";
 
 
-      applyTheme(savedTheme);
+      applyTheme(
+        savedTheme
+      );
 
 
       themeCheckbox.addEventListener(
@@ -1781,44 +2350,159 @@
 
 
       /* =====================================================
-         HELPERS
+         DATA URI DECODER
          ===================================================== */
 
-      function decodeDataUri(uri) {
+      function decodeDataUri(
+        uri
+      ) {
 
-        if (!uri.startsWith("data:")) {
+        if (
+          typeof uri !== "string"
+        ) {
+
           return uri;
+
         }
+
+
+        if (
+          !uri.startsWith("data:")
+        ) {
+
+          return uri;
+
+        }
+
 
         const comma =
           uri.indexOf(",");
 
+
+        if (
+          comma === -1
+        ) {
+
+          return uri;
+
+        }
+
+
         const meta =
-          uri.slice(0, comma);
+          uri.slice(
+            0,
+            comma
+          );
+
 
         const data =
-          uri.slice(comma + 1);
+          uri.slice(
+            comma + 1
+          );
 
-        return meta.includes(";base64")
-          ? atob(data)
-          : decodeURIComponent(data);
+
+        try {
+
+          if (
+            meta.includes(";base64")
+          ) {
+
+            const binary =
+              atob(data);
+
+
+            const bytes =
+              new Uint8Array(
+                binary.length
+              );
+
+
+            for (
+              let i = 0;
+              i < binary.length;
+              i++
+            ) {
+
+              bytes[i] =
+                binary.charCodeAt(i);
+
+            }
+
+
+            return new TextDecoder()
+              .decode(bytes);
+
+          }
+
+
+          return decodeURIComponent(
+            data
+          );
+
+        } catch (e) {
+
+          return data;
+
+        }
 
       }
 
 
-      function escapeHtml(s) {
+      /* =====================================================
+         PARSE METADATA
+         ===================================================== */
 
-        return String(s).replace(
-          /[&<>"']/g,
-          c =>
-            ({
-              "&": "&amp;",
-              "<": "&lt;",
-              ">": "&gt;",
-              '"': "&quot;",
-              "'": "&#039;"
-            }[c])
-        );
+      function parseDataUri(
+        uri
+      ) {
+
+        const decoded =
+          decodeDataUri(
+            uri
+          );
+
+
+        if (
+          typeof decoded !== "string"
+        ) {
+
+          return {
+
+            metadata: {},
+
+            raw: decoded
+
+          };
+
+        }
+
+
+        try {
+
+          return {
+
+            metadata:
+              JSON.parse(
+                decoded
+              ),
+
+            raw:
+              decoded
+
+          };
+
+        } catch (e) {
+
+          return {
+
+            metadata: {},
+
+            raw:
+              decoded
+
+          };
+
+        }
 
       }
 
@@ -1827,14 +2511,27 @@
          TRAIT SLUG
          ===================================================== */
 
-      function traitSlug(value) {
+      function traitSlug(
+        value
+      ) {
 
-        return String(value || "")
+        return String(
+          value || ""
+        )
           .trim()
           .toLowerCase()
-          .replace(/[''`]/g, "")
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/^-+|-+$/g, "");
+          .replace(
+            /[''`]/g,
+            ""
+          )
+          .replace(
+            /[^a-z0-9]+/g,
+            "-"
+          )
+          .replace(
+            /^-+|-+$/g,
+            ""
+          );
 
       }
 
@@ -1845,24 +2542,40 @@
       ) {
 
         const key =
-          String(traitType || "")
+          String(
+            traitType || ""
+          )
             .trim()
             .toLowerCase()
-            .replace(/[^a-z]/g, "");
+            .replace(
+              /[^a-z]/g,
+              ""
+            );
+
 
         const category =
           CATEGORY_NUM[key];
 
+
         if (!category) {
+
           return null;
+
         }
+
 
         const slug =
-          traitSlug(value);
+          traitSlug(
+            value
+          );
+
 
         if (!slug) {
+
           return null;
+
         }
+
 
         return (
           `${TRAIT_PAGE_BASE}` +
@@ -1877,11 +2590,18 @@
          OUTFIT NAME
          ===================================================== */
 
-      function cleanTraitName(value) {
+      function cleanTraitName(
+        value
+      ) {
 
-        return String(value || "")
+        return String(
+          value || ""
+        )
           .trim()
-          .replace(/\s+/g, " ");
+          .replace(
+            /\s+/g,
+            " "
+          );
 
       }
 
@@ -1892,36 +2612,54 @@
       ) {
 
         const found =
-          attrs.find(a => {
+          attrs.find(
+            a => {
 
-            const type =
-              String(
-                a.trait_type || ""
-              )
-                .trim()
-                .toLowerCase();
+              const type =
+                String(
+                  a.trait_type || ""
+                )
+                  .trim()
+                  .toLowerCase();
 
-            return type === wantedType;
 
-          });
+              return (
+                type === wantedType
+              );
+
+            }
+          );
+
 
         return found
-          ? cleanTraitName(found.value)
+          ? cleanTraitName(
+              found.value
+            )
           : "";
 
       }
 
 
-      function simplifyTrait(value) {
+      function simplifyTrait(
+        value
+      ) {
 
-        if (!value) return "";
+        if (!value) {
+
+          return "";
+
+        }
+
 
         return value
           .replace(
             /\b(color|colours?)\b/gi,
             ""
           )
-          .replace(/\s+/g, " ")
+          .replace(
+            /\s+/g,
+            " "
+          )
           .trim();
 
       }
@@ -1948,15 +2686,19 @@
 
 
         const words = [
+
           top,
           head,
           face,
           accessory
+
         ].filter(Boolean);
 
 
         if (!words.length) {
+
           return "The Daily Chonk";
+
         }
 
 
@@ -2001,6 +2743,7 @@
 
 
         let hash = 0;
+
 
         const source =
           [
@@ -2084,7 +2827,9 @@
       }
 
 
-      function updateOutfitName(attrs) {
+      function updateOutfitName(
+        attrs
+      ) {
 
         const top =
           getTraitPart(
@@ -2092,17 +2837,20 @@
             "top"
           );
 
+
         const head =
           getTraitPart(
             attrs,
             "head"
           );
 
+
         const face =
           getTraitPart(
             attrs,
             "face"
           );
+
 
         const accessory =
           getTraitPart(
@@ -2123,29 +2871,71 @@
 
 
       /* =====================================================
+         ESCAPE HTML
+         ===================================================== */
+
+      function escapeHtml(
+        s
+      ) {
+
+        return String(
+          s
+        ).replace(
+          /[&<>"']/g,
+          c =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#039;"
+            }[c])
+        );
+
+      }
+
+
+      /* =====================================================
          SHOW TRAITS
          ===================================================== */
 
-      function showTraits(json) {
+      function showTraits(
+        json
+      ) {
 
-        traitsEl.innerHTML = "";
+        traitsEl.innerHTML =
+          "";
+
 
         const attrs =
-          Array.isArray(json.attributes)
+          Array.isArray(
+            json.attributes
+          )
             ? json.attributes
             : [];
 
 
-        updateOutfitName(attrs);
+        updateOutfitName(
+          attrs
+        );
 
 
         if (!attrs.length) {
 
           traitsEl.innerHTML = `
+
             <div class="trait">
-              <span>Source</span>
-              <span>Onchain</span>
+
+              <span>
+                Source
+              </span>
+
+              <span>
+                Onchain
+              </span>
+
             </div>
+
           `;
 
           return;
@@ -2153,102 +2943,582 @@
         }
 
 
-        attrs.forEach(a => {
+        attrs.forEach(
+          a => {
 
-          const type =
-            a.trait_type ??
-            "Trait";
-
-          const value =
-            String(
-              a.value ?? "—"
-            );
+            const type =
+              a.trait_type ??
+              "Trait";
 
 
-          const href =
-            resolveTraitPageUrl(
-              type,
-              value
-            );
+            const value =
+              String(
+                a.value ?? "—"
+              );
 
 
-          if (href) {
-
-            const link =
-              document.createElement("a");
-
-
-            link.className =
-              "trait";
+            const href =
+              resolveTraitPageUrl(
+                type,
+                value
+              );
 
 
-            link.href =
-              href;
+            if (href) {
+
+              const link =
+                document.createElement(
+                  "a"
+                );
 
 
-            link.target =
-              "_blank";
+              link.className =
+                "trait";
 
 
-            link.rel =
-              "noopener";
+              link.href =
+                href;
 
 
-            link.title =
-              `Browse ${value} traits on Chonks`;
+              link.target =
+                "_blank";
 
 
-            link.innerHTML = `
-              <span>
-                ${escapeHtml(value)}
-              </span>
-
-              <span>
-                Buy Trait
-              </span>
-            `;
+              link.rel =
+                "noopener";
 
 
-            traitsEl.appendChild(link);
-
-          } else {
-
-            const row =
-              document.createElement("div");
+              link.title =
+                `Browse ${value} traits on Chonks`;
 
 
-            row.className =
-              "trait";
+              link.innerHTML = `
+
+                <span>
+                  ${escapeHtml(value)}
+                </span>
+
+                <span>
+                  Buy Trait
+                </span>
+
+              `;
 
 
-            row.style.cursor =
-              "default";
+              traitsEl.appendChild(
+                link
+              );
+
+            } else {
+
+              const row =
+                document.createElement(
+                  "div"
+                );
 
 
-            row.innerHTML = `
-              <span>
-                ${escapeHtml(type)}
-              </span>
-
-              <span>
-                ${escapeHtml(value)}
-              </span>
-            `;
+              row.className =
+                "trait";
 
 
-            row.style.overflow =
-              "visible";
+              row.style.cursor =
+                "default";
 
 
-            row.style.background =
-              "var(--progress-bg)";
+              row.innerHTML = `
+
+                <span>
+                  ${escapeHtml(type)}
+                </span>
+
+                <span>
+                  ${escapeHtml(value)}
+                </span>
+
+              `;
 
 
-            traitsEl.appendChild(row);
+              row.style.overflow =
+                "visible";
+
+
+              row.style.background =
+                "var(--progress-bg)";
+
+
+              traitsEl.appendChild(
+                row
+              );
+
+            }
 
           }
+        );
 
-        });
+      }
+
+
+      /* =====================================================
+         EXTRACT 2D
+         ===================================================== */
+
+      function extract2D(
+        uri
+      ) {
+
+        const parsed =
+          parseDataUri(
+            uri
+          );
+
+
+        const metadata =
+          parsed.metadata;
+
+
+        if (
+          metadata.image
+        ) {
+
+          return {
+
+            image:
+              metadata.image,
+
+            metadata
+
+          };
+
+        }
+
+
+        if (
+          typeof parsed.raw ===
+          "string" &&
+          parsed.raw.startsWith(
+            "data:image"
+          )
+        ) {
+
+          return {
+
+            image:
+              parsed.raw,
+
+            metadata
+
+          };
+
+        }
+
+
+        return {
+
+          image:
+            null,
+
+          metadata
+
+        };
+
+      }
+
+
+      /* =====================================================
+         EXTRACT 3D
+         ===================================================== */
+
+      function extract3D(
+        uri
+      ) {
+
+        const parsed =
+          parseDataUri(
+            uri
+          );
+
+
+        const metadata =
+          parsed.metadata;
+
+
+        if (
+          metadata.animation_url
+        ) {
+
+          return {
+
+            viewer:
+              metadata.animation_url,
+
+            metadata
+
+          };
+
+        }
+
+
+        if (
+          typeof uri ===
+          "string" &&
+          (
+            uri.startsWith(
+              "data:text/html"
+            ) ||
+            uri.startsWith(
+              "data:application/xhtml+xml"
+            )
+          )
+        ) {
+
+          return {
+
+            viewer:
+              uri,
+
+            metadata
+
+          };
+
+        }
+
+
+        return {
+
+          viewer:
+            null,
+
+          metadata
+
+        };
+
+      }
+
+
+      /* =====================================================
+         SHOW 2D
+         ===================================================== */
+
+      function show2D() {
+
+        if (!cached2D) {
+
+          loading.hidden =
+            false;
+
+          loading.textContent =
+            "2D render unavailable.";
+
+          return;
+
+        }
+
+
+        viewer3D.classList.remove(
+          "loaded"
+        );
+
+
+        rotateHint.classList.remove(
+          "visible"
+        );
+
+
+        setTimeout(
+          () => {
+
+            if (
+              currentMode !== "2d"
+            ) {
+
+              return;
+
+            }
+
+
+            viewer3D.src =
+              "about:blank";
+
+
+            viewerLoaded =
+              false;
+
+
+            viewer3D.style.pointerEvents =
+              "none";
+
+          },
+          250
+        );
+
+
+        image.hidden =
+          false;
+
+
+        image.classList.add(
+          "changing"
+        );
+
+
+        setTimeout(
+          () => {
+
+            if (
+              currentMode !== "2d"
+            ) {
+
+              return;
+
+            }
+
+
+            image.src =
+              cached2D;
+
+
+            image.hidden =
+              false;
+
+
+            loading.hidden =
+              true;
+
+
+            requestAnimationFrame(
+              () => {
+
+                image.classList.remove(
+                  "changing"
+                );
+
+              }
+            );
+
+          },
+          120
+        );
+
+      }
+
+
+      /* =====================================================
+         SHOW 3D
+         ===================================================== */
+
+      function show3D() {
+
+        if (!cached3D) {
+
+          loading.hidden =
+            false;
+
+          loading.textContent =
+            "3D render unavailable.";
+
+          return;
+
+        }
+
+
+        image.classList.add(
+          "changing"
+        );
+
+
+        setTimeout(
+          () => {
+
+            if (
+              currentMode !== "3d"
+            ) {
+
+              return;
+
+            }
+
+
+            image.hidden =
+              true;
+
+            image.classList.remove(
+              "changing"
+            );
+
+
+            loading.hidden =
+              false;
+
+
+            loading.textContent =
+              "Loading 3D Chonk…";
+
+
+            viewer3D.style.pointerEvents =
+              "auto";
+
+
+            viewer3D.classList.remove(
+              "loaded"
+            );
+
+
+            viewerLoaded =
+              false;
+
+
+            const existingSrc =
+              viewer3D.dataset.render;
+
+
+            if (
+              existingSrc === cached3D &&
+              viewer3D.src &&
+              viewer3D.src !==
+                "about:blank"
+            ) {
+
+              viewer3D.classList.add(
+                "loaded"
+              );
+
+
+              loading.hidden =
+                true;
+
+
+              showRotateHint();
+
+              return;
+
+            }
+
+
+            viewer3D.dataset.render =
+              cached3D;
+
+
+            viewer3D.onload =
+              () => {
+
+                viewerLoaded =
+                  true;
+
+
+                loading.hidden =
+                  true;
+
+
+                requestAnimationFrame(
+                  () => {
+
+                    viewer3D.classList.add(
+                      "loaded"
+                    );
+
+                  }
+                );
+
+
+                showRotateHint();
+
+              };
+
+
+            viewer3D.onerror =
+              () => {
+
+                loading.hidden =
+                  false;
+
+
+                loading.textContent =
+                  "Unable to load the 3D viewer.";
+
+              };
+
+
+            viewer3D.src =
+              cached3D;
+
+          },
+          180
+        );
+
+      }
+
+
+      /* =====================================================
+         ROTATE HINT
+         ===================================================== */
+
+      let hintTimer =
+        null;
+
+
+      function showRotateHint() {
+
+        rotateHint.classList.remove(
+          "visible"
+        );
+
+
+        clearTimeout(
+          hintTimer
+        );
+
+
+        hintTimer =
+          setTimeout(
+            () => {
+
+              if (
+                currentMode === "3d" &&
+                viewerLoaded
+              ) {
+
+                rotateHint.classList.add(
+                  "visible"
+                );
+
+              }
+
+            },
+            400
+          );
+
+
+        setTimeout(
+          () => {
+
+            rotateHint.classList.remove(
+              "visible"
+            );
+
+          },
+          5000
+        );
+
+      }
+
+
+      /* =====================================================
+         RENDER CURRENT VIEW
+         ===================================================== */
+
+      function renderCurrentView() {
+
+        if (
+          currentMode === "3d"
+        ) {
+
+          show3D();
+
+        } else {
+
+          show2D();
+
+        }
 
       }
 
@@ -2261,114 +3531,139 @@
 
         try {
 
+          loading.hidden =
+            false;
+
+
+          loading.textContent =
+            "Loading today’s outfit…";
+
+
           const [
-  uri,
-  svgUri
-] =
-  await Promise.all([
+            uri2D,
+            uri3D
+          ] =
+            await Promise.all([
 
-    contract.tokenURI(
-      CHONK_ID
-    ),
+              contract.renderAsDataUri2D(
+                CHONK_ID
+              ),
 
-    contract.renderAsDataUri2D(
-      CHONK_ID
-    )
+              contract.renderAsDataUri3D(
+                CHONK_ID
+              )
 
-  ]);
-
-          const sourceUri =
-            svgUri || uri;
+            ]);
 
 
-          let metadata = {};
-          let imageUri = null;
+          /* =================================================
+             2D
+             ================================================= */
+
+          const parsed2D =
+            extract2D(
+              uri2D
+            );
 
 
-          try {
-
-            const decoded =
-              decodeDataUri(
-                sourceUri
-              );
+          cached2D =
+            parsed2D.image;
 
 
-            metadata =
-              JSON.parse(
-                decoded
-              );
+          /* =================================================
+             3D
+             ================================================= */
+
+          const parsed3D =
+            extract3D(
+              uri3D
+            );
 
 
-            imageUri =
-              metadata.image ||
-              null;
+          cached3D =
+            parsed3D.viewer;
 
 
-          } catch (_) {
+          /* =================================================
+             TRAITS
+             ================================================= */
+
+          if (
+            parsed2D.metadata &&
+            Array.isArray(
+              parsed2D.metadata.attributes
+            )
+          ) {
+
+            showTraits(
+              parsed2D.metadata
+            );
+
+          } else if (
+            parsed3D.metadata &&
+            Array.isArray(
+              parsed3D.metadata.attributes
+            )
+          ) {
+
+            showTraits(
+              parsed3D.metadata
+            );
+
+          }
+
+
+          /* =================================================
+             3D AVAILABILITY
+             ================================================= */
+
+          if (!cached3D) {
+
+            console.warn(
+              "Daily Chonk: 3D renderer did not return an animation_url."
+            );
+
 
             if (
-              sourceUri.startsWith(
-                "data:image"
-              )
+              currentMode === "3d"
             ) {
 
-              imageUri =
-                sourceUri;
+              currentMode =
+                "2d";
+
+
+              setStoredViewMode(
+                "2d"
+              );
+
+
+              updateViewButtons();
 
             }
 
           }
 
 
-          if (!imageUri) {
+          /* =================================================
+             RENDER
+             ================================================= */
 
-            throw new Error(
-              "No image found in on-chain metadata"
-            );
-
-          }
-
-
-          image.classList.add(
-            "changing"
-          );
-
-
-          setTimeout(() => {
-
-            image.src =
-              imageUri;
-
-            image.hidden =
-              false;
-
-            loading.hidden =
-              true;
-
-
-            requestAnimationFrame(() => {
-
-              image.classList.remove(
-                "changing"
-              );
-
-            });
-
-          }, 220);
-
-
-          showTraits(
-            metadata
-          );
+          renderCurrentView();
 
 
           statusEl.textContent =
             "Live — refreshing directly from the Base chain.";
 
-
         } catch (err) {
 
-          console.error(err);
+          console.error(
+            "Daily Chonk load error:",
+            err
+          );
+
+
+          loading.hidden =
+            false;
 
 
           loading.textContent =
@@ -2380,10 +3675,14 @@
 
 
           traitsEl.innerHTML = `
+
             <div class="error">
+
               Could not fetch on-chain data.
               Please try again in a moment.
+
             </div>
+
           `;
 
 
@@ -2417,7 +3716,9 @@
           CYCLE;
 
 
-        if (elapsed < 0) {
+        if (
+          elapsed < 0
+        ) {
 
           elapsed +=
             CYCLE;
@@ -2470,12 +3771,41 @@
           ) * 100}%`;
 
 
+        /* =================================================
+           DAILY RESET DETECTION
+           ================================================= */
+
         if (
           remaining >
             lastRemaining &&
           lastRemaining <
             5000
         ) {
+
+          cached2D =
+            null;
+
+
+          cached3D =
+            null;
+
+
+          viewer3D.dataset.render =
+            "";
+
+
+          viewer3D.src =
+            "about:blank";
+
+
+          viewer3D.classList.remove(
+            "loaded"
+          );
+
+
+          viewerLoaded =
+            false;
+
 
           loadChonk();
 
@@ -2485,6 +3815,10 @@
         lastRemaining =
           remaining;
 
+
+        /* =================================================
+           STATUS
+           ================================================= */
 
         if (
           remaining <
@@ -2516,7 +3850,16 @@
          INITIAL LOAD
          ===================================================== */
 
+      viewer3D.style.pointerEvents =
+        "none";
+
+
+      viewer3D.src =
+        "about:blank";
+
+
       loadChonk();
+
 
       tick();
 
@@ -2525,6 +3868,7 @@
         tick,
         1000
       );
+
 
     })();
 
