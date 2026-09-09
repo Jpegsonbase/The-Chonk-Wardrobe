@@ -68,19 +68,7 @@
       transition: background 0.25s ease, color 0.25s ease;
     }
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      background-image: url("./background.png");
-      background-repeat: repeat;
-      background-size: 100px 100px;
-      background-position: center top;
-      opacity: 0.10;
-      transition: opacity 0.3s ease;
-    }
+    
    
     @keyframes chonkModeSpin {
   from {
@@ -95,11 +83,45 @@
 body.chonk-mode-spin::before {
   animation: chonkModeSpin 2s cubic-bezier(.2,.8,.2,1);
 }
+ 
+ #chonk-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0.10;
+}
 
+.chonk-bg-tile {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background-image: url("./background.png");
+  background-size: 100px 100px;
+  background-repeat: no-repeat;
+  background-position: center;
+  transform-origin: center center;
+}
 
-    [data-theme="dark"] body::before {
-      filter: sepia(1) saturate(5) hue-rotate(175deg) brightness(0.8);
-    }
+[data-theme="dark"] #chonk-background {
+  filter: sepia(1) saturate(5) hue-rotate(175deg) brightness(0.8);
+}
+
+@keyframes individualChonkSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.chonk-bg-tile.spinning {
+  animation: individualChonkSpin 1.5s cubic-bezier(.2,.8,.2,1);
+}
+
 
     .wrap {
       position: relative;
@@ -723,6 +745,7 @@ body.chonk-mode-spin::before {
 </head>
 
 <body>
+    <div id="chonk-background"></div>
   <div class="wrap">
 
     <header>
@@ -893,20 +916,46 @@ body.chonk-mode-spin::before {
     const button2D = document.getElementById("view-2d");
     const button3D = document.getElementById("view-3d");
     const buttonSpin = document.getElementById("view-spin");
-    const chonkModeButton = document.getElementById("chonk-mode");
+const chonkModeButton = document.getElementById("chonk-mode");
+const chonkBackground = document.getElementById("chonk-background");
+
+function createChonkBackground() {
+  chonkBackground.innerHTML = "";
+
+  const size = 100;
+  const columns = Math.ceil(window.innerWidth / size) + 1;
+  const rows = Math.ceil(window.innerHeight / size) + 1;
+
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < columns; x++) {
+      const tile = document.createElement("div");
+
+      tile.className = "chonk-bg-tile";
+      tile.style.left = `${x * size}px`;
+      tile.style.top = `${y * size}px`;
+
+      chonkBackground.appendChild(tile);
+    }
+  }
+}
+
+createChonkBackground();
+
+window.addEventListener("resize", createChonkBackground);
 
 chonkModeButton.addEventListener("click", () => {
-  document.body.classList.remove("chonk-mode-spin");
+  const tiles = document.querySelectorAll(".chonk-bg-tile");
 
-  // Restart the animation if clicked again.
-  void document.body.offsetWidth;
+  tiles.forEach(tile => {
+    tile.classList.remove("spinning");
 
-  document.body.classList.add("chonk-mode-spin");
+    // Restart the animation every time the button is clicked.
+    void tile.offsetWidth;
 
-  setTimeout(() => {
-    document.body.classList.remove("chonk-mode-spin");
-  }, 2000);
+    tile.classList.add("spinning");
+  });
 });
+
 
 
     let currentMode = "2d";
