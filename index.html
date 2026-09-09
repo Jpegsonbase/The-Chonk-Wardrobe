@@ -119,7 +119,7 @@ body.chonk-mode-spin::before {
 }
 
 .chonk-bg-tile.spinning {
-  animation: individualChonkSpin 1.5s cubic-bezier(.2,.8,.2,1);
+  animation: individualChonkSpin 2s linear infinite;
 }
 
 
@@ -696,7 +696,10 @@ body.chonk-mode-spin::before {
   color: var(--ink);
   text-decoration: underline;
 }
-
+.chonk-mode-button.active {
+  color: var(--ink);
+  font-weight: 1000;
+}
 .chonk-mode-button:active {
   transform: scale(0.95);
 }
@@ -919,6 +922,8 @@ body.chonk-mode-spin::before {
 const chonkModeButton = document.getElementById("chonk-mode");
 const chonkBackground = document.getElementById("chonk-background");
 
+let chonkModeActive = false;
+
 function createChonkBackground() {
   chonkBackground.innerHTML = "";
 
@@ -934,6 +939,10 @@ function createChonkBackground() {
       tile.style.left = `${x * size}px`;
       tile.style.top = `${y * size}px`;
 
+      if (chonkModeActive) {
+        tile.classList.add("spinning");
+      }
+
       chonkBackground.appendChild(tile);
     }
   }
@@ -944,16 +953,16 @@ createChonkBackground();
 window.addEventListener("resize", createChonkBackground);
 
 chonkModeButton.addEventListener("click", () => {
+  chonkModeActive = !chonkModeActive;
+
   const tiles = document.querySelectorAll(".chonk-bg-tile");
 
   tiles.forEach(tile => {
-    tile.classList.remove("spinning");
-
-    // Restart the animation every time the button is clicked.
-    void tile.offsetWidth;
-
-    tile.classList.add("spinning");
+    tile.classList.toggle("spinning", chonkModeActive);
   });
+
+  // Make the button show whether Chonk Mode is active.
+  chonkModeButton.classList.toggle("active", chonkModeActive);
 });
 
 
