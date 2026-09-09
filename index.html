@@ -91,7 +91,13 @@ body.chonk-mode-spin::before {
   pointer-events: none;
   overflow: hidden;
   opacity: 0.10;
+  transition: opacity 0.4s ease, filter 0.4s ease;
 }
+body.chonk-mode-active #chonk-background {
+  opacity: 0.35;
+  filter: saturate(2) contrast(1.15);
+}
+
 
 .chonk-bg-tile {
   position: absolute;
@@ -1025,7 +1031,13 @@ chonkModeButton.addEventListener("click", () => {
     tile.classList.toggle("rainbow", chonkModeActive);
   });
 
-  // Make the button show whether Chonk Mode is active.
+  // Bring the Chonk background visually forward.
+  document.body.classList.toggle(
+    "chonk-mode-active",
+    chonkModeActive
+  );
+
+  // Highlight the button.
   chonkModeButton.classList.toggle("active", chonkModeActive);
 });
 
