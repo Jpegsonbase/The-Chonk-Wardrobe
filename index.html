@@ -553,20 +553,20 @@
        HERO TOP
        ========================================================= */
 
-    .hero-top {
-      display: grid;
+  .hero-top {
+  display: grid;
 
-      grid-template-columns:
-        auto
-        minmax(0, 1fr)
-        auto;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
 
-      align-items: center;
+  align-items: center;
 
-      gap: 14px;
+  gap: 14px;
 
-      margin-bottom: 14px;
-    }
+  margin-bottom: 14px;
+}
+
 
     .hero-top > strong {
       white-space: nowrap;
@@ -596,8 +596,9 @@
 
   text-align: center;
 
-  justify-self: center;
+  justify-self: start;
 }
+
 
 
     .outfit-name-label {
@@ -1603,23 +1604,18 @@
 
         <div class="hero-top">
 
-          <strong>
-            Chonk #30000
-          </strong>
+  <div class="outfit-name-wrap">
 
+    <h2 id="outfit-name">
+      Finding today's fit…
+    </h2>
 
-          <div class="outfit-name-wrap">
+  </div>
 
-            <h2 id="outfit-name">
-              Finding today's fit…
-            </h2>
+  <!-- 2D / 3D TOGGLE -->
 
-          </div>
+  <div class="view-controls">
 
-
-          <!-- 2D / 3D TOGGLE -->
-
-          <div class="view-controls">
 
             <div
               class="view-toggle"
