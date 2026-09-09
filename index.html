@@ -188,8 +188,34 @@ body.chonk-mode-active #chonk-background {
     chonkRainbow 3s linear infinite;
 }
 
+    /* Easter egg: raining chonk heads */
+    @keyframes head-fall {
+      0% {
+        transform: translateY(-120px) rotate(0deg) translateX(0);
+        opacity: 0.95;
+      }
+      10% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(calc(100vh + 120px)) rotate(720deg) translateX(var(--sway, 20px));
+        opacity: 0.7;
+      }
+    }
 
-
+    .rain-head {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: var(--size, 64px);
+      height: auto;
+      image-rendering: pixelated;
+      pointer-events: none;
+      z-index: 9999;
+      will-change: transform, opacity;
+      animation: head-fall var(--duration, 5s) linear forwards;
+      filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.15));
+    }
 
     .wrap {
       position: relative;
@@ -1699,6 +1725,100 @@ function generateOutfitName(top, head, face, accessory) {
     loadChonk();
     tick();
     setInterval(tick, 1000);
+
+    /* ========== EASTER EGG: type "chonk" to rain heads ========== */
+    const HEAD_SRC = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAABMCAYAAACmj3NpAAACkUlEQVR42u2dMW/TQBSA3zlJkZMCLUKtaJmiikpO6FyJBaSwMcBO6EAGVjYmBsTP6MRoCQm6IXXtgJgjIXW2BBMBNU1ixz4mWPNOSpT68n1StqeXu/t8Pt9zTjG/Pr+QBWEFFoXRBgaMld8gGMGAYEAwIBgQDAgGBCMYvKHqGE/58WpgmcGAYAQDggHBgGBAMCAYELx6gi21Kb8F7x/F1B895v/PL/PTnvwZprPiuRbKugZXOsdys7HGiPj8kBUg2f+naCSvwDYJySuwDw46x3IDyf4K5sFrBQQzk1dA8L+ZTMWrnBgRuSeKAsb2Zmg/vXt8vtTGGiNRFKlikySRwWBQGhGtVksd2+/3nXLbsnxqtZrV0u12bZn65oJLXt4msQYDggHBgGBAMCAYEIxg8IbqydtDVaC1Vra2tlWx62FN7vc+qmKjKJI4jlWxeZ5Lu91WxSZJoh6ERwe35fXTPVXss/dfJS90hfk4jtWlVW2/nAXv3WmoBe/sbqhiXV4xhmGorsNmWeZch9VwPayKdhyM0edtNpvqvi2iX9yiWYMBwYBgQDAgGBAMCEYweEVVlP/gsbF5S0R5fHRwkUpx2lM14Nv3n2JcykNKPrx5KM87uvJjlhcyTgtVbPrlpboN+08eyPmPydz7Zs9eiR1N1YJnJ7RW6vW6ugHGiPyefdZYRERGyoF15XIyVbfBBZec9ca6iMxfcHqRyuVYJzjQyN3Zvcu9zsc1GLkeC0aux4KR67Fg5HosGLkeC0aux4KR67Fg5PqNGZwciV3M8X1V0iAwEq5V5v7lk6yQaV4sdXDDaxUJFlCGHY6n6qTVZV9hRWFlqCy7lY3RJL+a+2DweB8MCAYEA4IBwYBgQDCCwWP+Al7TbW9hj/68AAAAAElFTkSuQmCC";
+
+    let typedSequence = "";
+    const SECRET = "chonk";
+    let rainActive = false;
+    let rainInterval = null;
+    let rainTimeout = null;
+
+    function spawnHead() {
+      const head = document.createElement("img");
+      head.src = HEAD_SRC;
+      head.alt = "";
+      head.className = "rain-head";
+      head.setAttribute("aria-hidden", "true");
+
+      const size = 48 + Math.random() * 48; // 48–96px
+      const duration = 3.5 + Math.random() * 4.5; // 3.5–8s
+      const left = Math.random() * 100; // vw
+      const sway = (Math.random() - 0.5) * 80; // px drift
+
+      head.style.setProperty("--size", size + "px");
+      head.style.setProperty("--duration", duration + "s");
+      head.style.setProperty("--sway", sway + "px");
+      head.style.left = left + "vw";
+      head.style.top = "-10px";
+
+      document.body.appendChild(head);
+
+      head.addEventListener("animationend", () => {
+        head.remove();
+      });
+    }
+
+    function startHeadRain() {
+      if (rainActive) return;
+      rainActive = true;
+
+      // Burst of heads immediately
+      for (let i = 0; i < 8; i++) {
+        setTimeout(spawnHead, i * 80);
+      }
+
+      // Continue raining for ~12 seconds
+      rainInterval = setInterval(spawnHead, 180 + Math.random() * 120);
+
+      rainTimeout = setTimeout(stopHeadRain, 12000);
+    }
+
+    function stopHeadRain() {
+      rainActive = false;
+      if (rainInterval) {
+        clearInterval(rainInterval);
+        rainInterval = null;
+      }
+      if (rainTimeout) {
+        clearTimeout(rainTimeout);
+        rainTimeout = null;
+      }
+    }
+
+    document.addEventListener("keydown", (e) => {
+      // Ignore when typing in inputs/textareas or with modifiers
+      if (
+        e.target.tagName === "INPUT" ||
+        e.target.tagName === "TEXTAREA" ||
+        e.target.isContentEditable ||
+        e.ctrlKey || e.metaKey || e.altKey
+      ) {
+        return;
+      }
+
+      const key = e.key.toLowerCase();
+
+      if (key.length === 1 && /[a-z0-9]/.test(key)) {
+        typedSequence += key;
+        if (typedSequence.length > SECRET.length) {
+          typedSequence = typedSequence.slice(-SECRET.length);
+        }
+        if (typedSequence === SECRET) {
+          startHeadRain();
+          typedSequence = "";
+        }
+      } else if (key === "backspace") {
+        typedSequence = typedSequence.slice(0, -1);
+      } else if (key === "escape") {
+        stopHeadRain();
+        typedSequence = "";
+      } else {
+        // Reset on other keys (space, arrows, etc.)
+        typedSequence = "";
+      }
+    });
   })();
   </script>
 </body>
