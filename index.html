@@ -81,6 +81,21 @@
       opacity: 0.10;
       transition: opacity 0.3s ease;
     }
+   
+    @keyframes chonkModeSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+body.chonk-mode-spin::before {
+  animation: chonkModeSpin 2s cubic-bezier(.2,.8,.2,1);
+}
+
 
     [data-theme="dark"] body::before {
       filter: sepia(1) saturate(5) hue-rotate(175deg) brightness(0.8);
@@ -641,6 +656,29 @@
       gap: 18px;
       flex-wrap: wrap;
     }
+    .chonk-mode-button {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.chonk-mode-button:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+.chonk-mode-button:active {
+  transform: scale(0.95);
+}
+
     .error {
       padding: 8px 0;
       color: #f87171;
@@ -800,11 +838,19 @@
     </div>
 
     <footer>
-      <span>Rendered directly from the Base blockchain.</span>
-      <div class="footer-links">
-        <span>ERC-6551</span><span>·</span><span>Daily Chonk</span>
-      </div>
-    </footer>
+  <span>Rendered directly from the Base blockchain.</span>
+
+  <div class="footer-links">
+    <span>ERC-6551</span>
+    <span>·</span>
+    <span>Daily Chonk</span>
+    <span>·</span>
+    <button id="chonk-mode" class="chonk-mode-button" type="button">
+      Chonk Mode
+    </button>
+  </div>
+</footer>
+
   </div>
 
   <script type="module">
@@ -847,6 +893,21 @@
     const button2D = document.getElementById("view-2d");
     const button3D = document.getElementById("view-3d");
     const buttonSpin = document.getElementById("view-spin");
+    const chonkModeButton = document.getElementById("chonk-mode");
+
+chonkModeButton.addEventListener("click", () => {
+  document.body.classList.remove("chonk-mode-spin");
+
+  // Restart the animation if clicked again.
+  void document.body.offsetWidth;
+
+  document.body.classList.add("chonk-mode-spin");
+
+  setTimeout(() => {
+    document.body.classList.remove("chonk-mode-spin");
+  }, 2000);
+});
+
 
     let currentMode = "2d";
     let cached2D = null;
