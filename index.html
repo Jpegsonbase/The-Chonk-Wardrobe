@@ -68,128 +68,23 @@
       transition: background 0.25s ease, color 0.25s ease;
     }
 
-    
-   
-    @keyframes chonkModeSpin {
-  from {
-    transform: rotate(0deg);
-  }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image: url("./background.png");
+      background-repeat: repeat;
+      background-size: 100px 100px;
+      background-position: center top;
+      opacity: 0.10;
+      transition: opacity 0.3s ease;
+    }
 
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-body.chonk-mode-spin::before {
-  animation: chonkModeSpin 2s cubic-bezier(.2,.8,.2,1);
-}
- 
- #chonk-background {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
-  opacity: 0.10;
-  transition: opacity 0.4s ease, filter 0.4s ease;
-}
-body.chonk-mode-active #chonk-background {
-  opacity: 0.35;
-  filter: saturate(2) contrast(1.15);
-}
-
-
-.chonk-bg-tile {
-  position: absolute;
-  width: 100px;
-  height: 100px;
-  background-image: url("./background.png");
-  background-size: 100px 100px;
-  background-repeat: no-repeat;
-  background-position: center;
-  transform-origin: center center;
-}
-
-
-@keyframes individualChonkSpin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.chonk-bg-tile.spinning {
-  animation: individualChonkSpin 2s linear infinite;
-}
-@keyframes chonkRainbow {
-  0% {
-    filter:
-      hue-rotate(0deg)
-      saturate(3)
-      brightness(1.15)
-      contrast(1.15);
-  }
-
-  16.6% {
-    filter:
-      hue-rotate(60deg)
-      saturate(3.5)
-      brightness(1.2)
-      contrast(1.2);
-  }
-
-  33.3% {
-    filter:
-      hue-rotate(120deg)
-      saturate(3.5)
-      brightness(1.2)
-      contrast(1.2);
-  }
-
-  50% {
-    filter:
-      hue-rotate(180deg)
-      saturate(4)
-      brightness(1.25)
-      contrast(1.2);
-  }
-
-  66.6% {
-    filter:
-      hue-rotate(240deg)
-      saturate(3.5)
-      brightness(1.2)
-      contrast(1.2);
-  }
-
-  83.3% {
-    filter:
-      hue-rotate(300deg)
-      saturate(4)
-      brightness(1.25)
-      contrast(1.2);
-  }
-
-  100% {
-    filter:
-      hue-rotate(360deg)
-      saturate(3)
-      brightness(1.15)
-      contrast(1.15);
-  }
-}
-
-.chonk-bg-tile.rainbow {
-  animation:
-    individualChonkSpin 2s linear infinite,
-    chonkRainbow 3s linear infinite;
-}
-
-
-
+    [data-theme="dark"] body::before {
+      filter: sepia(1) saturate(5) hue-rotate(175deg) brightness(0.8);
+    }
 
     .wrap {
       position: relative;
@@ -444,6 +339,34 @@ body.chonk-mode-active #chonk-background {
       min-width: 42px;
       letter-spacing: 0;
     }
+    .walk-button {
+  min-width: 48px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.view-button.walking {
+  background: var(--accent);
+  color: #191919;
+}
+
+@media (max-width: 820px) {
+  .walk-button {
+    min-width: 38px;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+@media (max-width: 500px) {
+  .walk-button {
+    min-width: 34px;
+    padding-left: 7px;
+    padding-right: 7px;
+    font-size: 0.82rem;
+  }
+}
+
 
     .image-wrap {
       flex: 1;
@@ -746,97 +669,12 @@ body.chonk-mode-active #chonk-background {
       gap: 18px;
       flex-wrap: wrap;
     }
-    .chonk-mode-button {
-  appearance: none;
-  border: 0;
-  padding: 0;
-  margin: 0;
-  background: transparent;
-  color: var(--muted);
-  font: inherit;
-  font-weight: 900;
-  cursor: pointer;
-  text-decoration: none;
-  transition: color 0.15s ease, transform 0.15s ease;
-}
-
-.chonk-mode-button:hover {
-  color: var(--ink);
-  text-decoration: underline;
-}
-.chonk-mode-button.active {
-  color: var(--ink);
-  font-weight: 1000;
-}
-.chonk-mode-button:active {
-  transform: scale(0.95);
-}
-
     .error {
       padding: 8px 0;
       color: #f87171;
       font-weight: 900;
       font-size: 0.95rem;
     }
-    
-    /* =========================================================
-   CHONK MODE — FALLING TRAITS
-   ========================================================= */
-
-#trait-rain {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 9999;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-body.chonk-mode #trait-rain {
-  opacity: 1;
-}
-
-.falling-trait {
-  position: absolute;
-  top: -140px;
-  left: 0;
-  width: 90px;
-  height: 90px;
-
-  object-fit: contain;
-  image-rendering: pixelated;
-
-  pointer-events: none;
-
-  animation-name: traitFall;
-  animation-timing-function: linear;
-  animation-fill-mode: forwards;
-
-  will-change: transform;
-}
-
-@keyframes traitFall {
-  0% {
-    transform:
-      translate3d(0, -140px, 0)
-      rotate(0deg);
-  }
-
-  100% {
-    transform:
-      translate3d(var(--drift), calc(100vh + 180px), 0)
-      rotate(var(--rotation));
-  }
-}
-
-@media (max-width: 500px) {
-  .falling-trait {
-    width: 65px;
-    height: 65px;
-  }
-}
-
 
     @media (max-width: 820px) {
       .wrap { width: min(100% - 22px, 700px); padding-top: 22px; }
@@ -875,8 +713,6 @@ body.chonk-mode #trait-rain {
 </head>
 
 <body>
-    <div id="chonk-background"></div>
-    <div id="trait-rain"></div>
   <div class="wrap">
 
     <header>
@@ -926,6 +762,8 @@ body.chonk-mode #trait-rain {
               <button type="button" class="view-button" id="view-2d" data-mode="2d" aria-pressed="true">2D</button>
               <button type="button" class="view-button" id="view-3d" data-mode="3d" aria-pressed="false">3D</button>
               <button type="button" class="view-button spin-button" id="view-spin" title="360° auto-spin" aria-label="Toggle 360 degree auto-spin" disabled>↻</button>
+              <button type="button" class="view-button walk-button" id="view-walk" title="Toggle walk animation" aria-label="Toggle walk animation" disabled>🚶</button>
+
             </div>
           </div>
         </div>
@@ -992,19 +830,11 @@ body.chonk-mode #trait-rain {
     </div>
 
     <footer>
-  <span>Rendered directly from the Base blockchain.</span>
-
-  <div class="footer-links">
-    <span>ERC-6551</span>
-    <span>·</span>
-    <span>Daily Chonk</span>
-    <span>·</span>
-    <button id="chonk-mode" class="chonk-mode-button" type="button">
-      Chonk Mode
-    </button>
-  </div>
-</footer>
-
+      <span>Rendered directly from the Base blockchain.</span>
+      <div class="footer-links">
+        <span>ERC-6551</span><span>·</span><span>Daily Chonk</span>
+      </div>
+    </footer>
   </div>
 
   <script type="module">
@@ -1015,7 +845,6 @@ body.chonk-mode #trait-rain {
     const CHONK_ID = 30000;
     const CONTRACT = "0x07152bfde079b5319e5308c43fb1dbc9c76cb4f9";
     const RPC = "https://mainnet.base.org";
-    const TRAITS_CONTRACT = "0x6b8f34e0559aa9a5507e74ad93374d9745cdbf09";
     const LAST_CHANGE = Date.parse("2026-09-06T18:34:34Z");
     const CYCLE = 24 * 60 * 60 * 1000;
     const TRAIT_PAGE_BASE = "https://www.chonks.xyz/traits/";
@@ -1027,25 +856,13 @@ body.chonk-mode #trait-rain {
     };
 
     const abi = [
-  "function tokenURI(uint256) view returns (string)",
-  "function renderAsDataUri2D(uint256) view returns (string)",
-  "function renderAsDataUri3D(uint256) view returns (string)",
-  "function getTraitsForChonkId(uint256) view returns (uint256[])"
-];
-
-const traitsAbi = [
-  "function getSvgForTokenId(uint256) view returns (string)"
-];
-
+      "function tokenURI(uint256) view returns (string)",
+      "function renderAsDataUri2D(uint256) view returns (string)",
+      "function renderAsDataUri3D(uint256) view returns (string)"
+    ];
 
     const provider = new ethers.JsonRpcProvider(RPC);
     const contract = new ethers.Contract(CONTRACT, abi, provider);
-    const traitsContract = new ethers.Contract(
-  TRAITS_CONTRACT,
-  traitsAbi,
-  provider
-);
-
 
     const image = document.getElementById("chonk-image");
     const loading = document.getElementById("loading");
@@ -1060,227 +877,31 @@ const traitsAbi = [
     const button2D = document.getElementById("view-2d");
     const button3D = document.getElementById("view-3d");
     const buttonSpin = document.getElementById("view-spin");
-const chonkModeButton = document.getElementById("chonk-mode");
-const chonkBackground = document.getElementById("chonk-background");
-
-let chonkModeActive = false;
-
-function createChonkBackground() {
-  chonkBackground.innerHTML = "";
-
-  const size = 100;
-  const columns = Math.ceil(window.innerWidth / size) + 1;
-  const rows = Math.ceil(window.innerHeight / size) + 1;
-
-  for (let y = 0; y < rows; y++) {
-    for (let x = 0; x < columns; x++) {
-      const tile = document.createElement("div");
-
-      tile.className = "chonk-bg-tile";
-      tile.style.left = `${x * size}px`;
-      tile.style.top = `${y * size}px`;
-
-     if (chonkModeActive) {
-  tile.classList.add("spinning");
-  tile.classList.add("rainbow");
-}
-
-      chonkBackground.appendChild(tile);
-    }
-  }
-}
-
-createChonkBackground();
-
-window.addEventListener("resize", createChonkBackground);
-
-chonkModeButton.addEventListener("click", () => {
-  chonkModeActive = !chonkModeActive;
-
-  const tiles = document.querySelectorAll(".chonk-bg-tile");
-
-  tiles.forEach(tile => {
-    tile.classList.toggle("spinning", chonkModeActive);
-    tile.classList.toggle("rainbow", chonkModeActive);
-  });
-
-  // Bring the Chonk background visually forward.
-  document.body.classList.toggle(
-    "chonk-mode-active",
-    chonkModeActive
-  );
-
-  // Highlight the button.
-  chonkModeButton.classList.toggle("active", chonkModeActive);
-
-  // Start / stop the falling trait animation.
-  if (chonkModeActive) {
-    startTraitRain();
-  } else {
-    stopTraitRain();
-  }
-});
+    const buttonWalk = document.getElementById("view-walk");
 
 
     let currentMode = "2d";
-    let cached2D = null;
-    let cached3DMeta = null;
-    let viewerReady = false;
-    let isSpinning = false;
-    /* =========================================================
-   CHONK MODE — TRAIT RAIN
-   ========================================================= */
+let cached2D = null;
+let cached3DMeta = null;
+let viewerReady = false;
+let isSpinning = false;
+let isWalking = false;
 
-let traitRainTimer = null;
-let traitRainActive = false;
-let fallingTraitSvgs = [];
+let scene, camera, renderer, controls, chonkGroup, animId;
 
-const traitRainEl = document.getElementById("trait-rain");
+// Walk animation state
+let walkClock = 0;
+let walkBaseY = 0;
+let walkBaseRotationZ = 0;
 
-async function loadTraitRainAssets() {
-  try {
-    const traitIds = await contract.getTraitsForChonkId(CHONK_ID);
-
-    console.log("Daily Chonk traits:", traitIds.map(id => id.toString()));
-
-    const svgPromises = traitIds.map(async (traitId) => {
-      try {
-        const svg = await traitsContract.getSvgForTokenId(traitId);
-
-        if (!svg || !svg.startsWith("<svg")) {
-          return null;
-        }
-
-        return svg;
-      } catch (err) {
-        console.warn(
-          "Could not load trait",
-          traitId.toString(),
-          err
-        );
-
-        return null;
-      }
-    });
-
-    const svgs = await Promise.all(svgPromises);
-
-    fallingTraitSvgs = svgs.filter(Boolean);
-
-    console.log(
-      `Loaded ${fallingTraitSvgs.length} falling trait SVGs.`
-    );
-
-  } catch (err) {
-    console.error("Could not load Chonk traits:", err);
-    fallingTraitSvgs = [];
-  }
-}
-
-
-function svgToDataUri(svg) {
-  return "data:image/svg+xml;charset=utf-8," +
-    encodeURIComponent(svg);
-}
-
-
-function spawnFallingTrait() {
-  if (!traitRainActive) return;
-
-  if (!fallingTraitSvgs.length) return;
-
-  const svg =
-    fallingTraitSvgs[
-      Math.floor(Math.random() * fallingTraitSvgs.length)
-    ];
-
-  const trait = document.createElement("img");
-
-  trait.className = "falling-trait";
-
-  trait.src = svgToDataUri(svg);
-
-  const size = 55 + Math.random() * 65;
-
-  const left =
-    Math.random() * window.innerWidth;
-
-  const duration =
-    5 + Math.random() * 5;
-
-  const drift =
-    (Math.random() - 0.5) * 220;
-
-  const rotation =
-    (Math.random() - 0.5) * 720;
-
-  trait.style.width = `${size}px`;
-  trait.style.height = `${size}px`;
-  trait.style.left = `${left}px`;
-
-  trait.style.setProperty(
-    "--drift",
-    `${drift}px`
-  );
-
-  trait.style.setProperty(
-    "--rotation",
-    `${rotation}deg`
-  );
-
-  trait.style.animationDuration =
-    `${duration}s`;
-
-  traitRainEl.appendChild(trait);
-
-  setTimeout(() => {
-    trait.remove();
-  }, (duration + 0.5) * 1000);
-}
-
-
-function startTraitRain() {
-  if (traitRainActive) return;
-
-  traitRainActive = true;
-
-  if (!fallingTraitSvgs.length) {
-    loadTraitRainAssets().then(() => {
-      if (!traitRainActive) return;
-
-      spawnFallingTrait();
-
-      traitRainTimer = setInterval(
-        spawnFallingTrait,
-        450
-      );
-    });
-
-    return;
-  }
-
-  spawnFallingTrait();
-
-  traitRainTimer = setInterval(
-    spawnFallingTrait,
-    450
-  );
-}
-
-
-function stopTraitRain() {
-  traitRainActive = false;
-
-  if (traitRainTimer) {
-    clearInterval(traitRainTimer);
-    traitRainTimer = null;
-  }
-
-  traitRainEl.innerHTML = "";
-}
-
-
-    let scene, camera, renderer, controls, chonkGroup, animId;
+const walkParts = {
+  leftLeg: [],
+  rightLeg: [],
+  leftArm: [],
+  rightArm: [],
+  body: [],
+  head: []
+};
 
     function getStoredViewMode() {
       try {
@@ -1295,23 +916,49 @@ function stopTraitRain() {
     currentMode = getStoredViewMode();
 
     function updateViewButtons() {
-      const is2D = currentMode === "2d";
-      button2D.classList.toggle("active", is2D);
-      button3D.classList.toggle("active", !is2D);
-      button2D.setAttribute("aria-pressed", String(is2D));
-      button3D.setAttribute("aria-pressed", String(!is2D));
+  const is2D = currentMode === "2d";
 
-      const canSpin = currentMode === "3d" && viewerReady;
-      buttonSpin.disabled = !canSpin;
-      buttonSpin.classList.toggle("active", isSpinning && canSpin);
-    }
+  button2D.classList.toggle("active", is2D);
+  button3D.classList.toggle("active", !is2D);
+
+  button2D.setAttribute("aria-pressed", String(is2D));
+  button3D.setAttribute("aria-pressed", String(!is2D));
+
+  const canAnimate = currentMode === "3d" && viewerReady;
+
+  buttonSpin.disabled = !canAnimate;
+  buttonWalk.disabled = !canAnimate;
+
+  buttonSpin.classList.toggle(
+    "active",
+    isSpinning && canAnimate
+  );
+
+  buttonWalk.classList.toggle(
+    "walking",
+    isWalking && canAnimate
+  );
+
+  buttonWalk.setAttribute(
+    "aria-pressed",
+    String(isWalking && canAnimate)
+  );
+}
+
 
     button2D.addEventListener("click", () => {
       if (currentMode === "2d") return;
       currentMode = "2d";
       setStoredViewMode(currentMode);
       isSpinning = false;
-      if (controls) controls.autoRotate = false;
+      isWalking = false;
+
+   if (controls) {
+     controls.autoRotate = false;
+    }
+
+    resetWalkPose();
+
       updateViewButtons();
       renderCurrentView();
     });
@@ -1336,6 +983,20 @@ function stopTraitRain() {
       updateViewButtons();
       if (isSpinning) showRotateHint();
     });
+  buttonWalk.addEventListener("click", () => {
+  if (currentMode !== "3d" || !viewerReady || !chonkGroup) return;
+
+  isWalking = !isWalking;
+
+  if (!isWalking) {
+    resetWalkPose();
+  }
+
+  updateViewButtons();
+  showRotateHint();
+});
+
+
 
     updateViewButtons();
 
@@ -1698,6 +1359,202 @@ function generateOutfitName(top, head, face, accessory) {
         group.add(mesh);
       }
     }
+    /* ========== WALK ANIMATION ========== */
+
+let walkOriginalTransforms = new Map();
+
+function resetWalkParts() {
+  walkParts.leftLeg = [];
+  walkParts.rightLeg = [];
+  walkParts.leftArm = [];
+  walkParts.rightArm = [];
+  walkParts.body = [];
+  walkParts.head = [];
+}
+
+/*
+ * The voxel renderer creates one mesh per cube, so we don't want
+ * to animate individual cubes. Instead, classify the cubes once
+ * and animate the complete Chonk as a group.
+ *
+ * This version deliberately keeps the head/body intact and uses
+ * a simple squash/lean/bounce walk cycle.
+ */
+function identifyWalkParts(group) {
+  resetWalkParts();
+
+  if (!group || !group.children.length) return;
+
+  let minY = Infinity;
+  let maxY = -Infinity;
+  let minX = Infinity;
+  let maxX = -Infinity;
+
+  group.children.forEach(mesh => {
+    minY = Math.min(minY, mesh.position.y);
+    maxY = Math.max(maxY, mesh.position.y);
+    minX = Math.min(minX, mesh.position.x);
+    maxX = Math.max(maxX, mesh.position.x);
+  });
+
+  const height = Math.max(maxY - minY, 1);
+  const width = Math.max(maxX - minX, 1);
+  const centerX = (minX + maxX) / 2;
+
+  group.children.forEach(mesh => {
+    const nx = (mesh.position.x - centerX) / width;
+    const ny = (mesh.position.y - minY) / height;
+
+    /*
+     * IMPORTANT:
+     * Head voxels are only classified here for information.
+     * We never move individual head meshes.
+     */
+    if (ny > 0.72) {
+      walkParts.head.push(mesh);
+      return;
+    }
+
+    /*
+     * Lower area = legs.
+     */
+    if (ny < 0.32) {
+      if (nx < -0.05) {
+        walkParts.leftLeg.push(mesh);
+      } else if (nx > 0.05) {
+        walkParts.rightLeg.push(mesh);
+      } else {
+        walkParts.body.push(mesh);
+      }
+      return;
+    }
+
+    /*
+     * Middle area.
+     */
+    if (ny < 0.72) {
+      if (Math.abs(nx) > 0.28) {
+        if (nx < 0) {
+          walkParts.leftArm.push(mesh);
+        } else {
+          walkParts.rightArm.push(mesh);
+        }
+      } else {
+        walkParts.body.push(mesh);
+      }
+    }
+  });
+
+  walkBaseY = group.position.y;
+  walkBaseRotationZ = group.rotation.z;
+}
+
+
+/*
+ * Store the original transform of the whole Chonk.
+ */
+function setupWalkPose() {
+  if (!chonkGroup) return;
+
+  walkOriginalTransforms = new Map();
+
+  chonkGroup.children.forEach(mesh => {
+    walkOriginalTransforms.set(mesh, {
+      position: mesh.position.clone(),
+      rotation: mesh.rotation.clone()
+    });
+  });
+
+  walkBaseY = chonkGroup.position.y;
+  walkBaseRotationZ = chonkGroup.rotation.z;
+}
+
+
+function resetWalkPose() {
+  if (!chonkGroup) return;
+
+  /*
+   * Reset the WHOLE Chonk.
+   */
+  chonkGroup.position.y = walkBaseY;
+  chonkGroup.rotation.z = walkBaseRotationZ;
+
+  /*
+   * Restore every voxel exactly.
+   */
+  walkOriginalTransforms.forEach((original, mesh) => {
+    mesh.position.copy(original.position);
+    mesh.rotation.copy(original.rotation);
+  });
+
+  walkClock = 0;
+}
+
+
+/*
+ * Procedural walk cycle.
+ *
+ * We animate the complete Chonk rather than trying to rotate
+ * individual voxel cubes. This keeps the head, face, clothes,
+ * and accessories visually connected.
+ */
+function animateWalk(delta) {
+  if (!chonkGroup || !isWalking) return;
+
+  walkClock += delta;
+
+  const speed = 5.0;
+  const t = walkClock * speed;
+
+  /*
+   * Main walking rhythm.
+   */
+  const step = Math.sin(t);
+
+  /*
+   * Small vertical bounce.
+   */
+  const bob = Math.abs(step) * 0.22;
+
+  /*
+   * Gentle body lean.
+   */
+  const lean = Math.sin(t) * 0.035;
+
+  /*
+   * Tiny forward/back movement gives the walk more life.
+   */
+  const forward = Math.sin(t * 2) * 0.035;
+
+  chonkGroup.position.y = walkBaseY + bob;
+  chonkGroup.rotation.z = walkBaseRotationZ + lean;
+
+  /*
+   * IMPORTANT:
+   *
+   * Do NOT do:
+   *
+   * mesh.position.y += ...
+   *
+   * on head voxels.
+   *
+   * That is what was causing the head to physically separate.
+   */
+}
+
+
+/*
+ * Make sure resetWalkPose has a known baseline after the model
+ * is created.
+ */
+function initializeWalkAnimation() {
+  if (!chonkGroup) return;
+
+  identifyWalkParts(chonkGroup);
+  setupWalkPose();
+  resetWalkPose();
+}
+
 
     function dispose3D() {
       if (animId) {
@@ -1755,6 +1612,11 @@ function generateOutfitName(top, head, face, accessory) {
       parseZColorMap(zMapFull, chonkGroup, geom);
       scene.add(chonkGroup);
 
+      // Prepare walk animation.
+      initializeWalkAnimation();
+
+
+
       controls = new OrbitControls(camera, canvas3D);
       controls.enableDamping = true;
       controls.enablePan = false;
@@ -1763,11 +1625,26 @@ function generateOutfitName(top, head, face, accessory) {
       controls.autoRotate = false;
       controls.autoRotateSpeed = 2.5;
 
-      function tick() {
-        animId = requestAnimationFrame(tick);
-        if (controls) controls.update();
-        if (renderer && scene && camera) renderer.render(scene, camera);
-      }
+      let previousTime = performance.now();
+
+function tick() {
+  animId = requestAnimationFrame(tick);
+
+  const now = performance.now();
+  const delta = Math.min((now - previousTime) / 1000, 0.05);
+  previousTime = now;
+
+  if (controls) controls.update();
+
+  if (isWalking) {
+    animateWalk(delta);
+  }
+
+  if (renderer && scene && camera) {
+    renderer.render(scene, camera);
+  }
+}
+
       tick();
 
       viewerReady = true;
@@ -1928,7 +1805,6 @@ function generateOutfitName(top, head, face, accessory) {
     }
 
     loadChonk();
-    loadTraitRainAssets();
     tick();
     setInterval(tick, 1000);
   })();
