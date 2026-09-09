@@ -3,22 +3,22 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
- 
+
   <title>Daily Chonk</title>
- 
+
   <meta
     name="description"
     content="Daily Chonk — an onchain experiment. A new outfit every 24 hours."
   />
- 
+
   <link
     rel="icon"
     type="image/png"
     href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAABAElEQVR4nO2asQ3CMBBF75CrMAIbsABMQRNKNmCD9DAJJTQsQOsJsgEjQHu02I7kGNn6nHSvSxT78vRt2ZHDRCT0je+pFNlci9tMwczFbRZVKgMxATRMvpf8YyG1xnyOOXNCfQImgMYE0JgAGvUCPy1k/4T6BEwADcvYBXOAL68qHcthGRaq1C+dww2e+gRMAI16ATdncskpvE6+lIZ0LWzVb4z6BEwAjWu14MgqHM/8bLNnVJ+ACaBRL2C7UTQmgIYpOmKSsQO9Sgqv39ln1CdgAmhccueRH3et4GN5G/UJmAAa9QIu/jeC7xNnwLt9m+pxLR/V2d6yXahPwATQfABRGTZIW+9a2QAAAABJRU5ErkJggg=="
   >
- 
+
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
- 
+
   <script type="importmap">
   {
     "imports": {
@@ -27,9 +27,9 @@
     }
   }
   </script>
- 
+
   <style>
- 
+
     :root {
       --ink: #191919;
       --paper: #f7f1e7;
@@ -42,7 +42,7 @@
       --green: #63d391;
       --shadow: 8px 8px 0 var(--line);
     }
- 
+
     [data-theme="dark"] {
       --ink: #e8eef7;
       --paper: #0f172a;
@@ -55,10 +55,10 @@
       --green: #63d391;
       --shadow: 8px 8px 0 var(--line);
     }
- 
+
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
- 
+
     body {
       margin: 0;
       min-height: 100vh;
@@ -67,19 +67,19 @@
       font-family: ui-rounded, "Trebuchet MS", system-ui, sans-serif;
       transition: background 0.25s ease, color 0.25s ease;
     }
- 
+
     
    
     @keyframes chonkModeSpin {
   from {
     transform: rotate(0deg);
   }
- 
+
   to {
     transform: rotate(360deg);
   }
 }
- 
+
 body.chonk-mode-spin::before {
   animation: chonkModeSpin 2s cubic-bezier(.2,.8,.2,1);
 }
@@ -97,8 +97,8 @@ body.chonk-mode-active #chonk-background {
   opacity: 0.35;
   filter: saturate(2) contrast(1.15);
 }
- 
- 
+
+
 .chonk-bg-tile {
   position: absolute;
   width: 100px;
@@ -109,18 +109,18 @@ body.chonk-mode-active #chonk-background {
   background-position: center;
   transform-origin: center center;
 }
- 
- 
+
+
 @keyframes individualChonkSpin {
   from {
     transform: rotate(0deg);
   }
- 
+
   to {
     transform: rotate(360deg);
   }
 }
- 
+
 .chonk-bg-tile.spinning {
   animation: individualChonkSpin 2s linear infinite;
 }
@@ -132,7 +132,7 @@ body.chonk-mode-active #chonk-background {
       brightness(1.15)
       contrast(1.15);
   }
- 
+
   16.6% {
     filter:
       hue-rotate(60deg)
@@ -140,7 +140,7 @@ body.chonk-mode-active #chonk-background {
       brightness(1.2)
       contrast(1.2);
   }
- 
+
   33.3% {
     filter:
       hue-rotate(120deg)
@@ -148,7 +148,7 @@ body.chonk-mode-active #chonk-background {
       brightness(1.2)
       contrast(1.2);
   }
- 
+
   50% {
     filter:
       hue-rotate(180deg)
@@ -156,7 +156,7 @@ body.chonk-mode-active #chonk-background {
       brightness(1.25)
       contrast(1.2);
   }
- 
+
   66.6% {
     filter:
       hue-rotate(240deg)
@@ -164,7 +164,7 @@ body.chonk-mode-active #chonk-background {
       brightness(1.2)
       contrast(1.2);
   }
- 
+
   83.3% {
     filter:
       hue-rotate(300deg)
@@ -172,7 +172,7 @@ body.chonk-mode-active #chonk-background {
       brightness(1.25)
       contrast(1.2);
   }
- 
+
   100% {
     filter:
       hue-rotate(360deg)
@@ -181,35 +181,13 @@ body.chonk-mode-active #chonk-background {
       contrast(1.15);
   }
 }
- 
+
 .chonk-bg-tile.rainbow {
   animation:
     individualChonkSpin 2s linear infinite,
     chonkRainbow 3s linear infinite;
 }
- 
-@keyframes chonkTitleRainbow {
-  0%    { color: hsl(0, 85%, 55%); }
-  16.6% { color: hsl(60, 85%, 50%); }
-  33.3% { color: hsl(120, 70%, 45%); }
-  50%   { color: hsl(180, 75%, 45%); }
-  66.6% { color: hsl(240, 80%, 65%); }
-  83.3% { color: hsl(300, 80%, 60%); }
-  100%  { color: hsl(360, 85%, 55%); }
-}
- 
-body.chonk-mode-active h1 .title-line {
-  animation: chonkTitleRainbow 3s linear infinite;
-  opacity: 1;
-  transform: none;
-}
- 
-@media (prefers-reduced-motion: reduce) {
-  body.chonk-mode-active h1 .title-line {
-    animation: none;
-  }
-}
- 
+
     /* Easter egg: raining chonk heads */
     @keyframes head-fall {
       0% {
@@ -224,7 +202,7 @@ body.chonk-mode-active h1 .title-line {
         opacity: 0.7;
       }
     }
- 
+
     .rain-head {
       position: fixed;
       top: 0;
@@ -238,7 +216,7 @@ body.chonk-mode-active h1 .title-line {
       animation: head-fall var(--duration, 5s) linear forwards;
       filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.15));
     }
- 
+
     .wrap {
       position: relative;
       z-index: 1;
@@ -246,7 +224,7 @@ body.chonk-mode-active h1 .title-line {
       margin: auto;
       padding: 34px 0 70px;
     }
- 
+
     a {
       color: inherit;
       font-weight: 900;
@@ -254,7 +232,7 @@ body.chonk-mode-active h1 .title-line {
     }
     a:hover { text-decoration: underline; }
     button { font-family: inherit; }
- 
+
     header {
       display: flex;
       justify-content: space-between;
@@ -262,7 +240,7 @@ body.chonk-mode-active h1 .title-line {
       align-items: end;
       margin-bottom: 22px;
     }
- 
+
     .eyebrow {
       font-weight: 950;
       letter-spacing: 0.16em;
@@ -270,7 +248,7 @@ body.chonk-mode-active h1 .title-line {
       font-size: 0.75rem;
       color: var(--muted);
     }
- 
+
     h1 {
       font-size: clamp(2.2rem, 6vw, 4.5rem);
       line-height: 0.9;
@@ -278,7 +256,7 @@ body.chonk-mode-active h1 .title-line {
       letter-spacing: -0.055em;
       overflow: hidden;
     }
- 
+
     .title-line {
       display: block;
       opacity: 0;
@@ -287,22 +265,22 @@ body.chonk-mode-active h1 .title-line {
     }
     .title-line:nth-child(1) { animation-delay: 0.08s; }
     .title-line:nth-child(2) { animation-delay: 0.22s; }
- 
+
     @keyframes titleReveal {
       0% { opacity: 0; transform: translateY(35px); }
       100% { opacity: 1; transform: translateY(0); }
     }
- 
+
     @media (prefers-reduced-motion: reduce) {
       .title-line { opacity: 1; transform: none; animation: none; }
     }
- 
+
     .header-right {
       display: flex;
       align-items: center;
       gap: 16px;
     }
- 
+
     .tag {
       border: 3px solid var(--line);
       padding: 10px 14px;
@@ -314,7 +292,7 @@ body.chonk-mode-active h1 .title-line {
       box-shadow: 5px 5px 0 var(--line);
       white-space: nowrap;
     }
- 
+
     /* Theme switch */
     .theme-switch {
       font-size: 17px;
@@ -369,7 +347,7 @@ body.chonk-mode-active h1 .title-line {
     .theme-switch__spot:nth-child(1) { width: 5px; height: 5px; top: 25%; left: 30%; }
     .theme-switch__spot:nth-child(2) { width: 4px; height: 4px; top: 55%; left: 60%; }
     .theme-switch__spot:nth-child(3) { width: 3px; height: 3px; top: 68%; left: 35%; }
- 
+
     .theme-switch__checkbox:checked + .theme-switch__container { background-color: #0f172a; }
     .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__clouds {
       opacity: 0; transform: translate(-50%, -50%) translateY(-10px);
@@ -386,7 +364,7 @@ body.chonk-mode-active h1 .title-line {
     .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__moon {
       transform: translateX(0);
     }
- 
+
     .card {
       border: 3px solid var(--line);
       background: var(--card);
@@ -394,7 +372,7 @@ body.chonk-mode-active h1 .title-line {
       border-radius: 18px;
       transition: background 0.25s ease, border-color 0.25s ease;
     }
- 
+
     .section-kicker {
       color: var(--muted);
       text-transform: uppercase;
@@ -403,14 +381,14 @@ body.chonk-mode-active h1 .title-line {
       font-size: 0.7rem;
       margin-bottom: 5px;
     }
- 
+
     main {
       display: grid;
       grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
       gap: 24px;
       align-items: stretch;
     }
- 
+
     .chonk-card {
       padding: 20px;
       min-height: 690px;
@@ -419,7 +397,7 @@ body.chonk-mode-active h1 .title-line {
       position: relative;
       overflow: hidden;
     }
- 
+
     .hero-top {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
@@ -427,7 +405,7 @@ body.chonk-mode-active h1 .title-line {
       gap: 14px;
       margin-bottom: 14px;
     }
- 
+
     .outfit-name-wrap {
       margin: 0;
       padding: 7px 14px;
@@ -440,7 +418,7 @@ body.chonk-mode-active h1 .title-line {
       text-align: center;
       justify-self: start;
     }
- 
+
     #outfit-name {
       margin: 0;
       font-size: clamp(1rem, 2vw, 1.35rem);
@@ -451,9 +429,9 @@ body.chonk-mode-active h1 .title-line {
       overflow: hidden;
       text-overflow: ellipsis;
     }
- 
+
     .view-controls { display: flex; justify-content: flex-end; margin: 0; }
- 
+
     .view-toggle {
       display: inline-flex;
       align-items: center;
@@ -463,7 +441,7 @@ body.chonk-mode-active h1 .title-line {
       background: var(--card);
       box-shadow: 4px 4px 0 var(--line);
     }
- 
+
     .view-button {
       appearance: none;
       border: 0;
@@ -484,7 +462,7 @@ body.chonk-mode-active h1 .title-line {
     .view-button:active:not(:disabled) { transform: scale(0.95); }
     .view-button:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
     .view-button:disabled { opacity: 0.35; cursor: not-allowed; }
- 
+
     .spin-button {
       font-size: 1.05rem;
       line-height: 1;
@@ -492,7 +470,7 @@ body.chonk-mode-active h1 .title-line {
       min-width: 42px;
       letter-spacing: 0;
     }
- 
+
     .image-wrap {
       flex: 1;
       min-height: 540px;
@@ -506,7 +484,7 @@ body.chonk-mode-active h1 .title-line {
         var(--progress-bg);
       position: relative;
     }
- 
+
     .image-wrap::after {
       content: "CHONK #30000";
       position: absolute;
@@ -519,7 +497,7 @@ body.chonk-mode-active h1 .title-line {
       pointer-events: none;
       z-index: 10;
     }
- 
+
     #chonk-image {
       width: min(100%, 650px);
       max-height: 580px;
@@ -531,7 +509,7 @@ body.chonk-mode-active h1 .title-line {
       opacity: 0;
       transform: scale(0.96) rotate(-2deg);
     }
- 
+
     #chonk-3d-canvas {
       position: absolute;
       inset: 0;
@@ -549,7 +527,7 @@ body.chonk-mode-active h1 .title-line {
       transform: scale(1);
     }
     #chonk-3d-canvas:active { cursor: grabbing; }
- 
+
     .rotate-hint {
       position: absolute;
       left: 50%;
@@ -577,7 +555,7 @@ body.chonk-mode-active h1 .title-line {
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
- 
+
     .loading {
       position: absolute;
       z-index: 20;
@@ -588,15 +566,15 @@ body.chonk-mode-active h1 .title-line {
       color: var(--muted);
       pointer-events: none;
     }
- 
+
     .side {
       display: flex;
       flex-direction: column;
       gap: 24px;
     }
- 
+
     .timer-card { padding: 26px; }
- 
+
     .timer-heading {
       display: flex;
       justify-content: space-between;
@@ -604,7 +582,7 @@ body.chonk-mode-active h1 .title-line {
       gap: 10px;
       margin-bottom: 4px;
     }
- 
+
     .live-dot {
       width: 10px; height: 10px;
       border-radius: 50%;
@@ -613,12 +591,12 @@ body.chonk-mode-active h1 .title-line {
       animation: pulse 1.8s infinite;
       flex: 0 0 auto;
     }
- 
+
     @keyframes pulse {
       0%, 100% { box-shadow: 0 0 0 0 rgba(99, 211, 145, 0.45); }
       50% { box-shadow: 0 0 0 7px rgba(99, 211, 145, 0); }
     }
- 
+
     #countdown {
       font-variant-numeric: tabular-nums;
       font-size: clamp(2.5rem, 5vw, 4rem);
@@ -627,13 +605,13 @@ body.chonk-mode-active h1 .title-line {
       margin: 7px 0 18px;
       line-height: 0.95;
     }
- 
+
     .countdown-caption {
       font-weight: 900;
       font-size: 0.95rem;
       margin-bottom: 15px;
     }
- 
+
     .progress {
       height: 15px;
       border: 3px solid var(--line);
@@ -647,7 +625,7 @@ body.chonk-mode-active h1 .title-line {
       background: var(--accent);
       transition: width 0.5s linear;
     }
- 
+
     .status {
       margin-top: 14px;
       color: var(--muted);
@@ -655,20 +633,20 @@ body.chonk-mode-active h1 .title-line {
       font-size: 0.9rem;
       line-height: 1.35;
     }
- 
+
     .details { padding: 24px; flex: 1; }
     .details h2, .about h2 {
       margin: 0;
       font-size: 1.45rem;
       letter-spacing: -0.03em;
     }
- 
+
     .traits {
       display: grid;
       gap: 9px;
       margin-top: 18px;
     }
- 
+
     .trait {
       position: relative;
       overflow: hidden;
@@ -733,7 +711,7 @@ body.chonk-mode-active h1 .title-line {
       transition: all 900ms cubic-bezier(0.48, 0, 0.12, 1);
     }
     .trait:hover span:first-child { color: #191919; }
- 
+
     .about { margin-top: 30px; padding: 30px; }
     .about-inner { max-width: 820px; }
     .about p {
@@ -751,7 +729,7 @@ body.chonk-mode-active h1 .title-line {
       font-weight: 950;
       line-height: 1.4;
     }
- 
+
     .links {
       margin-top: 30px;
       display: grid;
@@ -777,7 +755,7 @@ body.chonk-mode-active h1 .title-line {
     }
     .link-card span:first-child { font-weight: 950; }
     .link-card span:last-child { font-size: 1.1rem; }
- 
+
     footer {
       margin-top: 34px;
       color: var(--muted);
@@ -807,7 +785,7 @@ body.chonk-mode-active h1 .title-line {
   text-decoration: none;
   transition: color 0.15s ease, transform 0.15s ease;
 }
- 
+
 .chonk-mode-button:hover {
   color: var(--ink);
   text-decoration: underline;
@@ -819,14 +797,14 @@ body.chonk-mode-active h1 .title-line {
 .chonk-mode-button:active {
   transform: scale(0.95);
 }
- 
+
     .error {
       padding: 8px 0;
       color: #f87171;
       font-weight: 900;
       font-size: 0.95rem;
     }
- 
+
     @media (max-width: 820px) {
       .wrap { width: min(100% - 22px, 700px); padding-top: 22px; }
       header { align-items: start; flex-direction: column; }
@@ -844,7 +822,7 @@ body.chonk-mode-active h1 .title-line {
       .image-wrap { min-height: 390px; }
       .links { grid-template-columns: 1fr; }
     }
- 
+
     @media (max-width: 500px) {
       .wrap { width: min(100% - 16px, 700px); }
       .tag { font-size: 0.72rem; padding: 8px 10px; }
@@ -862,11 +840,11 @@ body.chonk-mode-active h1 .title-line {
     }
   </style>
 </head>
- 
+
 <body>
     <div id="chonk-background"></div>
   <div class="wrap">
- 
+
     <header>
       <div>
         <div class="eyebrow">Daily Chonk</div>
@@ -875,7 +853,7 @@ body.chonk-mode-active h1 .title-line {
           <span class="title-line">DAILY.</span>
         </h1>
       </div>
- 
+
       <div class="header-right">
         <label class="theme-switch">
           <input type="checkbox" class="theme-switch__checkbox" id="theme-checkbox">
@@ -897,18 +875,18 @@ body.chonk-mode-active h1 .title-line {
             </div>
           </div>
         </label>
- 
+
         <div class="tag">● LIVE · ONCHAIN</div>
       </div>
     </header>
- 
+
     <main>
       <section class="card chonk-card">
         <div class="hero-top">
           <div class="outfit-name-wrap">
             <h2 id="outfit-name">Finding today's fit…</h2>
           </div>
- 
+
           <div class="view-controls">
             <div class="view-toggle" role="group" aria-label="Chonk display mode">
               <button type="button" class="view-button" id="view-2d" data-mode="2d" aria-pressed="true">2D</button>
@@ -917,7 +895,7 @@ body.chonk-mode-active h1 .title-line {
             </div>
           </div>
         </div>
- 
+
         <div class="image-wrap">
           <div id="loading" class="loading">Loading today’s outfit…</div>
           <img id="chonk-image" alt="Today’s Daily Chonk outfit" hidden />
@@ -925,7 +903,7 @@ body.chonk-mode-active h1 .title-line {
           <div id="rotate-hint" class="rotate-hint">↔ DRAG TO ROTATE · SCROLL TO ZOOM</div>
         </div>
       </section>
- 
+
       <aside class="side">
         <section class="card timer-card">
           <div class="timer-heading">
@@ -937,7 +915,7 @@ body.chonk-mode-active h1 .title-line {
           <div class="progress"><div id="progress"></div></div>
           <div id="status" class="status">Syncing with the daily cycle…</div>
         </section>
- 
+
         <section class="card details">
           <div class="section-kicker">The current fit</div>
           <h2>Today's traits</h2>
@@ -947,7 +925,7 @@ body.chonk-mode-active h1 .title-line {
         </section>
       </aside>
     </main>
- 
+
     <section class="card about">
       <div class="about-inner">
         <div class="section-kicker">The experiment</div>
@@ -966,7 +944,7 @@ body.chonk-mode-active h1 .title-line {
         <div class="statement">New day. New fit. Same Chonk.</div>
       </div>
     </section>
- 
+
     <div class="links">
       <a class="link-card" href="https://www.chonks.xyz/chonks/30000" target="_blank" rel="noopener">
         <span>View Chonk #30000</span><span>↗</span>
@@ -978,10 +956,10 @@ body.chonk-mode-active h1 .title-line {
         <span>Learn more about Chonks</span><span>↗</span>
       </a>
     </div>
- 
+
     <footer>
   <span>Rendered directly from the Base blockchain.</span>
- 
+
   <div class="footer-links">
     <span>ERC-6551</span>
     <span>·</span>
@@ -992,13 +970,13 @@ body.chonk-mode-active h1 .title-line {
     </button>
   </div>
 </footer>
- 
+
   </div>
- 
+
   <script type="module">
   import * as THREE from "three";
   import { OrbitControls } from "three/addons/controls/OrbitControls.js";
- 
+
   (() => {
     const CHONK_ID = 30000;
     const CONTRACT = "0x07152bfde079b5319e5308c43fb1dbc9c76cb4f9";
@@ -1007,21 +985,21 @@ body.chonk-mode-active h1 .title-line {
     const CYCLE = 24 * 60 * 60 * 1000;
     const TRAIT_PAGE_BASE = "https://www.chonks.xyz/traits/";
    
- 
+
     const CATEGORY_NUM = {
       head: 1, hair: 2, face: 3, accessory: 4,
       top: 5, bottoms: 6, bottom: 6, pants: 6, shoes: 7, shoe: 7
     };
- 
+
     const abi = [
       "function tokenURI(uint256) view returns (string)",
       "function renderAsDataUri2D(uint256) view returns (string)",
       "function renderAsDataUri3D(uint256) view returns (string)"
     ];
- 
+
     const provider = new ethers.JsonRpcProvider(RPC);
     const contract = new ethers.Contract(CONTRACT, abi, provider);
- 
+
     const image = document.getElementById("chonk-image");
     const loading = document.getElementById("loading");
     const canvas3D = document.getElementById("chonk-3d-canvas");
@@ -1037,68 +1015,68 @@ body.chonk-mode-active h1 .title-line {
     const buttonSpin = document.getElementById("view-spin");
 const chonkModeButton = document.getElementById("chonk-mode");
 const chonkBackground = document.getElementById("chonk-background");
- 
+
 let chonkModeActive = false;
- 
+
 function createChonkBackground() {
   chonkBackground.innerHTML = "";
- 
+
   const size = 100;
   const columns = Math.ceil(window.innerWidth / size) + 1;
   const rows = Math.ceil(window.innerHeight / size) + 1;
- 
+
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < columns; x++) {
       const tile = document.createElement("div");
- 
+
       tile.className = "chonk-bg-tile";
       tile.style.left = `${x * size}px`;
       tile.style.top = `${y * size}px`;
- 
+
      if (chonkModeActive) {
   tile.classList.add("spinning");
   tile.classList.add("rainbow");
 }
- 
+
       chonkBackground.appendChild(tile);
     }
   }
 }
- 
+
 createChonkBackground();
- 
+
 window.addEventListener("resize", createChonkBackground);
- 
+
 chonkModeButton.addEventListener("click", () => {
   chonkModeActive = !chonkModeActive;
- 
+
   const tiles = document.querySelectorAll(".chonk-bg-tile");
- 
+
   tiles.forEach(tile => {
     tile.classList.toggle("spinning", chonkModeActive);
     tile.classList.toggle("rainbow", chonkModeActive);
   });
- 
+
   // Bring the Chonk background visually forward.
   document.body.classList.toggle(
     "chonk-mode-active",
     chonkModeActive
   );
- 
+
   // Highlight the button.
   chonkModeButton.classList.toggle("active", chonkModeActive);
 });
- 
- 
- 
+
+
+
     let currentMode = "2d";
     let cached2D = null;
     let cached3DMeta = null;
     let viewerReady = false;
     let isSpinning = false;
- 
+
     let scene, camera, renderer, controls, chonkGroup, animId;
- 
+
     function getStoredViewMode() {
       try {
         const stored = localStorage.getItem("chonk-view-mode");
@@ -1110,19 +1088,19 @@ chonkModeButton.addEventListener("click", () => {
       try { localStorage.setItem("chonk-view-mode", mode); } catch (e) {}
     }
     currentMode = getStoredViewMode();
- 
+
     function updateViewButtons() {
       const is2D = currentMode === "2d";
       button2D.classList.toggle("active", is2D);
       button3D.classList.toggle("active", !is2D);
       button2D.setAttribute("aria-pressed", String(is2D));
       button3D.setAttribute("aria-pressed", String(!is2D));
- 
+
       const canSpin = currentMode === "3d" && viewerReady;
       buttonSpin.disabled = !canSpin;
       buttonSpin.classList.toggle("active", isSpinning && canSpin);
     }
- 
+
     button2D.addEventListener("click", () => {
       if (currentMode === "2d") return;
       currentMode = "2d";
@@ -1132,7 +1110,7 @@ chonkModeButton.addEventListener("click", () => {
       updateViewButtons();
       renderCurrentView();
     });
- 
+
     button3D.addEventListener("click", () => {
       if (currentMode === "3d") return;
       if (!cached3DMeta) {
@@ -1144,7 +1122,7 @@ chonkModeButton.addEventListener("click", () => {
       updateViewButtons();
       renderCurrentView();
     });
- 
+
     buttonSpin.addEventListener("click", () => {
       if (currentMode !== "3d" || !viewerReady || !controls) return;
       isSpinning = !isSpinning;
@@ -1153,9 +1131,9 @@ chonkModeButton.addEventListener("click", () => {
       updateViewButtons();
       if (isSpinning) showRotateHint();
     });
- 
+
     updateViewButtons();
- 
+
     /* Theme */
     function getStoredTheme() {
       try { return localStorage.getItem("chonk-theme"); } catch (e) { return null; }
@@ -1172,7 +1150,7 @@ chonkModeButton.addEventListener("click", () => {
     themeCheckbox.addEventListener("change", () => {
       applyTheme(themeCheckbox.checked ? "dark" : "light");
     });
- 
+
     /* Data URI helpers */
     function decodeDataUri(uri) {
       if (typeof uri !== "string" || !uri.startsWith("data:")) return uri;
@@ -1192,7 +1170,7 @@ chonkModeButton.addEventListener("click", () => {
         return data;
       }
     }
- 
+
     function parseDataUri(uri) {
       const decoded = decodeDataUri(uri);
       if (typeof decoded !== "string") return { metadata: {}, raw: decoded };
@@ -1202,13 +1180,13 @@ chonkModeButton.addEventListener("click", () => {
         return { metadata: {}, raw: decoded };
       }
     }
- 
+
     function extract3DData(uri) {
       const parsed = parseDataUri(uri);
       const metadata = parsed.metadata || {};
       let zMapFull = null;
       let bgColor = "#ffffff";
- 
+
       let html = null;
       if (metadata.animation_url) {
         const anim = metadata.animation_url;
@@ -1218,17 +1196,17 @@ chonkModeButton.addEventListener("click", () => {
       } else if (typeof uri === "string" && uri.startsWith("data:text/html")) {
         html = decodeDataUri(uri);
       }
- 
+
       if (html) {
         const zMatch = html.match(/var\s+zMapFull\s*=\s*'([0-9a-fA-F]+)'/);
         if (zMatch) zMapFull = zMatch[1];
         const bgMatch = html.match(/var\s+bgColor\s*=\s*'([^']+)'/);
         if (bgMatch) bgColor = bgMatch[1];
       }
- 
+
       return { zMapFull, bgColor, metadata };
     }
- 
+
     function extract2D(uri) {
       const parsed = parseDataUri(uri);
       const metadata = parsed.metadata;
@@ -1238,7 +1216,7 @@ chonkModeButton.addEventListener("click", () => {
       }
       return { image: null, metadata };
     }
- 
+
     /* Traits + outfit name */
     function traitSlug(value) {
       return String(value || "").trim().toLowerCase()
@@ -1246,7 +1224,7 @@ chonkModeButton.addEventListener("click", () => {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, "");
     }
- 
+
     function resolveTraitPageUrl(traitType, value) {
       const key = String(traitType || "").trim().toLowerCase().replace(/[^a-z]/g, "");
       const category = CATEGORY_NUM[key];
@@ -1255,26 +1233,26 @@ chonkModeButton.addEventListener("click", () => {
       if (!slug) return null;
       return `${TRAIT_PAGE_BASE}${encodeURIComponent(slug)}?category=${category}`;
     }
- 
+
     function cleanTraitName(value) {
       return String(value || "").trim().replace(/\s+/g, " ");
     }
- 
+
     function getTraitPart(attrs, wantedType) {
       const found = attrs.find(a => String(a.trait_type || "").trim().toLowerCase() === wantedType);
       return found ? cleanTraitName(found.value) : "";
     }
- 
+
     function simplifyTrait(value) {
       if (!value) return "";
       return value.replace(/\b(color|colours?)\b/gi, "").replace(/\s+/g, " ").trim();
     }
- 
+
     
 /// ============================================================
 // DAILY CHONK — CURATED OUTFIT NAME GENERATOR
 // ============================================================
- 
+
 const NAME_WORDS = {
   vibe: [
     "Electric", "Midnight", "Golden", "Dirty", "Dreamy",
@@ -1284,7 +1262,7 @@ const NAME_WORDS = {
     "Funky", "Dizzy", "Sweet", "Heavy", "Fever",
     "Disco", "Rebel", "Sunday", "Plastic", "Romantic"
   ],
- 
+
   fashion: [
     "Satin", "Denim", "Leather", "Velvet", "Silk",
     "Suede", "Lace", "Pleated", "Tailored", "Cropped",
@@ -1292,7 +1270,7 @@ const NAME_WORDS = {
     "Striped", "Sporty", "Classic", "Glossy", "Fuzzy",
     "Floral", "Utility", "Western", "Preppy", "Glam"
   ],
- 
+
   detail: [
     "Stitch", "Fringe", "Buckle", "Lace", "Collar",
     "Chain", "Pocket", "Stripe", "Patch", "Bow",
@@ -1300,52 +1278,52 @@ const NAME_WORDS = {
     "Charm", "Badge", "Pin", "Loop", "Ruffle",
     "Sparkle", "Print", "Thread", "Stud", "Trim"
   ],
- 
+
   place: [
     "Downtown", "Motel", "Rooftop", "Backstage", "Club",
     "Studio", "Arcade", "Diner", "Boardwalk", "Penthouse",
     "Garage", "Runway", "Backstreet", "Poolside", "Afterparty"
   ],
- 
+
   character: [
     "Icon", "Legend", "Heartbreaker", "Rebel", "Star",
     "Sweetheart", "Outlaw", "Showoff", "Dreamer", "Player",
     "Rascal", "Rockstar", "Hotshot", "Wildcard", "Darling"
   ]
 };
- 
+
 function pickDeterministic(list, hash, offset = 0) {
   return list[(hash + offset) % list.length];
 }
- 
+
 function outfitHash(pieces) {
   const source = pieces.join("|").toLowerCase();
- 
+
   let hash = 2166136261;
- 
+
   for (let i = 0; i < source.length; i++) {
     hash ^= source.charCodeAt(i);
     hash = Math.imul(hash, 16777619);
   }
- 
+
   return hash >>> 0;
 }
- 
+
 function generateOutfitName(top, head, face, accessory) {
   top = simplifyTrait(top);
   head = simplifyTrait(head);
   face = simplifyTrait(face);
   accessory = simplifyTrait(accessory);
- 
+
   const pieces = [top, head, face, accessory].filter(Boolean);
- 
+
   if (!pieces.length) {
     return "Daily Chonk";
   }
- 
+
   const hash = outfitHash(pieces);
   const lower = pieces.join(" ").toLowerCase();
- 
+
   // Specific combinations
   if (
     lower.includes("3d glasses") &&
@@ -1353,21 +1331,21 @@ function generateOutfitName(top, head, face, accessory) {
   ) {
     return "Street Legend";
   }
- 
+
   if (
     lower.includes("dress") &&
     lower.includes("glasses")
   ) {
     return "After Dark";
   }
- 
+
   if (
     lower.includes("shag") &&
     lower.includes("dress")
   ) {
     return "Shaggy Icon";
   }
- 
+
   // Curated naming styles
   const styles = [
     () => {
@@ -1375,74 +1353,74 @@ function generateOutfitName(top, head, face, accessory) {
       const fashion = pickDeterministic(NAME_WORDS.fashion, hash, 27);
       return `${vibe} ${fashion}`;
     },
- 
+
     () => {
       const vibe = pickDeterministic(NAME_WORDS.vibe, hash, 41);
       const detail = pickDeterministic(NAME_WORDS.detail, hash, 53);
       return `${vibe} ${detail}`;
     },
- 
+
     () => {
       const fashion = pickDeterministic(NAME_WORDS.fashion, hash, 67);
       const detail = pickDeterministic(NAME_WORDS.detail, hash, 71);
       return `${fashion} ${detail}`;
     },
- 
+
     () => {
       const place = pickDeterministic(NAME_WORDS.place, hash, 83);
       const character = pickDeterministic(NAME_WORDS.character, hash, 97);
       return `${place} ${character}`;
     },
- 
+
     () => {
       const vibe = pickDeterministic(NAME_WORDS.vibe, hash, 101);
       const character = pickDeterministic(NAME_WORDS.character, hash, 113);
       return `${vibe} ${character}`;
     },
- 
+
     () => {
       const character = pickDeterministic(NAME_WORDS.character, hash, 127);
       const detail = pickDeterministic(NAME_WORDS.detail, hash, 139);
       return `${character} ${detail}`;
     },
- 
+
     () => {
       const place = pickDeterministic(NAME_WORDS.place, hash, 149);
       const fashion = pickDeterministic(NAME_WORDS.fashion, hash, 157);
       return `${place} ${fashion}`;
     },
- 
+
     () => {
       const character = pickDeterministic(NAME_WORDS.character, hash, 163);
       return `The ${character}`;
     },
- 
+
     () => {
       const vibe = pickDeterministic(NAME_WORDS.vibe, hash, 173);
       return `${vibe} Club`;
     },
- 
+
     () => {
       const fashion = pickDeterministic(NAME_WORDS.fashion, hash, 181);
       return `${fashion} Drop`;
     },
- 
+
     () => {
       const vibe = pickDeterministic(NAME_WORDS.vibe, hash, 191);
       return `${vibe} After Dark`;
     },
- 
+
     () => {
       const vibe = pickDeterministic(NAME_WORDS.vibe, hash, 199);
       return `${vibe} Studios`;
     }
   ];
- 
+
   const styleIndex = hash % styles.length;
- 
+
   return styles[styleIndex]();
 }
- 
+
     function updateOutfitName(attrs) {
       outfitNameEl.textContent = generateOutfitName(
         getTraitPart(attrs, "top"),
@@ -1451,13 +1429,13 @@ function generateOutfitName(top, head, face, accessory) {
         getTraitPart(attrs, "accessory")
       );
     }
- 
+
     function escapeHtml(s) {
       return String(s).replace(/[&<>"']/g, c => ({
         "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
       }[c]));
     }
- 
+
     function showTraits(json) {
       traitsEl.innerHTML = "";
       const attrs = Array.isArray(json.attributes) ? json.attributes : [];
@@ -1490,9 +1468,9 @@ function generateOutfitName(top, head, face, accessory) {
         }
       });
     }
- 
+
     /* ========== CUSTOM 3D VIEWER ========== */
- 
+
     function parseZColorMap(colorMap, group, geom) {
       for (let i = 0; i < colorMap.length; i += 12) {
         const x = parseInt(colorMap.slice(i, i + 2), 16);
@@ -1506,7 +1484,7 @@ function generateOutfitName(top, head, face, accessory) {
         const adjustedY = y + 14;
         const adjustedZ = z - 5;
         const invertedY = 29 - adjustedY;
- 
+
         const mesh = new THREE.Mesh(
           geom,
           new THREE.MeshStandardMaterial({ color })
@@ -1515,7 +1493,7 @@ function generateOutfitName(top, head, face, accessory) {
         group.add(mesh);
       }
     }
- 
+
     function dispose3D() {
       if (animId) {
         cancelAnimationFrame(animId);
@@ -1536,20 +1514,20 @@ function generateOutfitName(top, head, face, accessory) {
       isSpinning = false;
       canvas3D.classList.remove("loaded");
     }
- 
+
     function init3D(zMapFull, bgColor) {
       dispose3D();
- 
+
       const wrap = canvas3D.parentElement;
       const w = wrap.clientWidth || 600;
       const h = wrap.clientHeight || 540;
- 
+
       scene = new THREE.Scene();
       scene.background = new THREE.Color(bgColor || "#ffffff");
- 
+
       camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 300);
       camera.position.set(-10, -5, 25);
- 
+
       renderer = new THREE.WebGLRenderer({
         canvas: canvas3D,
         antialias: true,
@@ -1557,7 +1535,7 @@ function generateOutfitName(top, head, face, accessory) {
       });
       renderer.setSize(w, h, false);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
- 
+
       const ambient = new THREE.AmbientLight(0x404040, 50);
       scene.add(ambient);
       const dir1 = new THREE.DirectionalLight(0xffffff, 1);
@@ -1566,12 +1544,12 @@ function generateOutfitName(top, head, face, accessory) {
       const dir2 = new THREE.DirectionalLight(0xffffff, 1);
       dir2.position.set(0, 5, -20);
       scene.add(dir2);
- 
+
       const geom = new THREE.BoxGeometry(1, 1, 1);
       chonkGroup = new THREE.Group();
       parseZColorMap(zMapFull, chonkGroup, geom);
       scene.add(chonkGroup);
- 
+
       controls = new OrbitControls(camera, canvas3D);
       controls.enableDamping = true;
       controls.enablePan = false;
@@ -1579,19 +1557,19 @@ function generateOutfitName(top, head, face, accessory) {
       controls.maxDistance = 50;
       controls.autoRotate = false;
       controls.autoRotateSpeed = 2.5;
- 
+
       function tick() {
         animId = requestAnimationFrame(tick);
         if (controls) controls.update();
         if (renderer && scene && camera) renderer.render(scene, camera);
       }
       tick();
- 
+
       viewerReady = true;
       canvas3D.classList.add("loaded");
       updateViewButtons();
     }
- 
+
     function resize3D() {
       if (!renderer || !camera) return;
       const wrap = canvas3D.parentElement;
@@ -1601,22 +1579,22 @@ function generateOutfitName(top, head, face, accessory) {
       camera.updateProjectionMatrix();
       renderer.setSize(w, h, false);
     }
- 
+
     window.addEventListener("resize", resize3D);
- 
+
     /* Views */
     function show2D() {
       canvas3D.classList.remove("loaded");
       rotateHint.classList.remove("visible");
       if (controls) controls.autoRotate = false;
       isSpinning = false;
- 
+
       if (!cached2D) {
         loading.hidden = false;
         loading.textContent = "2D render unavailable.";
         return;
       }
- 
+
       image.hidden = false;
       image.classList.add("changing");
       setTimeout(() => {
@@ -1627,14 +1605,14 @@ function generateOutfitName(top, head, face, accessory) {
         requestAnimationFrame(() => image.classList.remove("changing"));
       }, 120);
     }
- 
+
     function show3D() {
       if (!cached3DMeta || !cached3DMeta.zMapFull) {
         loading.hidden = false;
         loading.textContent = "3D render unavailable.";
         return;
       }
- 
+
       image.classList.add("changing");
       setTimeout(() => {
         if (currentMode !== "3d") return;
@@ -1642,13 +1620,13 @@ function generateOutfitName(top, head, face, accessory) {
         image.classList.remove("changing");
         loading.hidden = false;
         loading.textContent = "Loading 3D Chonk…";
- 
+
         init3D(cached3DMeta.zMapFull, cached3DMeta.bgColor);
         loading.hidden = true;
         showRotateHint();
       }, 120);
     }
- 
+
     let hintTimer = null;
     function showRotateHint() {
       rotateHint.classList.remove("visible");
@@ -1660,37 +1638,37 @@ function generateOutfitName(top, head, face, accessory) {
       }, 400);
       setTimeout(() => rotateHint.classList.remove("visible"), 5000);
     }
- 
+
     function renderCurrentView() {
       if (currentMode === "3d") show3D();
       else show2D();
     }
- 
+
     /* Load */
     async function loadChonk() {
       try {
         loading.hidden = false;
         loading.textContent = "Loading today’s outfit…";
- 
+
         const [uri2D, uri3D] = await Promise.all([
           contract.renderAsDataUri2D(CHONK_ID),
           contract.renderAsDataUri3D(CHONK_ID)
         ]);
- 
+
         const parsed2D = extract2D(uri2D);
         cached2D = parsed2D.image;
- 
+
         const extracted = extract3DData(uri3D);
         cached3DMeta = extracted.zMapFull
           ? { zMapFull: extracted.zMapFull, bgColor: extracted.bgColor }
           : null;
- 
+
         if (parsed2D.metadata && Array.isArray(parsed2D.metadata.attributes)) {
           showTraits(parsed2D.metadata);
         } else if (extracted.metadata && Array.isArray(extracted.metadata.attributes)) {
           showTraits(extracted.metadata);
         }
- 
+
         if (!cached3DMeta) {
           console.warn("Daily Chonk: could not extract zMapFull from 3D render.");
           if (currentMode === "3d") {
@@ -1698,7 +1676,7 @@ function generateOutfitName(top, head, face, accessory) {
             setStoredViewMode("2d");
           }
         }
- 
+
         updateViewButtons();
         renderCurrentView();
         statusEl.textContent = "Live — refreshing directly from the Base chain.";
@@ -1711,7 +1689,7 @@ function generateOutfitName(top, head, face, accessory) {
         outfitNameEl.textContent = "Today's Chonk";
       }
     }
- 
+
     /* Countdown */
     let lastRemaining = Infinity;
     function tick() {
@@ -1719,14 +1697,14 @@ function generateOutfitName(top, head, face, accessory) {
       let elapsed = (now - LAST_CHANGE) % CYCLE;
       if (elapsed < 0) elapsed += CYCLE;
       const remaining = CYCLE - elapsed;
- 
+
       const h = Math.floor(remaining / 3600000);
       const m = Math.floor((remaining % 3600000) / 60000);
       const s = Math.floor((remaining % 60000) / 1000);
       countdownEl.textContent =
         `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
       progressEl.style.width = `${(elapsed / CYCLE) * 100}%`;
- 
+
       if (remaining > lastRemaining && lastRemaining < 5000) {
         cached2D = null;
         cached3DMeta = null;
@@ -1734,7 +1712,7 @@ function generateOutfitName(top, head, face, accessory) {
         loadChonk();
       }
       lastRemaining = remaining;
- 
+
       if (remaining < 60000) {
         statusEl.textContent = "The wardrobe is about to roll…";
       } else if (remaining < 3600000) {
@@ -1743,60 +1721,60 @@ function generateOutfitName(top, head, face, accessory) {
         statusEl.textContent = "The bot picks a new combination every 24 hours.";
       }
     }
- 
+
     loadChonk();
     tick();
     setInterval(tick, 1000);
- 
+
     /* ========== EASTER EGG: type "chonk" to rain heads ========== */
     const HEAD_SRC = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAABMCAYAAACmj3NpAAACkUlEQVR42u2dMW/TQBSA3zlJkZMCLUKtaJmiikpO6FyJBaSwMcBO6EAGVjYmBsTP6MRoCQm6IXXtgJgjIXW2BBMBNU1ixz4mWPNOSpT68n1StqeXu/t8Pt9zTjG/Pr+QBWEFFoXRBgaMld8gGMGAYEAwIBgQDAgGBCMYvKHqGE/58WpgmcGAYAQDggHBgGBAMCAYELx6gi21Kb8F7x/F1B895v/PL/PTnvwZprPiuRbKugZXOsdys7HGiPj8kBUg2f+naCSvwDYJySuwDw46x3IDyf4K5sFrBQQzk1dA8L+ZTMWrnBgRuSeKAsb2Zmg/vXt8vtTGGiNRFKlikySRwWBQGhGtVksd2+/3nXLbsnxqtZrV0u12bZn65oJLXt4msQYDggHBgGBAMCAYEIxg8IbqydtDVaC1Vra2tlWx62FN7vc+qmKjKJI4jlWxeZ5Lu91WxSZJoh6ERwe35fXTPVXss/dfJS90hfk4jtWlVW2/nAXv3WmoBe/sbqhiXV4xhmGorsNmWeZch9VwPayKdhyM0edtNpvqvi2iX9yiWYMBwYBgQDAgGBAMCEYweEVVlP/gsbF5S0R5fHRwkUpx2lM14Nv3n2JcykNKPrx5KM87uvJjlhcyTgtVbPrlpboN+08eyPmPydz7Zs9eiR1N1YJnJ7RW6vW6ugHGiPyefdZYRERGyoF15XIyVbfBBZec9ca6iMxfcHqRyuVYJzjQyN3Zvcu9zsc1GLkeC0aux4KR67Fg5HosGLkeC0aux4KR67Fg5PqNGZwciV3M8X1V0iAwEq5V5v7lk6yQaV4sdXDDaxUJFlCGHY6n6qTVZV9hRWFlqCy7lY3RJL+a+2DweB8MCAYEA4IBwYBgQDCCwWP+Al7TbW9hj/68AAAAAElFTkSuQmCC";
- 
+
     let typedSequence = "";
     const SECRET = "chonk";
     let rainActive = false;
     let rainInterval = null;
     let rainTimeout = null;
- 
+
     function spawnHead() {
       const head = document.createElement("img");
       head.src = HEAD_SRC;
       head.alt = "";
       head.className = "rain-head";
       head.setAttribute("aria-hidden", "true");
- 
+
       const size = 48 + Math.random() * 48; // 48–96px
       const duration = 3.5 + Math.random() * 4.5; // 3.5–8s
       const left = Math.random() * 100; // vw
       const sway = (Math.random() - 0.5) * 80; // px drift
- 
+
       head.style.setProperty("--size", size + "px");
       head.style.setProperty("--duration", duration + "s");
       head.style.setProperty("--sway", sway + "px");
       head.style.left = left + "vw";
       head.style.top = "-10px";
- 
+
       document.body.appendChild(head);
- 
+
       head.addEventListener("animationend", () => {
         head.remove();
       });
     }
- 
+
     function startHeadRain() {
       if (rainActive) return;
       rainActive = true;
- 
+
       // Burst of heads immediately
       for (let i = 0; i < 8; i++) {
         setTimeout(spawnHead, i * 80);
       }
- 
+
       // Continue raining for ~12 seconds
       rainInterval = setInterval(spawnHead, 180 + Math.random() * 120);
- 
+
       rainTimeout = setTimeout(stopHeadRain, 12000);
     }
- 
+
     function stopHeadRain() {
       rainActive = false;
       if (rainInterval) {
@@ -1808,7 +1786,7 @@ function generateOutfitName(top, head, face, accessory) {
         rainTimeout = null;
       }
     }
- 
+
     document.addEventListener("keydown", (e) => {
       // Ignore when typing in inputs/textareas or with modifiers
       if (
@@ -1819,9 +1797,9 @@ function generateOutfitName(top, head, face, accessory) {
       ) {
         return;
       }
- 
+
       const key = e.key.toLowerCase();
- 
+
       if (key.length === 1 && /[a-z0-9]/.test(key)) {
         typedSequence += key;
         if (typedSequence.length > SECRET.length) {
@@ -1842,30 +1820,29 @@ function generateOutfitName(top, head, face, accessory) {
       }
     });
     console.log(`
- 
- 
+
+
 ___________________________________________________________________
- 
+
 Riddle
- 
+
 The answer isn't behind a door,
 nor buried deep within.
- 
+
 It waits upon the place
 where every journey begins.
- 
+
 Speak the right five letters
 and suddenly, things get a little... chonky.
 ___________________________________________________________________
- 
+
 Let's F*cking Chonk! 💙
 ___________________________________________________________________
- 
+
                                                                                                                     
 `);
- 
+
   })();
   </script>
 </body>
 </html>
- 
