@@ -121,6 +121,26 @@ body.chonk-mode-spin::before {
 .chonk-bg-tile.spinning {
   animation: individualChonkSpin 2s linear infinite;
 }
+@keyframes chonkRainbow {
+  0% {
+    filter: hue-rotate(0deg) saturate(1.2);
+  }
+
+  50% {
+    filter: hue-rotate(180deg) saturate(1.8);
+  }
+
+  100% {
+    filter: hue-rotate(360deg) saturate(1.2);
+  }
+}
+
+.chonk-bg-tile.rainbow {
+  animation:
+    individualChonkSpin 2s linear infinite,
+    chonkRainbow 4s linear infinite;
+}
+
 
 
     .wrap {
@@ -939,9 +959,10 @@ function createChonkBackground() {
       tile.style.left = `${x * size}px`;
       tile.style.top = `${y * size}px`;
 
-      if (chonkModeActive) {
-        tile.classList.add("spinning");
-      }
+     if (chonkModeActive) {
+  tile.classList.add("spinning");
+  tile.classList.add("rainbow");
+}
 
       chonkBackground.appendChild(tile);
     }
@@ -959,6 +980,7 @@ chonkModeButton.addEventListener("click", () => {
 
   tiles.forEach(tile => {
     tile.classList.toggle("spinning", chonkModeActive);
+    tile.classList.toggle("rainbow", chonkModeActive);
   });
 
   // Make the button show whether Chonk Mode is active.
