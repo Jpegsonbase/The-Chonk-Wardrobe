@@ -778,6 +778,65 @@ body.chonk-mode-active #chonk-background {
       font-weight: 900;
       font-size: 0.95rem;
     }
+    
+    /* =========================================================
+   CHONK MODE — FALLING TRAITS
+   ========================================================= */
+
+#trait-rain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+body.chonk-mode #trait-rain {
+  opacity: 1;
+}
+
+.falling-trait {
+  position: absolute;
+  top: -140px;
+  left: 0;
+  width: 90px;
+  height: 90px;
+
+  object-fit: contain;
+  image-rendering: pixelated;
+
+  pointer-events: none;
+
+  animation-name: traitFall;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+
+  will-change: transform;
+}
+
+@keyframes traitFall {
+  0% {
+    transform:
+      translate3d(0, -140px, 0)
+      rotate(0deg);
+  }
+
+  100% {
+    transform:
+      translate3d(var(--drift), calc(100vh + 180px), 0)
+      rotate(var(--rotation));
+  }
+}
+
+@media (max-width: 500px) {
+  .falling-trait {
+    width: 65px;
+    height: 65px;
+  }
+}
+
 
     @media (max-width: 820px) {
       .wrap { width: min(100% - 22px, 700px); padding-top: 22px; }
@@ -817,6 +876,7 @@ body.chonk-mode-active #chonk-background {
 
 <body>
     <div id="chonk-background"></div>
+    <div id="trait-rain"></div>
   <div class="wrap">
 
     <header>
@@ -955,6 +1015,7 @@ body.chonk-mode-active #chonk-background {
     const CHONK_ID = 30000;
     const CONTRACT = "0x07152bfde079b5319e5308c43fb1dbc9c76cb4f9";
     const RPC = "https://mainnet.base.org";
+    const TRAITS_CONTRACT = "0x6b8f34e0559aa9a5507e74ad93374d9745cdbf09";
     const LAST_CHANGE = Date.parse("2026-09-06T18:34:34Z");
     const CYCLE = 24 * 60 * 60 * 1000;
     const TRAIT_PAGE_BASE = "https://www.chonks.xyz/traits/";
@@ -966,13 +1027,25 @@ body.chonk-mode-active #chonk-background {
     };
 
     const abi = [
-      "function tokenURI(uint256) view returns (string)",
-      "function renderAsDataUri2D(uint256) view returns (string)",
-      "function renderAsDataUri3D(uint256) view returns (string)"
-    ];
+  "function tokenURI(uint256) view returns (string)",
+  "function renderAsDataUri2D(uint256) view returns (string)",
+  "function renderAsDataUri3D(uint256) view returns (string)",
+  "function getTraitsForChonkId(uint256) view returns (uint256[])"
+];
+
+const traitsAbi = [
+  "function getSvgForTokenId(uint256) view returns (string)"
+];
+
 
     const provider = new ethers.JsonRpcProvider(RPC);
     const contract = new ethers.Contract(CONTRACT, abi, provider);
+    const traitsContract = new ethers.Contract(
+  TRAITS_CONTRACT,
+  traitsAbi,
+  provider
+);
+
 
     const image = document.getElementById("chonk-image");
     const loading = document.getElementById("loading");
@@ -1039,8 +1112,14 @@ chonkModeButton.addEventListener("click", () => {
 
   // Highlight the button.
   chonkModeButton.classList.toggle("active", chonkModeActive);
-});
 
+  // Start / stop the falling trait animation.
+  if (chonkModeActive) {
+    startTraitRain();
+  } else {
+    stopTraitRain();
+  }
+});
 
 
     let currentMode = "2d";
@@ -1048,6 +1127,158 @@ chonkModeButton.addEventListener("click", () => {
     let cached3DMeta = null;
     let viewerReady = false;
     let isSpinning = false;
+    /* =========================================================
+   CHONK MODE — TRAIT RAIN
+   ========================================================= */
+
+let traitRainTimer = null;
+let traitRainActive = false;
+let fallingTraitSvgs = [];
+
+const traitRainEl = document.getElementById("trait-rain");
+
+async function loadTraitRainAssets() {
+  try {
+    const traitIds = await contract.getTraitsForChonkId(CHONK_ID);
+
+    console.log("Daily Chonk traits:", traitIds.map(id => id.toString()));
+
+    const svgPromises = traitIds.map(async (traitId) => {
+      try {
+        const svg = await traitsContract.getSvgForTokenId(traitId);
+
+        if (!svg || !svg.startsWith("<svg")) {
+          return null;
+        }
+
+        return svg;
+      } catch (err) {
+        console.warn(
+          "Could not load trait",
+          traitId.toString(),
+          err
+        );
+
+        return null;
+      }
+    });
+
+    const svgs = await Promise.all(svgPromises);
+
+    fallingTraitSvgs = svgs.filter(Boolean);
+
+    console.log(
+      `Loaded ${fallingTraitSvgs.length} falling trait SVGs.`
+    );
+
+  } catch (err) {
+    console.error("Could not load Chonk traits:", err);
+    fallingTraitSvgs = [];
+  }
+}
+
+
+function svgToDataUri(svg) {
+  return "data:image/svg+xml;charset=utf-8," +
+    encodeURIComponent(svg);
+}
+
+
+function spawnFallingTrait() {
+  if (!traitRainActive) return;
+
+  if (!fallingTraitSvgs.length) return;
+
+  const svg =
+    fallingTraitSvgs[
+      Math.floor(Math.random() * fallingTraitSvgs.length)
+    ];
+
+  const trait = document.createElement("img");
+
+  trait.className = "falling-trait";
+
+  trait.src = svgToDataUri(svg);
+
+  const size = 55 + Math.random() * 65;
+
+  const left =
+    Math.random() * window.innerWidth;
+
+  const duration =
+    5 + Math.random() * 5;
+
+  const drift =
+    (Math.random() - 0.5) * 220;
+
+  const rotation =
+    (Math.random() - 0.5) * 720;
+
+  trait.style.width = `${size}px`;
+  trait.style.height = `${size}px`;
+  trait.style.left = `${left}px`;
+
+  trait.style.setProperty(
+    "--drift",
+    `${drift}px`
+  );
+
+  trait.style.setProperty(
+    "--rotation",
+    `${rotation}deg`
+  );
+
+  trait.style.animationDuration =
+    `${duration}s`;
+
+  traitRainEl.appendChild(trait);
+
+  setTimeout(() => {
+    trait.remove();
+  }, (duration + 0.5) * 1000);
+}
+
+
+function startTraitRain() {
+  if (traitRainActive) return;
+
+  traitRainActive = true;
+
+  if (!fallingTraitSvgs.length) {
+    loadTraitRainAssets().then(() => {
+      if (!traitRainActive) return;
+
+      spawnFallingTrait();
+
+      traitRainTimer = setInterval(
+        spawnFallingTrait,
+        450
+      );
+    });
+
+    return;
+  }
+
+  spawnFallingTrait();
+
+  traitRainTimer = setInterval(
+    spawnFallingTrait,
+    450
+  );
+}
+
+
+function stopTraitRain() {
+  traitRainActive = false;
+
+  if (traitRainTimer) {
+    clearInterval(traitRainTimer);
+    traitRainTimer = null;
+  }
+
+  traitRainEl.innerHTML = "";
+}
+
 
     let scene, camera, renderer, controls, chonkGroup, animId;
 
@@ -1697,6 +1928,7 @@ function generateOutfitName(top, head, face, accessory) {
     }
 
     loadChonk();
+    loadTraitRainAssets();
     tick();
     setInterval(tick, 1000);
   })();
