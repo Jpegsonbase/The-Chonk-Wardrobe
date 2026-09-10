@@ -1010,8 +1010,8 @@ body.chonk-mode-active #chonk-background {
     </div>
 
     <div id="rating-average" class="rating-average">
-      No ratings yet
-    </div>
+  Daily score
+</div>
   </div>
 
   <div
@@ -1859,7 +1859,7 @@ function generateOutfitName(top, head, face, accessory) {
         statusEl.textContent = "The bot picks a new combination every 24 hours.";
       }
     }
-    /* ========== RATE THE FIT ========== */
+   /* ========== RATE THE FIT ========== */
 
 const RATING_STORAGE_KEY = "daily-chonk-rating";
 
@@ -1868,6 +1868,34 @@ function getDailyRatingKey() {
   const dayNumber = Math.floor(elapsed / CYCLE);
 
   return `daily-chonk-${dayNumber}`;
+}
+
+function getDailySeed() {
+  const elapsed = Date.now() - LAST_CHANGE;
+  return Math.floor(elapsed / CYCLE);
+}
+
+function seededRandom(seed) {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+
+function getFakeDailyScore() {
+  const day = getDailySeed();
+
+  // Different vote count every day.
+  const voteCount =
+  10 + Math.floor(seededRandom(day + 100) * 21);
+
+  // Different average every day.
+  // Range: approximately 3.2 to 4.9
+  const average =
+    3.2 + seededRandom(day + 200) * 1.7;
+
+  return {
+    average,
+    voteCount
+  };
 }
 
 function getRatings() {
@@ -1922,30 +1950,16 @@ function saveRatings(data) {
 
 function updateRatingUI() {
   const data = getRatings();
-  const ratings = data.ratings || [];
+  const fakeScore = getFakeDailyScore();
 
   /*
-   * Calculate the average.
-   *
-   * Example:
-   * 5 + 4 + 4 + 3 = 16
-   * 16 / 4 = 4.0
+   * Show the synthetic daily score.
    */
-  const average = ratings.length
-    ? ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length
-    : 0;
-
-  if (!ratings.length) {
-    ratingAverageEl.textContent = "No ratings yet";
-  } else {
-    ratingAverageEl.textContent =
-      `${average.toFixed(1)} / 5 · ${ratings.length} ${
-        ratings.length === 1 ? "vote" : "votes"
-      }`;
-  }
+  ratingAverageEl.textContent =
+    `${fakeScore.average.toFixed(1)} / 5 · ${fakeScore.voteCount} votes`;
 
   /*
-   * Highlight the stars the visitor selected.
+   * Highlight the visitor's own rating.
    */
   const buttons = starRating.querySelectorAll("button");
 
@@ -1958,6 +1972,9 @@ function updateRatingUI() {
     );
   });
 
+  /*
+   * Show the visitor's personal rating.
+   */
   if (data.myRating !== null) {
     ratingStatusEl.textContent =
       `You rated this fit ${data.myRating}/5.`;
@@ -2033,9 +2050,9 @@ starRating.addEventListener("mouseleave", () => {
  */
 updateRatingUI();
 
-    loadChonk();
-    tick();
-    setInterval(tick, 1000);
+loadChonk();
+tick();
+setInterval(tick, 1000);
 
     /* ========== EASTER EGG: type "chonk" to rain heads ========== */
     const HEAD_SRC = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAABMCAYAAACmj3NpAAACkUlEQVR42u2dMW/TQBSA3zlJkZMCLUKtaJmiikpO6FyJBaSwMcBO6EAGVjYmBsTP6MRoCQm6IXXtgJgjIXW2BBMBNU1ixz4mWPNOSpT68n1StqeXu/t8Pt9zTjG/Pr+QBWEFFoXRBgaMld8gGMGAYEAwIBgQDAgGBCMYvKHqGE/58WpgmcGAYAQDggHBgGBAMCAYELx6gi21Kb8F7x/F1B895v/PL/PTnvwZprPiuRbKugZXOsdys7HGiPj8kBUg2f+naCSvwDYJySuwDw46x3IDyf4K5sFrBQQzk1dA8L+ZTMWrnBgRuSeKAsb2Zmg/vXt8vtTGGiNRFKlikySRwWBQGhGtVksd2+/3nXLbsnxqtZrV0u12bZn65oJLXt4msQYDggHBgGBAMCAYEIxg8IbqydtDVaC1Vra2tlWx62FN7vc+qmKjKJI4jlWxeZ5Lu91WxSZJoh6ERwe35fXTPVXss/dfJS90hfk4jtWlVW2/nAXv3WmoBe/sbqhiXV4xhmGorsNmWeZch9VwPayKdhyM0edtNpvqvi2iX9yiWYMBwYBgQDAgGBAMCEYweEVVlP/gsbF5S0R5fHRwkUpx2lM14Nv3n2JcykNKPrx5KM87uvJjlhcyTgtVbPrlpboN+08eyPmPydz7Zs9eiR1N1YJnJ7RW6vW6ugHGiPyefdZYRERGyoF15XIyVbfBBZec9ca6iMxfcHqRyuVYJzjQyN3Zvcu9zsc1GLkeC0aux4KR67Fg5HosGLkeC0aux4KR67Fg5PqNGZwciV3M8X1V0iAwEq5V5v7lk6yQaV4sdXDDaxUJFlCGHY6n6qTVZV9hRWFlqCy7lY3RJL+a+2DweB8MCAYEA4IBwYBgQDCCwWP+Al7TbW9hj/68AAAAAElFTkSuQmCC";
