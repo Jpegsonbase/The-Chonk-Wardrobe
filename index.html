@@ -838,6 +838,105 @@ body.chonk-mode-active #chonk-background {
       footer { align-items: flex-start; flex-direction: column; }
       .rotate-hint { bottom: 18px; font-size: 0.56rem; padding: 7px 10px; }
     }
+    /* =========================
+   RATE THE FIT
+   ========================= */
+
+.rating-section {
+  margin-top: 18px;
+  padding: 18px;
+  border: 3px solid var(--line);
+  border-radius: 14px;
+  background: var(--progress-bg);
+}
+
+.rating-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.rating-heading h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  letter-spacing: -0.03em;
+}
+
+.rating-average {
+  font-size: 0.78rem;
+  font-weight: 950;
+  color: var(--muted);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.star-rating {
+  display: flex;
+  gap: 5px;
+  margin-top: 14px;
+}
+
+.star-rating button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #c8c0b4;
+  font-size: clamp(2rem, 5vw, 2.7rem);
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    transform 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.star-rating button:hover,
+.star-rating button.hovered,
+.star-rating button.selected {
+  color: var(--accent);
+}
+
+.star-rating button:hover {
+  transform: translateY(-3px) scale(1.08);
+}
+
+.star-rating button:active {
+  transform: scale(0.9);
+}
+
+.star-rating button:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 3px;
+  border-radius: 5px;
+}
+
+.rating-status {
+  margin-top: 9px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+@media (max-width: 500px) {
+  .rating-section {
+    padding: 15px;
+  }
+
+  .rating-heading {
+    align-items: flex-start;
+  }
+
+  .rating-average {
+    font-size: 0.68rem;
+  }
+
+  .star-rating {
+    justify-content: center;
+  }
+}
+
   </style>
 </head>
 
@@ -897,11 +996,42 @@ body.chonk-mode-active #chonk-background {
         </div>
 
         <div class="image-wrap">
-          <div id="loading" class="loading">Loading today’s outfit…</div>
-          <img id="chonk-image" alt="Today’s Daily Chonk outfit" hidden />
-          <canvas id="chonk-3d-canvas"></canvas>
-          <div id="rotate-hint" class="rotate-hint">↔ DRAG TO ROTATE · SCROLL TO ZOOM</div>
-        </div>
+  <div id="loading" class="loading">Loading today’s outfit…</div>
+  <img id="chonk-image" alt="Today’s Daily Chonk outfit" hidden />
+  <canvas id="chonk-3d-canvas"></canvas>
+  <div id="rotate-hint" class="rotate-hint">↔ DRAG TO ROTATE · SCROLL TO ZOOM</div>
+</div>
+
+<div class="rating-section">
+  <div class="rating-heading">
+    <div>
+      <div class="section-kicker">Daily rating</div>
+      <h3>Rate the fit</h3>
+    </div>
+
+    <div id="rating-average" class="rating-average">
+      No ratings yet
+    </div>
+  </div>
+
+  <div
+    id="star-rating"
+    class="star-rating"
+    role="radiogroup"
+    aria-label="Rate today's outfit from 1 to 5 stars"
+  >
+    <button type="button" data-rating="1" aria-label="1 star">★</button>
+    <button type="button" data-rating="2" aria-label="2 stars">★</button>
+    <button type="button" data-rating="3" aria-label="3 stars">★</button>
+    <button type="button" data-rating="4" aria-label="4 stars">★</button>
+    <button type="button" data-rating="5" aria-label="5 stars">★</button>
+  </div>
+
+  <div id="rating-status" class="rating-status">
+    Tap a star to rate today's fit.
+  </div>
+</div>
+
       </section>
 
       <aside class="side">
@@ -1015,6 +1145,10 @@ body.chonk-mode-active #chonk-background {
     const buttonSpin = document.getElementById("view-spin");
 const chonkModeButton = document.getElementById("chonk-mode");
 const chonkBackground = document.getElementById("chonk-background");
+const starRating = document.getElementById("star-rating");
+const ratingAverageEl = document.getElementById("rating-average");
+const ratingStatusEl = document.getElementById("rating-status");
+
 
 let chonkModeActive = false;
 
@@ -1706,11 +1840,15 @@ function generateOutfitName(top, head, face, accessory) {
       progressEl.style.width = `${(elapsed / CYCLE) * 100}%`;
 
       if (remaining > lastRemaining && lastRemaining < 5000) {
-        cached2D = null;
-        cached3DMeta = null;
-        dispose3D();
-        loadChonk();
-      }
+  cached2D = null;
+  cached3DMeta = null;
+  dispose3D();
+
+  // Reset the rating display for the new daily outfit.
+  updateRatingUI();
+
+  loadChonk();
+}
       lastRemaining = remaining;
 
       if (remaining < 60000) {
@@ -1721,6 +1859,179 @@ function generateOutfitName(top, head, face, accessory) {
         statusEl.textContent = "The bot picks a new combination every 24 hours.";
       }
     }
+    /* ========== RATE THE FIT ========== */
+
+const RATING_STORAGE_KEY = "daily-chonk-rating";
+
+function getDailyRatingKey() {
+  const elapsed = Date.now() - LAST_CHANGE;
+  const dayNumber = Math.floor(elapsed / CYCLE);
+
+  return `daily-chonk-${dayNumber}`;
+}
+
+function getRatings() {
+  const key = getDailyRatingKey();
+
+  try {
+    const stored = localStorage.getItem(RATING_STORAGE_KEY);
+
+    if (!stored) {
+      return {
+        key: key,
+        ratings: [],
+        myRating: null
+      };
+    }
+
+    const data = JSON.parse(stored);
+
+    /*
+     * If the day has changed, throw away
+     * the previous day's ratings.
+     */
+    if (data.key !== key) {
+      return {
+        key: key,
+        ratings: [],
+        myRating: null
+      };
+    }
+
+    return data;
+
+  } catch (e) {
+    return {
+      key: key,
+      ratings: [],
+      myRating: null
+    };
+  }
+}
+
+function saveRatings(data) {
+  try {
+    localStorage.setItem(
+      RATING_STORAGE_KEY,
+      JSON.stringify(data)
+    );
+  } catch (e) {
+    console.warn("Could not save Daily Chonk rating.", e);
+  }
+}
+
+function updateRatingUI() {
+  const data = getRatings();
+  const ratings = data.ratings || [];
+
+  /*
+   * Calculate the average.
+   *
+   * Example:
+   * 5 + 4 + 4 + 3 = 16
+   * 16 / 4 = 4.0
+   */
+  const average = ratings.length
+    ? ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length
+    : 0;
+
+  if (!ratings.length) {
+    ratingAverageEl.textContent = "No ratings yet";
+  } else {
+    ratingAverageEl.textContent =
+      `${average.toFixed(1)} / 5 · ${ratings.length} ${
+        ratings.length === 1 ? "vote" : "votes"
+      }`;
+  }
+
+  /*
+   * Highlight the stars the visitor selected.
+   */
+  const buttons = starRating.querySelectorAll("button");
+
+  buttons.forEach(button => {
+    const rating = Number(button.dataset.rating);
+
+    button.classList.toggle(
+      "selected",
+      data.myRating !== null && rating <= data.myRating
+    );
+  });
+
+  if (data.myRating !== null) {
+    ratingStatusEl.textContent =
+      `You rated this fit ${data.myRating}/5.`;
+  } else {
+    ratingStatusEl.textContent =
+      "Tap a star to rate today's fit.";
+  }
+}
+
+function submitRating(rating) {
+  const data = getRatings();
+
+  /*
+   * If this visitor already voted,
+   * replace their previous vote.
+   */
+  if (data.myRating !== null) {
+    const index = data.ratings.indexOf(data.myRating);
+
+    if (index !== -1) {
+      data.ratings[index] = rating;
+    } else {
+      data.ratings.push(rating);
+    }
+  } else {
+    data.ratings.push(rating);
+  }
+
+  data.myRating = rating;
+
+  saveRatings(data);
+  updateRatingUI();
+}
+
+/*
+ * Make each star clickable.
+ */
+starRating.querySelectorAll("button").forEach(button => {
+
+  button.addEventListener("click", () => {
+    const rating = Number(button.dataset.rating);
+
+    submitRating(rating);
+  });
+
+  /*
+   * Highlight stars while hovering.
+   */
+  button.addEventListener("mouseenter", () => {
+    const rating = Number(button.dataset.rating);
+
+    starRating.querySelectorAll("button").forEach(star => {
+      star.classList.toggle(
+        "hovered",
+        Number(star.dataset.rating) <= rating
+      );
+    });
+  });
+});
+
+/*
+ * Remove hover highlighting when
+ * the mouse leaves the stars.
+ */
+starRating.addEventListener("mouseleave", () => {
+  starRating.querySelectorAll("button").forEach(star => {
+    star.classList.remove("hovered");
+  });
+});
+
+/*
+ * Load the current rating when the page opens.
+ */
+updateRatingUI();
 
     loadChonk();
     tick();
