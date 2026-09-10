@@ -121,22 +121,8 @@ body.chonk-mode-active #chonk-background {
   }
 }
 
-@keyframes individualChonkSpinReverse {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(-360deg);
-  }
-}
-
 .chonk-bg-tile.spinning {
   animation: individualChonkSpin 2s linear infinite;
-}
-
-.chonk-bg-tile.spinning.spin-reverse {
-  animation: individualChonkSpinReverse 2s linear infinite;
 }
 
 @keyframes chonkRainbow {
@@ -200,12 +186,6 @@ body.chonk-mode-active #chonk-background {
 .chonk-bg-tile.rainbow {
   animation:
     individualChonkSpin 2s linear infinite,
-    chonkRainbow 3s linear infinite;
-}
-
-.chonk-bg-tile.rainbow.spin-reverse {
-  animation:
-    individualChonkSpinReverse 2s linear infinite,
     chonkRainbow 3s linear infinite;
 }
 
@@ -1256,11 +1236,6 @@ function createChonkBackground() {
       tile.style.left = `${x * size}px`;
       tile.style.top = `${y * size}px`;
 
-      // Checkerboard parity: every other tile spins the opposite way
-      if ((x + y) % 2 === 1) {
-        tile.classList.add("spin-reverse");
-      }
-
       if (chonkModeActive) {
         tile.classList.add("spinning");
         tile.classList.add("rainbow");
@@ -1283,7 +1258,6 @@ chonkModeButton.addEventListener("click", () => {
   tiles.forEach(tile => {
     tile.classList.toggle("spinning", chonkModeActive);
     tile.classList.toggle("rainbow", chonkModeActive);
-    // spin-reverse is assigned at creation based on grid position
   });
 
   // Bring the Chonk background visually forward.
