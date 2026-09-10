@@ -238,6 +238,74 @@ body.chonk-mode-active #chonk-background {
       filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.15));
     }
 
+    /* LFC easter egg: rainbow-cycling shades heads (Chonk Mode only) */
+    @keyframes shadesRainbow {
+      0% {
+        filter:
+          hue-rotate(0deg)
+          saturate(2)
+          brightness(1.1)
+          drop-shadow(2px 2px 0 rgba(0,0,0,0.15));
+      }
+      16.6% {
+        filter:
+          hue-rotate(60deg)
+          saturate(2.2)
+          brightness(1.12)
+          drop-shadow(2px 2px 0 rgba(0,0,0,0.15));
+      }
+      33.3% {
+        filter:
+          hue-rotate(120deg)
+          saturate(2.2)
+          brightness(1.12)
+          drop-shadow(2px 2px 0 rgba(0,0,0,0.15));
+      }
+      50% {
+        filter:
+          hue-rotate(180deg)
+          saturate(2.4)
+          brightness(1.15)
+          drop-shadow(2px 2px 0 rgba(0,0,0,0.15));
+      }
+      66.6% {
+        filter:
+          hue-rotate(240deg)
+          saturate(2.2)
+          brightness(1.12)
+          drop-shadow(2px 2px 0 rgba(0,0,0,0.15));
+      }
+      83.3% {
+        filter:
+          hue-rotate(300deg)
+          saturate(2.4)
+          brightness(1.15)
+          drop-shadow(2px 2px 0 rgba(0,0,0,0.15));
+      }
+      100% {
+        filter:
+          hue-rotate(360deg)
+          saturate(2)
+          brightness(1.1)
+          drop-shadow(2px 2px 0 rgba(0,0,0,0.15));
+      }
+    }
+
+    .rain-shades {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: var(--size, 72px);
+      height: auto;
+      image-rendering: pixelated;
+      pointer-events: none;
+      z-index: 9999;
+      will-change: transform, opacity, filter;
+      animation:
+        head-fall var(--duration, 5s) linear forwards,
+        shadesRainbow 1.8s linear infinite;
+    }
+
     .wrap {
       position: relative;
       z-index: 1;
@@ -1226,6 +1294,11 @@ chonkModeButton.addEventListener("click", () => {
 
   // Highlight the button.
   chonkModeButton.classList.toggle("active", chonkModeActive);
+
+  // Shades rain is Chonk Mode–only; stop it when mode turns off
+  if (!chonkModeActive && typeof stopShadesRain === "function") {
+    stopShadesRain();
+  }
 });
 
 
@@ -2084,11 +2157,18 @@ setInterval(tick, 1000);
     /* ========== EASTER EGG: type "chonk" to rain heads ========== */
     const HEAD_SRC = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAABMCAYAAACmj3NpAAACkUlEQVR42u2dMW/TQBSA3zlJkZMCLUKtaJmiikpO6FyJBaSwMcBO6EAGVjYmBsTP6MRoCQm6IXXtgJgjIXW2BBMBNU1ixz4mWPNOSpT68n1StqeXu/t8Pt9zTjG/Pr+QBWEFFoXRBgaMld8gGMGAYEAwIBgQDAgGBCMYvKHqGE/58WpgmcGAYAQDggHBgGBAMCAYELx6gi21Kb8F7x/F1B895v/PL/PTnvwZprPiuRbKugZXOsdys7HGiPj8kBUg2f+naCSvwDYJySuwDw46x3IDyf4K5sFrBQQzk1dA8L+ZTMWrnBgRuSeKAsb2Zmg/vXt8vtTGGiNRFKlikySRwWBQGhGtVksd2+/3nXLbsnxqtZrV0u12bZn65oJLXt4msQYDggHBgGBAMCAYEIxg8IbqydtDVaC1Vra2tlWx62FN7vc+qmKjKJI4jlWxeZ5Lu91WxSZJoh6ERwe35fXTPVXss/dfJS90hfk4jtWlVW2/nAXv3WmoBe/sbqhiXV4xhmGorsNmWeZch9VwPayKdhyM0edtNpvqvi2iX9yiWYMBwYBgQDAgGBAMCEYweEVVlP/gsbF5S0R5fHRwkUpx2lM14Nv3n2JcykNKPrx5KM87uvJjlhcyTgtVbPrlpboN+08eyPmPydz7Zs9eiR1N1YJnJ7RW6vW6ugHGiPyefdZYRERGyoF15XIyVbfBBZec9ca6iMxfcHqRyuVYJzjQyN3Zvcu9zsc1GLkeC0aux4KR67Fg5HosGLkeC0aux4KR67Fg5PqNGZwciV3M8X1V0iAwEq5V5v7lk6yQaV4sdXDDaxUJFlCGHY6n6qTVZV9hRWFlqCy7lY3RJL+a+2DweB8MCAYEA4IBwYBgQDCCwWP+Al7TbW9hj/68AAAAAElFTkSuQmCC";
 
+    /* LFC easter egg: rainbow shades (only while Chonk Mode is on) */
+    const SHADES_SRC = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAH0CAYAAADL1t+KAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OTA0N0MzMEFBQzczMTFGMUIyOURGQTEzMzA4RjEzMzAiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OTA0N0MzMEJBQzczMTFGMUIyOURGQTEzMzA4RjEzMzAiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo5MDQ3QzMwOEFDNzMxMUYxQjI5REZBMTMzMDhGMTMzMCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo5MDQ3QzMwOUFDNzMxMUYxQjI5REZBMTMzMDhGMTMzMCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pn1WR0gAAA1+SURBVHja7N1NbBxX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";
+
     let typedSequence = "";
     const SECRET = "chonk";
+    const SECRET_LFC = "lfc";
     let rainActive = false;
     let rainInterval = null;
     let rainTimeout = null;
+    let shadesRainActive = false;
+    let shadesRainInterval = null;
+    let shadesRainTimeout = null;
 
     function spawnHead() {
       const head = document.createElement("img");
@@ -2142,6 +2222,56 @@ setInterval(tick, 1000);
       }
     }
 
+    function spawnShades() {
+      const head = document.createElement("img");
+      head.src = SHADES_SRC;
+      head.alt = "";
+      head.className = "rain-shades";
+      head.setAttribute("aria-hidden", "true");
+
+      const size = 56 + Math.random() * 64; // 56–120px
+      const duration = 3.5 + Math.random() * 4.5; // 3.5–8s
+      const left = Math.random() * 100; // vw
+      const sway = (Math.random() - 0.5) * 90; // px drift
+
+      head.style.setProperty("--size", size + "px");
+      head.style.setProperty("--duration", duration + "s");
+      head.style.setProperty("--sway", sway + "px");
+      head.style.left = left + "vw";
+      head.style.top = "-10px";
+
+      document.body.appendChild(head);
+
+      head.addEventListener("animationend", () => {
+        head.remove();
+      });
+    }
+
+    function startShadesRain() {
+      if (shadesRainActive) return;
+      if (!chonkModeActive) return; // only while Chonk Mode is on
+      shadesRainActive = true;
+
+      for (let i = 0; i < 10; i++) {
+        setTimeout(spawnShades, i * 70);
+      }
+
+      shadesRainInterval = setInterval(spawnShades, 150 + Math.random() * 110);
+      shadesRainTimeout = setTimeout(stopShadesRain, 14000);
+    }
+
+    function stopShadesRain() {
+      shadesRainActive = false;
+      if (shadesRainInterval) {
+        clearInterval(shadesRainInterval);
+        shadesRainInterval = null;
+      }
+      if (shadesRainTimeout) {
+        clearTimeout(shadesRainTimeout);
+        shadesRainTimeout = null;
+      }
+    }
+
     document.addEventListener("keydown", (e) => {
       // Ignore when typing in inputs/textareas or with modifiers
       if (
@@ -2157,17 +2287,26 @@ setInterval(tick, 1000);
 
       if (key.length === 1 && /[a-z0-9]/.test(key)) {
         typedSequence += key;
-        if (typedSequence.length > SECRET.length) {
-          typedSequence = typedSequence.slice(-SECRET.length);
+        // Keep enough history for the longer secret
+        const maxLen = Math.max(SECRET.length, SECRET_LFC.length);
+        if (typedSequence.length > maxLen) {
+          typedSequence = typedSequence.slice(-maxLen);
         }
-        if (typedSequence === SECRET) {
+        if (typedSequence.endsWith(SECRET)) {
           startHeadRain();
+          typedSequence = "";
+        } else if (typedSequence.endsWith(SECRET_LFC)) {
+          // Rainbow shades only work when Chonk Mode is active
+          if (chonkModeActive) {
+            startShadesRain();
+          }
           typedSequence = "";
         }
       } else if (key === "backspace") {
         typedSequence = typedSequence.slice(0, -1);
       } else if (key === "escape") {
         stopHeadRain();
+        stopShadesRain();
         typedSequence = "";
       } else {
         // Reset on other keys (space, arrows, etc.)
