@@ -1302,6 +1302,7 @@ body.chonk-mode-active #chonk-background {
       .spin-button { min-width: 38px; padding: 7px 10px; }
       .image-wrap { min-height: 390px; }
       .links { grid-template-columns: 1fr; }
+      .save-fit-button { display: none !important; }
     }
 
     @media (max-width: 500px) {
@@ -1834,6 +1835,7 @@ chonkModeButton.addEventListener("click", () => {
     let currentMode = "2d";
     let cached2D = null;
     let lastOutfitAttrs = [];
+    let lastTraitColorMaps = {};
     let cached3DMeta = null;
     let viewerReady = false;
     let isSpinning = false;
@@ -2216,7 +2218,11 @@ function generateOutfitName(top, head, face, accessory) {
       outfitNameEl.textContent = name;
       const loadingName = !name || name === "Finding today's fit…";
       shareXButton.disabled = loadingName;
-      saveFitButton.disabled = loadingName || !cached2D;
+      saveFitButton.disabled = loadingName || !cached2D || isMobileFitSave();
+    }
+
+    function isMobileFitSave() {
+      return window.matchMedia("(max-width: 820px)").matches;
     }
 
     function loadFitImage(src) {
@@ -2228,15 +2234,65 @@ function generateOutfitName(top, head, face, accessory) {
       });
     }
 
-    function collectFitTraits() {
-      return Array.from(traitsEl.querySelectorAll(".trait")).map((row) => {
-        const name = (row.querySelector(".trait-name")?.textContent || "").trim();
-        const thumb = row.querySelector("img.trait-thumb");
-        return {
-          name,
-          src: thumb && thumb.src ? thumb.src : null
-        };
-      }).filter((trait) => trait.name && trait.name !== "Source");
+    function parseTraitColorMap(colorMap) {
+      if (!colorMap || typeof colorMap !== "string") return null;
+      let hex = colorMap.trim();
+      if (hex.startsWith("0x") || hex.startsWith("0X")) hex = hex.slice(2);
+      if (hex.length < 10 || hex.length % 10 !== 0) return null;
+
+      const pixels = [];
+      let minX = 29, minY = 29, maxX = 0, maxY = 0;
+      for (let i = 0; i < hex.length; i += 10) {
+        const x = parseInt(hex.slice(i, i + 2), 16);
+        const y = parseInt(hex.slice(i + 2, i + 4), 16);
+        const r = parseInt(hex.slice(i + 4, i + 6), 16);
+        const g = parseInt(hex.slice(i + 6, i + 8), 16);
+        const b = parseInt(hex.slice(i + 8, i + 10), 16);
+        if (Number.isNaN(x) || Number.isNaN(y)) continue;
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+        pixels.push({ x, y, r, g, b });
+      }
+      if (!pixels.length) return null;
+      return { pixels, minX, minY, maxX, maxY };
+    }
+
+    function colorMapToCanvas(colorMap, tileSize, background) {
+      const parsed = parseTraitColorMap(colorMap);
+      if (!parsed) return null;
+      const pad = 1;
+      const viewX = Math.max(0, parsed.minX - pad);
+      const viewY = Math.max(0, parsed.minY - pad);
+      const viewW = Math.max(1, parsed.maxX - parsed.minX + 1 + pad * 2);
+      const viewH = Math.max(1, parsed.maxY - parsed.minY + 1 + pad * 2);
+      const scale = Math.max(1, Math.floor(tileSize / Math.max(viewW, viewH)));
+      const canvas = document.createElement("canvas");
+      canvas.width = tileSize;
+      canvas.height = tileSize;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = background || "#f7f1e7";
+      ctx.fillRect(0, 0, tileSize, tileSize);
+      const drawW = viewW * scale;
+      const drawH = viewH * scale;
+      const ox = Math.floor((tileSize - drawW) / 2);
+      const oy = Math.floor((tileSize - drawH) / 2);
+      parsed.pixels.forEach((pixel) => {
+        ctx.fillStyle = `rgb(${pixel.r},${pixel.g},${pixel.b})`;
+        ctx.fillRect(
+          ox + (pixel.x - viewX) * scale,
+          oy + (pixel.y - viewY) * scale,
+          scale,
+          scale
+        );
+      });
+      return canvas;
+    }
+
+    function drawFitTile(ctx, source, x, y, size) {
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(source, x, y, size, size);
     }
 
     function fitGridSize(traitCount) {
@@ -2248,34 +2304,32 @@ function generateOutfitName(top, head, face, accessory) {
       return { cols, rows: 2 + extraRows };
     }
 
-    function drawCover(ctx, img, x, y, size) {
-      const src = Math.min(img.width || size, img.height || size);
-      const sx = Math.max(0, ((img.width || src) - src) / 2);
-      const sy = Math.max(0, ((img.height || src) - src) / 2);
-      ctx.drawImage(img, sx, sy, src, src, x, y, size, size);
-    }
-
     async function saveTheFit() {
-      if (!cached2D) return;
+      if (!cached2D || isMobileFitSave()) return;
       saveFitButton.disabled = true;
       const previousLabel = saveFitButton.textContent;
       saveFitButton.textContent = "Saving…";
 
       try {
-        const chonkImg = await loadFitImage(cached2D);
-        let traits = collectFitTraits();
+        const heroEl = image;
+        const chonkImg = (heroEl && heroEl.complete && heroEl.naturalWidth)
+          ? heroEl
+          : await loadFitImage(cached2D);
+
         if (lastOutfitAttrs.length) {
-          const fetched = await fetchTraitImagesByNames(lastOutfitAttrs);
-          traits = traits.map((trait) => {
-            const lookup = String(trait.name).replace(/^[^:]+:\s*/, "").toLowerCase();
-            return { ...trait, src: trait.src || fetched[lookup] || fetched[trait.name.toLowerCase()] || null };
-          });
+          await fetchTraitImagesByNames(lastOutfitAttrs);
         }
+
         const thumbs = [];
-        for (const trait of traits) {
-          if (!trait.src) continue;
-          try { thumbs.push(await loadFitImage(trait.src)); } catch (e) {}
-        }
+        lastOutfitAttrs.forEach((attr) => {
+          const typeKey = String(attr.trait_type || "").trim().toLowerCase();
+          if (["body", "body type", "background", "background color"].includes(typeKey)) return;
+          const value = String(attr.value ?? "").trim();
+          const map = lastTraitColorMaps[value.toLowerCase()];
+          if (!map) return;
+          const tile = colorMapToCanvas(map, 220, "#f7f1e7");
+          if (tile) thumbs.push(tile);
+        });
 
         const gap = 18;
         const pad = 36;
@@ -2292,7 +2346,7 @@ function generateOutfitName(top, head, face, accessory) {
         ctx.imageSmoothingEnabled = false;
 
         const heroSize = cell * 2 + gap;
-        drawCover(ctx, chonkImg, pad, pad, heroSize);
+        drawFitTile(ctx, chonkImg, pad, pad, heroSize);
 
         const used = new Set(["0,0", "0,1", "1,0", "1,1"]);
         let traitIndex = 0;
@@ -2301,7 +2355,7 @@ function generateOutfitName(top, head, face, accessory) {
             if (used.has(`${r},${c}`)) continue;
             const x = pad + c * (cell + gap);
             const y = pad + r * (cell + gap);
-            drawCover(ctx, thumbs[traitIndex], x, y, cell);
+            drawFitTile(ctx, thumbs[traitIndex], x, y, cell);
             traitIndex += 1;
           }
         }
@@ -2315,7 +2369,7 @@ function generateOutfitName(top, head, face, accessory) {
         statusEl.textContent = "Could not save today's fit. Try again in a moment.";
       } finally {
         saveFitButton.textContent = previousLabel || "Save the fit";
-        saveFitButton.disabled = !cached2D;
+        saveFitButton.disabled = !cached2D || isMobileFitSave();
       }
     }
 
@@ -2429,7 +2483,7 @@ function generateOutfitName(top, head, face, accessory) {
       const viewH = Math.max(1, maxY - minY + 1 + pad * 2);
 
       const svg =
-        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewX} ${viewY} ${viewW} ${viewH}" shape-rendering="crispEdges">` +
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${viewW}" height="${viewH}" viewBox="${viewX} ${viewY} ${viewW} ${viewH}" shape-rendering="crispEdges">` +
         `<rect x="${viewX}" y="${viewY}" width="${viewW}" height="${viewH}" fill="#f7f1e7"/>` +
         rects.join("") +
         `</svg>`;
@@ -2463,6 +2517,7 @@ function generateOutfitName(top, head, face, accessory) {
             return;
           }
           const colorMap = await fetchTraitColorMap(value);
+          if (colorMap) lastTraitColorMaps[value.toLowerCase()] = colorMap;
           const image = colorMapToSvgDataUri(colorMap);
           if (image) results[value.toLowerCase()] = image;
         })
