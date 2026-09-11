@@ -539,7 +539,8 @@ body.chonk-mode-active #chonk-background {
       align-items: center;
       gap: 8px;
       margin: 0;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      flex: 0 0 auto;
     }
 
     .share-x-button {
@@ -1283,17 +1284,19 @@ body.chonk-mode-active #chonk-background {
       main { grid-template-columns: 1fr; }
       .chonk-card { min-height: 0; }
       .hero-top {
-        grid-template-columns: 1fr;
-        gap: 10px;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px;
       }
-      .outfit-name-wrap { justify-self: stretch; width: 100%; }
-      .view-controls { justify-content: space-between; width: 100%; }
-      #outfit-name { font-size: clamp(0.85rem, 3vw, 1.15rem); }
+      .outfit-name-wrap { padding: 6px 10px; }
+      .view-controls { gap: 6px; }
+      #outfit-name { font-size: clamp(0.78rem, 2.8vw, 1.05rem); }
       .share-x-label { display: none; }
       .share-x-button {
-        width: 42px;
-        min-width: 42px;
+        width: 38px;
+        min-width: 38px;
+        min-height: 38px;
         padding: 0;
+        box-shadow: 3px 3px 0 var(--line);
       }
       .view-button { padding: 7px 11px; min-width: 45px; }
       .spin-button { min-width: 38px; padding: 7px 10px; }
@@ -1305,8 +1308,14 @@ body.chonk-mode-active #chonk-background {
       .wrap { width: min(100% - 16px, 700px); }
       .tag { font-size: 0.72rem; padding: 8px 10px; }
       .chonk-card { padding: 12px; }
-      .hero-top { gap: 7px; margin-bottom: 12px; }
-      #outfit-name { font-size: 0.78rem; }
+      .hero-top { gap: 6px; margin-bottom: 12px; }
+      .outfit-name-wrap { padding: 5px 8px; }
+      #outfit-name { font-size: 0.72rem; }
+      .share-x-button {
+        width: 34px;
+        min-width: 34px;
+        min-height: 34px;
+      }
       .view-toggle { box-shadow: 3px 3px 0 var(--line); }
       .view-button { padding: 6px 8px; min-width: 40px; font-size: 0.62rem; }
       .spin-button { min-width: 34px; padding: 6px 8px; font-size: 0.95rem; }
@@ -3116,12 +3125,3 @@ where every journey begins.
 Speak the right five letters
 and suddenly, things get a little... chonky.
 ___________________________________________________________________
-
-Let's F*cking Chonk! 💙
-___________________________________________________________________
-
-                                                                                                                    
-`);
-
-  })();
-  </script>
