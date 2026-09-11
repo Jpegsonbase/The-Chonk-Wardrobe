@@ -5,6 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <title>Daily Chonk</title>
+  <link rel="canonical" href="https://dailychonk.xyz/" />
+  <meta name="theme-color" content="#ffcf4a" />
+  <meta
+    name="description"
+    content="Daily Chonk — an onchain experiment. A new outfit every 24 hours."
+  />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Daily Chonk" />
+  <meta property="og:url" content="https://dailychonk.xyz/" />
+  <meta property="og:title" content="Daily Chonk — a new outfit every 24 hours" />
+  <meta
+    property="og:description"
+    content="One Chonk. One new onchain fit every day. Live on Base."
+  />
+  <meta property="og:image" content="https://dailychonk.xyz/og.png" />
+  <meta property="og:image:alt" content="Daily Chonk voxel character on a cream poster" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@jpegsonbase" />
+  <meta name="twitter:title" content="Daily Chonk — a new outfit every 24 hours" />
+  <meta
+    name="twitter:description"
+    content="One Chonk. One new onchain fit every day. Live on Base."
+  />
+  <meta name="twitter:image" content="https://dailychonk.xyz/og.png" />
   <script>
     (function () {
       var stored = null;
@@ -16,11 +42,6 @@
       document.documentElement.setAttribute("data-theme", theme);
     })();
   </script>
-
-  <meta
-    name="description"
-    content="Daily Chonk — an onchain experiment. A new outfit every 24 hours."
-  />
 
   <link
     rel="icon"
@@ -512,7 +533,39 @@ body.chonk-mode-active #chonk-background {
       text-overflow: ellipsis;
     }
 
-    .view-controls { display: flex; justify-content: flex-end; margin: 0; }
+    .view-controls {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      flex-wrap: wrap;
+    }
+
+    .share-x-button {
+      appearance: none;
+      border: 3px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+      border-radius: 999px;
+      box-shadow: 4px 4px 0 var(--line);
+      padding: 7px 12px;
+      min-height: 40px;
+      font-family: inherit;
+      font-size: 0.68rem;
+      font-weight: 950;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .share-x-button:hover { background: var(--accent); color: #191919; }
+    .share-x-button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      background: var(--card);
+      color: var(--ink);
+    }
+    .share-x-button:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
 
     .view-toggle {
       display: inline-flex;
@@ -919,6 +972,23 @@ body.chonk-mode-active #chonk-background {
       line-height: 1.35;
     }
 
+    .retry-button {
+      appearance: none;
+      margin-top: 10px;
+      border: 3px solid var(--line);
+      background: var(--accent);
+      color: #191919;
+      border-radius: 999px;
+      box-shadow: 4px 4px 0 var(--line);
+      padding: 7px 14px;
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 950;
+      cursor: pointer;
+    }
+    .retry-button:hover { transform: translate(-1px, -1px); }
+    .retry-button[hidden] { display: none; }
+
     .details { padding: 24px; flex: 1; }
     .details h2, .about h2 {
       margin: 0;
@@ -1134,6 +1204,7 @@ body.chonk-mode-active #chonk-background {
         gap: 8px;
       }
       #outfit-name { font-size: clamp(0.85rem, 3vw, 1.15rem); }
+      .share-x-button { padding: 6px 10px; font-size: 0.6rem; min-height: 36px; }
       .view-button { padding: 7px 11px; min-width: 45px; }
       .spin-button { min-width: 38px; padding: 7px 10px; }
       .image-wrap { min-height: 390px; }
@@ -1304,6 +1375,9 @@ body.chonk-mode-active #chonk-background {
           </div>
 
           <div class="view-controls">
+            <button type="button" class="share-x-button" id="share-x" disabled aria-label="Share today's outfit on X">
+              Share on X
+            </button>
             <div class="view-toggle" role="group" aria-label="Chonk display mode">
               <button type="button" class="view-button" id="view-2d" data-mode="2d" aria-pressed="true">2D</button>
               <button type="button" class="view-button" id="view-3d" data-mode="3d" aria-pressed="false">3D</button>
@@ -1374,6 +1448,7 @@ body.chonk-mode-active #chonk-background {
           <div class="countdown-caption">The wardrobe rolls again soon.</div>
           <div class="progress"><div id="progress"></div></div>
           <div id="status" class="status">Syncing with the daily cycle…</div>
+          <button type="button" class="retry-button" id="retry-load" hidden>Retry</button>
         </section>
 
         <section class="card details">
@@ -1434,16 +1509,19 @@ body.chonk-mode-active #chonk-background {
   </div>
 
   <script type="module">
-  import * as THREE from "three";
-  import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-
   (() => {
     const CHONK_ID = 30000;
     const CONTRACT = "0x07152bfde079b5319e5308c43fb1dbc9c76cb4f9";
     const TRAITS_CURRENT = "0x74D8725A65C21251A83f6647aa23140Bd80504b1";
     const TRAITS_LEGACY = "0x6B8f34E0559aa9A5507e74aD93374D9745CdbF09";
     const LEGACY_TRAIT_MAX = 340646; // traits below this live on the legacy contract
-    const RPC = "https://mainnet.base.org";
+    const SHARE_URL = "https://dailychonk.xyz/";
+    const RPC_URLS = [
+      "https://mainnet.base.org",
+      "https://base.llamarpc.com",
+      "https://1rpc.io/base",
+      "https://base.drpc.org"
+    ];
     const LAST_CHANGE = Date.parse("2026-09-06T18:40:34Z");
     const CYCLE = 24 * 60 * 60 * 1000;
     const TRAIT_PAGE_BASE = "https://www.chonks.xyz/traits/";
@@ -1469,10 +1547,46 @@ body.chonk-mode-active #chonk-background {
       "function tokenURI(uint256) view returns (string)"
     ];
 
-    const provider = new ethers.JsonRpcProvider(RPC);
-    const contract = new ethers.Contract(CONTRACT, abi, provider);
-    const traitsCurrent = new ethers.Contract(TRAITS_CURRENT, traitsAbi, provider);
-    const traitsLegacy = new ethers.Contract(TRAITS_LEGACY, traitsAbi, provider);
+    let rpcIndex = 0;
+    let provider;
+    let contract;
+    let traitsCurrent;
+    let traitsLegacy;
+
+    function bindContracts(rpcUrl) {
+      provider = new ethers.JsonRpcProvider(rpcUrl, 8453, { staticNetwork: true });
+      contract = new ethers.Contract(CONTRACT, abi, provider);
+      traitsCurrent = new ethers.Contract(TRAITS_CURRENT, traitsAbi, provider);
+      traitsLegacy = new ethers.Contract(TRAITS_LEGACY, traitsAbi, provider);
+    }
+
+    bindContracts(RPC_URLS[rpcIndex]);
+
+    function withTimeout(promise, ms) {
+      return Promise.race([
+        promise,
+        new Promise((_, reject) => {
+          setTimeout(() => reject(new Error("RPC timeout")), ms);
+        })
+      ]);
+    }
+
+    async function withProvider(work) {
+      let lastError;
+      for (let i = 0; i < RPC_URLS.length; i++) {
+        const index = (rpcIndex + i) % RPC_URLS.length;
+        bindContracts(RPC_URLS[index]);
+        try {
+          const result = await withTimeout(work(), 10000);
+          rpcIndex = index;
+          return result;
+        } catch (error) {
+          lastError = error;
+          console.warn("Base RPC failed:", RPC_URLS[index], error);
+        }
+      }
+      throw lastError;
+    }
 
     const image = document.getElementById("chonk-image");
     const loading = document.getElementById("loading");
@@ -1487,6 +1601,8 @@ body.chonk-mode-active #chonk-background {
     const button2D = document.getElementById("view-2d");
     const button3D = document.getElementById("view-3d");
     const buttonSpin = document.getElementById("view-spin");
+    const shareXButton = document.getElementById("share-x");
+    const retryLoadButton = document.getElementById("retry-load");
 const chonkModeButton = document.getElementById("chonk-mode");
 const chonkBackground = document.getElementById("chonk-background");
 const starRating = document.getElementById("star-rating");
@@ -1559,6 +1675,22 @@ chonkModeButton.addEventListener("click", () => {
     let isSpinning = false;
 
     let scene, camera, renderer, controls, chonkGroup, animId;
+    let THREE = null;
+    let OrbitControls = null;
+    let threeLoader = null;
+
+    function loadThree() {
+      if (!threeLoader) {
+        threeLoader = Promise.all([
+          import("three"),
+          import("three/addons/controls/OrbitControls.js")
+        ]).then(([threeModule, controlsModule]) => {
+          THREE = threeModule;
+          OrbitControls = controlsModule.OrbitControls;
+        });
+      }
+      return threeLoader;
+    }
 
     function getStoredViewMode() {
       try {
@@ -1916,13 +2048,75 @@ function generateOutfitName(top, head, face, accessory) {
   return styles[styleIndex]();
 }
 
+    function setOutfitName(name) {
+      outfitNameEl.textContent = name;
+      const loadingName = !name || name === "Finding today's fit…";
+      shareXButton.disabled = loadingName;
+    }
+
+    function shareOutfitOnX() {
+      const name = (outfitNameEl.textContent || "Daily Chonk").trim();
+      const text = `${name} — today's Daily Chonk.\nA new onchain outfit every 24 hours.`;
+      const shareUrl =
+        "https://x.com/intent/tweet?text=" + encodeURIComponent(text) +
+        "&url=" + encodeURIComponent(SHARE_URL);
+      window.open(shareUrl, "_blank", "noopener,noreferrer");
+    }
+
+    shareXButton.addEventListener("click", shareOutfitOnX);
+
     function updateOutfitName(attrs) {
-      outfitNameEl.textContent = generateOutfitName(
-        getTraitPart(attrs, "top"),
-        getTraitPart(attrs, "head"),
-        getTraitPart(attrs, "face"),
-        getTraitPart(attrs, "accessory")
-      );
+      const traits = {
+        top: getTraitPart(attrs, "top"),
+        head: getTraitPart(attrs, "head"),
+        face: getTraitPart(attrs, "face"),
+        accessory: getTraitPart(attrs, "accessory")
+      };
+
+      setOutfitName(generateOutfitName(
+        traits.top,
+        traits.head,
+        traits.face,
+        traits.accessory
+      ));
+
+      loadLiveOutfitName(traits);
+    }
+
+    async function loadLiveOutfitName(traits) {
+      const dayKey = getDailyRatingKey();
+
+      try {
+        const cached = await fetch(
+          `${getDatabaseUrl()}/daily-chonk-names/${encodeURIComponent(dayKey)}.json`
+        );
+        if (cached.ok) {
+          const payload = await cached.json();
+          if (payload && payload.name) {
+            setOutfitName(payload.name);
+            return;
+          }
+        }
+      } catch (error) {
+        console.warn("Could not load cached outfit name.", error);
+      }
+
+      if (!OUTFIT_NAME_FUNCTION_URL) return;
+
+      try {
+        const response = await fetch(OUTFIT_NAME_FUNCTION_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(traits)
+        });
+        if (!response.ok) return;
+        const payload = await response.json();
+        if (payload && payload.name) {
+          setOutfitName(payload.name);
+        }
+      } catch (error) {
+        console.warn("Could not generate live outfit name.", error);
+      }
     }
 
     function escapeHtml(s) {
@@ -2185,7 +2379,7 @@ function generateOutfitName(top, head, face, accessory) {
       }, 120);
     }
 
-    function show3D() {
+    async function show3D() {
       if (!cached3DMeta || !cached3DMeta.zMapFull) {
         loading.hidden = false;
         loading.textContent = "3D render unavailable.";
@@ -2193,17 +2387,24 @@ function generateOutfitName(top, head, face, accessory) {
       }
 
       image.classList.add("changing");
-      setTimeout(() => {
-        if (currentMode !== "3d") return;
-        image.hidden = true;
-        image.classList.remove("changing");
-        loading.hidden = false;
-        loading.textContent = "Loading 3D Chonk…";
+      await new Promise(resolve => setTimeout(resolve, 120));
+      if (currentMode !== "3d") return;
 
+      image.hidden = true;
+      image.classList.remove("changing");
+      loading.hidden = false;
+      loading.textContent = "Loading 3D Chonk…";
+
+      try {
+        await loadThree();
+        if (currentMode !== "3d") return;
         init3D(cached3DMeta.zMapFull, cached3DMeta.bgColor);
         loading.hidden = true;
         showRotateHint();
-      }, 120);
+      } catch (error) {
+        console.error("Could not load Three.js", error);
+        loading.textContent = "Could not load the 3D viewer.";
+      }
     }
 
     let hintTimer = null;
@@ -2223,16 +2424,27 @@ function generateOutfitName(top, head, face, accessory) {
       else show2D();
     }
 
+    let loadRetryTimer = null;
+    let autoRetriedLoad = false;
+
+    retryLoadButton.addEventListener("click", () => {
+      autoRetriedLoad = false;
+      loadChonk();
+    });
+
     /* Load */
     async function loadChonk() {
+      clearTimeout(loadRetryTimer);
+      retryLoadButton.hidden = true;
+
       try {
         loading.hidden = false;
         loading.textContent = "Loading today’s outfit…";
 
-        const [uri2D, uri3D] = await Promise.all([
+        const [uri2D, uri3D] = await withProvider(() => Promise.all([
           contract.renderAsDataUri2D(CHONK_ID),
           contract.renderAsDataUri3D(CHONK_ID)
-        ]);
+        ]));
 
         const parsed2D = extract2D(uri2D);
         cached2D = parsed2D.image;
@@ -2265,14 +2477,20 @@ function generateOutfitName(top, head, face, accessory) {
 
         updateViewButtons();
         renderCurrentView();
+        autoRetriedLoad = false;
         statusEl.textContent = "Live — refreshing directly from the Base chain.";
       } catch (err) {
         console.error("Daily Chonk load error:", err);
         loading.hidden = false;
         loading.textContent = "Unable to load today’s outfit.";
-        statusEl.textContent = "RPC or contract request failed. Retrying shortly.";
-        traitsEl.innerHTML = `<div class="error">Could not fetch on-chain data. Please try again in a moment.</div>`;
-        outfitNameEl.textContent = "Today's Chonk";
+        retryLoadButton.hidden = false;
+        statusEl.textContent = "Could not reach Base. Tap Retry.";
+        traitsEl.innerHTML = `<div class="error">Could not fetch on-chain data. Check your connection, then tap Retry.</div>`;
+        setOutfitName("Today's Chonk");
+        if (!autoRetriedLoad) {
+          autoRetriedLoad = true;
+          loadRetryTimer = setTimeout(loadChonk, 3000);
+        }
       }
     }
 
@@ -2319,6 +2537,8 @@ function generateOutfitName(top, head, face, accessory) {
  * Leave empty until you create the database — votes stay on this device only.
  */
 const FIREBASE_RTDB_URL = "https://daily-chonk-default-rtdb.firebaseio.com";
+const OUTFIT_NAME_FUNCTION_URL =
+  "https://us-central1-daily-chonk.cloudfunctions.net/outfitName";
 
 const RATING_STORAGE_KEY = "daily-chonk-rating";
 const VOTER_ID_KEY = "daily-chonk-voter-id";
