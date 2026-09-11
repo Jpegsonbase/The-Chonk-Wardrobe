@@ -2430,6 +2430,8 @@ function generateOutfitName(top, head, face, accessory) {
     }
 
     async function loadLiveOutfitName(traits) {
+      if (!OUTFIT_NAME_FUNCTION_URL) return;
+
       const dayKey = getDailyRatingKey();
 
       try {
@@ -2914,8 +2916,7 @@ function generateOutfitName(top, head, face, accessory) {
  * Leave empty until you create the database — votes stay on this device only.
  */
 const FIREBASE_RTDB_URL = "https://daily-chonk-default-rtdb.firebaseio.com";
-const OUTFIT_NAME_FUNCTION_URL =
-  "https://us-central1-daily-chonk.cloudfunctions.net/outfitName";
+const OUTFIT_NAME_FUNCTION_URL = "";
 
 const RATING_STORAGE_KEY = "daily-chonk-rating";
 const VOTER_ID_KEY = "daily-chonk-voter-id";
