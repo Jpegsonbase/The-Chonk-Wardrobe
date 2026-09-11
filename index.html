@@ -518,6 +518,7 @@ body.chonk-mode-active #chonk-background {
       color: #191919;
       border-radius: 999px;
       box-shadow: 4px 4px 0 var(--line);
+      width: max-content;
       min-width: 0;
       max-width: 100%;
       overflow: hidden;
@@ -1251,10 +1252,11 @@ body.chonk-mode-active #chonk-background {
       main { grid-template-columns: 1fr; }
       .chonk-card { min-height: 0; }
       .hero-top {
-        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-columns: minmax(0, 1fr);
         gap: 8px;
       }
       .outfit-name-wrap { padding: 6px 10px; }
+      .view-controls { justify-self: end; }
       .view-controls { gap: 6px; }
       #outfit-name { font-size: clamp(0.78rem, 2.8vw, 1.05rem); }
       .share-x-label { display: none; }
@@ -1989,188 +1991,81 @@ chonkModeButton.addEventListener("click", () => {
       return value.replace(/\b(color|colours?)\b/gi, "").replace(/\s+/g, " ").trim();
     }
 
-    
-/// ============================================================
-// DAILY CHONK — CURATED OUTFIT NAME GENERATOR
-// ============================================================
+    /* Names come from the traits on the Chonk. Skip filler words, colors,
+       and generic slots like "top" / "shoes" so you never get "On Purpose". */
+    const NAME_STOP = new Set([
+      "on", "the", "a", "an", "of", "with", "for", "and", "in", "at", "to",
+      "from", "by", "as", "or", "its", "it's"
+    ]);
+    const NAME_COLORS = new Set([
+      "black", "white", "red", "blue", "green", "yellow", "orange", "pink",
+      "purple", "brown", "grey", "gray", "gold", "silver", "navy", "beige",
+      "cream", "tan", "teal", "mint", "maroon", "ivory", "khaki", "camo"
+    ]);
+    const NAME_SLOT = new Set([
+      "top", "bottom", "shoes", "shoe", "pants", "shirt", "body", "base",
+      "trait", "none", "empty", "default", "background"
+    ]);
+    const NAME_SKIP_TYPES = new Set([
+      "body", "body type", "background", "background color"
+    ]);
 
-const OUTFIT_NAMES = {
-  general: [
-    "That's the One",
-    "No Notes",
-    "Out the Door",
-    "Close Enough",
-    "A Little Extra",
-    "Didn't Try",
-    "Tried a Bit",
-    "Keep Walking",
-    "Meet You There",
-    "Coffee First",
-    "Five More Minutes",
-    "Wrong Jacket",
-    "Right Jacket",
-    "Looks About Right",
-    "I Can Explain",
-    "Don't Overthink It",
-    "Overthought It",
-    "Made It Work",
-    "Found This",
-    "Wore It Anyway",
-    "On Purpose",
-    "Not On Purpose",
-    "See You Tonight",
-    "Stay In",
-    "Going Out",
-    "Last Minute",
-    "I'm Outside",
-    "Be There Soon",
-    "Forgot Something",
-    "Bring a Jacket",
-    "Too Warm",
-    "Too Cool",
-    "Open Late",
-    "Left Early",
-    "Stayed Late",
-    "Same as Yesterday",
-    "The Comfortable One",
-    "The Uncomfortable One",
-    "Simple on Purpose",
-    "Borrowed Fit",
-    "Lucky Guess",
-    "Safe Bet",
-    "Regular Order",
-    "Yeah This",
-    "This'll Do",
-    "Good Enough",
-    "Better Than Fine",
-    "Growing On Me",
-    "Instant Yes",
-    "Slow Yes",
-    "Could Be Worse",
-    "Fair Enough",
-    "Had to Leave",
-    "One More Song",
-    "Table for One",
-    "Plus One",
-    "Call You Back",
-    "Weather's Fine",
-    "Neighborhood Walk",
-    "Corner Store",
-    "Night Bus",
-    "Early Start",
-    "Almost Ready",
-    "Ready Enough",
-    "Looks Expensive",
-    "Looks Borrowed",
-    "Looks Found",
-    "Quiet One",
-    "Loud One",
-    "For Now",
-    "For Later",
-    "Trust Me",
-    "Hold On",
-    "Close Enough, Really",
-    "That's a Choice",
-    "Committed to It",
-    "Halfway In",
-    "Full Send",
-    "Low Key",
-    "A Bit Much",
-    "Not Too Much",
-    "Just Right",
-    "Kinda Perfect",
-    "Accidentally Nice",
-    "Dressed Like a Maybe",
-    "Dressed Like a Yes"
-  ],
-  glasses: [
-    "Shades Indoors",
-    "Shades Outdoors",
-    "Keep the Glasses",
-    "Big Lenses",
-    "Tinted",
-    "Can't See Me",
-    "Specs On",
-    "Leave the Shades"
-  ],
-  hat: [
-    "Leave the Hat",
-    "Hat Stays",
-    "Cap Committed",
-    "Don't Touch the Hat",
-    "Under the Brim",
-    "Big Hat Day",
-    "The Hat's the Point"
-  ],
-  dress: [
-    "Dressed Anyway",
-    "Going Fancy",
-    "Fancy Adjacent",
-    "The Dress One",
-    "Whole Outfit Thing"
-  ],
-  leather: [
-    "Leather Weather",
-    "Jacket Weather",
-    "Creaky Jacket",
-    "Keep the Jacket"
-  ],
-  shoes: [
-    "It's the Shoes",
-    "Walkable",
-    "Not Walkable",
-    "Wrong Shoes, Still Going"
-  ]
-};
+    function outfitHash(pieces) {
+      const source = pieces.join("|").toLowerCase();
+      let hash = 2166136261;
+      for (let i = 0; i < source.length; i++) {
+        hash ^= source.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+      }
+      return hash >>> 0;
+    }
 
-function outfitHash(pieces) {
-  const source = pieces.join("|").toLowerCase();
+    function traitPhraseForName(value) {
+      const tokens = simplifyTrait(value).split(/\s+/).filter(Boolean);
+      const kept = [];
+      for (const token of tokens) {
+        const word = token.toLowerCase().replace(/[^a-z0-9+]/g, "");
+        if (!word) continue;
+        if (NAME_STOP.has(word)) continue;
+        if (NAME_COLORS.has(word)) continue;
+        if (NAME_SLOT.has(word)) continue;
+        kept.push(token);
+      }
+      return kept.join(" ").trim();
+    }
 
-  let hash = 2166136261;
+    function scoreNamePhrase(phrase) {
+      const n = phrase.split(/\s+/).filter(Boolean).length;
+      return n * 16 + phrase.length;
+    }
 
-  for (let i = 0; i < source.length; i++) {
-    hash ^= source.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
-  }
+    function generateOutfitNameFromAttrs(attrs) {
+      const phrases = [];
+      const seen = new Set();
+      for (const attr of attrs || []) {
+        const typeKey = String(attr.trait_type || "").trim().toLowerCase();
+        if (NAME_SKIP_TYPES.has(typeKey)) continue;
+        const phrase = traitPhraseForName(attr.value);
+        const key = phrase.toLowerCase();
+        if (!phrase || seen.has(key)) continue;
+        seen.add(key);
+        phrases.push(phrase);
+      }
 
-  return hash >>> 0;
-}
+      if (!phrases.length) return "Daily Chonk";
 
-function generateOutfitName(top, head, face, accessory) {
-  top = simplifyTrait(top);
-  head = simplifyTrait(head);
-  face = simplifyTrait(face);
-  accessory = simplifyTrait(accessory);
+      phrases.sort((a, b) => scoreNamePhrase(b) - scoreNamePhrase(a));
+      const top = phrases.slice(0, 3);
+      const hash = outfitHash(phrases);
 
-  const pieces = [top, head, face, accessory].filter(Boolean);
+      if (top.length === 1) return top[0];
 
-  if (!pieces.length) {
-    return "Daily Chonk";
-  }
-
-  const hash = outfitHash(pieces);
-  const lower = pieces.join(" ").toLowerCase();
-
-  if (lower.includes("3d glasses") && lower.includes("baseball cap")) {
-    return "Shades and a Cap";
-  }
-  if (lower.includes("shag") && lower.includes("dress")) {
-    return "The Shag Dress";
-  }
-
-  const related = [];
-  if (/glass|shade|spec/.test(lower)) related.push(...OUTFIT_NAMES.glasses);
-  if (/cap|hat|beanie|helm|crown/.test(lower)) related.push(...OUTFIT_NAMES.hat);
-  if (/dress|gown|skirt/.test(lower)) related.push(...OUTFIT_NAMES.dress);
-  if (/leather|jacket|coat/.test(lower)) related.push(...OUTFIT_NAMES.leather);
-  if (/shoe|boot|sneaker|heel/.test(lower)) related.push(...OUTFIT_NAMES.shoes);
-
-  const pool = (related.length && hash % 3 !== 0)
-    ? related
-    : OUTFIT_NAMES.general;
-
-  return pool[hash % pool.length];
-}
+      const joined = `${top[0]} ${top[1]}`;
+      if (joined.length <= 28) {
+        return hash % 2 === 0 ? joined : `${top[1]} ${top[0]}`;
+      }
+      return top[hash % top.length];
+    }
 
     const LOADING_NAME = "Getting the fit ready…";
     const LOADING_JOKES = [
@@ -2233,7 +2128,8 @@ function generateOutfitName(top, head, face, accessory) {
     function updateOutfitNameScroll() {
       const track = document.getElementById("outfit-name-track");
       const wrap = outfitNameEl && outfitNameEl.parentElement;
-      if (!track || !wrap) return;
+      const row = wrap && wrap.parentElement;
+      if (!track || !outfitNameEl || !wrap || !row) return;
 
       const copies = Array.from(track.querySelectorAll(".outfit-name-copy"));
       if (!copies.length) return;
@@ -2242,8 +2138,20 @@ function generateOutfitName(top, head, face, accessory) {
       outfitNameEl.classList.remove("scrolling");
       track.style.animationDuration = "";
 
-      const overflow = copies[0].scrollWidth > wrap.clientWidth - 28;
-      if (!overflow) return;
+      const needed = copies[0].scrollWidth;
+      const wrapStyle = getComputedStyle(wrap);
+      const chrome =
+        (parseFloat(wrapStyle.paddingLeft) || 0) +
+        (parseFloat(wrapStyle.paddingRight) || 0) +
+        (parseFloat(wrapStyle.borderLeftWidth) || 0) +
+        (parseFloat(wrapStyle.borderRightWidth) || 0);
+      const controls = row.querySelector(".view-controls");
+      const rowStyle = getComputedStyle(row);
+      const stacked = rowStyle.gridTemplateColumns.trim().split(/\s+/).length < 2;
+      const gap = parseFloat(rowStyle.columnGap || rowStyle.gap) || 0;
+      const reserved = stacked ? 0 : (controls ? controls.offsetWidth + gap : 0);
+      const available = Math.max(0, row.clientWidth - reserved - chrome);
+      if (!needed || needed <= available + 2) return;
 
       const extra = document.createElement("span");
       extra.className = "outfit-name-copy";
@@ -2474,13 +2382,7 @@ function generateOutfitName(top, head, face, accessory) {
         accessory: getTraitPart(attrs, "accessory")
       };
 
-      setOutfitName(generateOutfitName(
-        traits.top,
-        traits.head,
-        traits.face,
-        traits.accessory
-      ));
-
+      setOutfitName(generateOutfitNameFromAttrs(attrs));
       loadLiveOutfitName(traits);
     }
 
@@ -2861,7 +2763,6 @@ function generateOutfitName(top, head, face, accessory) {
           if (Object.keys(imageByValue).length) showTraits(meta, imageByValue);
         });
       }
-      if (snap.name) setOutfitName(snap.name);
       const wanted3D = getStoredViewMode() === "3d" && cached3DMeta;
       currentMode = wanted3D ? "3d" : "2d";
       updateViewButtons();
