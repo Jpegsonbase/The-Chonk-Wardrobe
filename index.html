@@ -2046,48 +2046,134 @@ chonkModeButton.addEventListener("click", () => {
 // DAILY CHONK — CURATED OUTFIT NAME GENERATOR
 // ============================================================
 
-const NAME_WORDS = {
-  vibe: [
-    "Electric", "Midnight", "Golden", "Dirty", "Dreamy",
-    "Wild", "Velvet", "Neon", "Cosmic", "Downtown",
-    "Afterparty", "Lucky", "Feral", "Cherry", "Chrome",
-    "Heavenly", "Reckless", "Playful", "Mystic", "Retro",
-    "Funky", "Dizzy", "Sweet", "Heavy", "Fever",
-    "Disco", "Rebel", "Sunday", "Plastic", "Romantic"
+const OUTFIT_NAMES = {
+  general: [
+    "That's the One",
+    "No Notes",
+    "Out the Door",
+    "Close Enough",
+    "A Little Extra",
+    "Didn't Try",
+    "Tried a Bit",
+    "Keep Walking",
+    "Meet You There",
+    "Coffee First",
+    "Five More Minutes",
+    "Wrong Jacket",
+    "Right Jacket",
+    "Looks About Right",
+    "I Can Explain",
+    "Don't Overthink It",
+    "Overthought It",
+    "Made It Work",
+    "Found This",
+    "Wore It Anyway",
+    "On Purpose",
+    "Not On Purpose",
+    "See You Tonight",
+    "Stay In",
+    "Going Out",
+    "Last Minute",
+    "I'm Outside",
+    "Be There Soon",
+    "Forgot Something",
+    "Bring a Jacket",
+    "Too Warm",
+    "Too Cool",
+    "Open Late",
+    "Left Early",
+    "Stayed Late",
+    "Same as Yesterday",
+    "The Comfortable One",
+    "The Uncomfortable One",
+    "Simple on Purpose",
+    "Borrowed Fit",
+    "Lucky Guess",
+    "Safe Bet",
+    "Regular Order",
+    "Yeah This",
+    "This'll Do",
+    "Good Enough",
+    "Better Than Fine",
+    "Growing On Me",
+    "Instant Yes",
+    "Slow Yes",
+    "Could Be Worse",
+    "Fair Enough",
+    "Had to Leave",
+    "One More Song",
+    "Table for One",
+    "Plus One",
+    "Call You Back",
+    "Weather's Fine",
+    "Neighborhood Walk",
+    "Corner Store",
+    "Night Bus",
+    "Early Start",
+    "Almost Ready",
+    "Ready Enough",
+    "Looks Expensive",
+    "Looks Borrowed",
+    "Looks Found",
+    "Quiet One",
+    "Loud One",
+    "For Now",
+    "For Later",
+    "Trust Me",
+    "Hold On",
+    "Close Enough, Really",
+    "That's a Choice",
+    "Committed to It",
+    "Halfway In",
+    "Full Send",
+    "Low Key",
+    "A Bit Much",
+    "Not Too Much",
+    "Just Right",
+    "Kinda Perfect",
+    "Accidentally Nice",
+    "Dressed Like a Maybe",
+    "Dressed Like a Yes"
   ],
-
-  fashion: [
-    "Satin", "Denim", "Leather", "Velvet", "Silk",
-    "Suede", "Lace", "Pleated", "Tailored", "Cropped",
-    "Beauty", "Vintage", "Sheer", "Couture", "Polished",
-    "Striped", "Sporty", "Classic", "Glossy", "Fuzzy",
-    "Floral", "Chic", "Elegance", "Preppy", "Glam"
+  glasses: [
+    "Shades Indoors",
+    "Shades Outdoors",
+    "Keep the Glasses",
+    "Big Lenses",
+    "Tinted",
+    "Can't See Me",
+    "Specs On",
+    "Leave the Shades"
   ],
-
-  detail: [
-    "Stitch", "Fringe", "Buckle", "Lace", "Collar",
-    "Chain", "Pocket", "Stripe", "Patch", "Bow",
-    "Cuff", "Hem", "Button", "Zip", "Seam",
-    "Charm", "Badge", "Pin", "Loop", "Ruffle",
-    "Sparkle", "Print", "Thread", "Stud", "Trim"
+  hat: [
+    "Leave the Hat",
+    "Hat Stays",
+    "Cap Committed",
+    "Don't Touch the Hat",
+    "Under the Brim",
+    "Big Hat Day",
+    "The Hat's the Point"
   ],
-
-  place: [
-    "Downtown", "Motel", "Rooftop", "Backstage", "Club",
-    "Studio", "Arcade", "Diner", "Boardwalk", "Penthouse",
-    "Garage", "Runway", "Backstreet", "Poolside", "Afterparty"
+  dress: [
+    "Dressed Anyway",
+    "Going Fancy",
+    "Fancy Adjacent",
+    "The Dress One",
+    "Whole Outfit Thing"
   ],
-
-  character: [
-    "Icon", "Legend", "Heartbreaker", "Rebel", "Star",
-    "Sweetheart", "Outlaw", "Showoff", "Dreamer", "Player",
-    "Rascal", "Rockstar", "Hotshot", "Wildcard", "Darling"
+  leather: [
+    "Leather Weather",
+    "Jacket Weather",
+    "Creaky Jacket",
+    "Keep the Jacket"
+  ],
+  shoes: [
+    "It's the Shoes",
+    "Walkable",
+    "Not Walkable",
+    "Wrong Shoes, Still Going"
   ]
 };
-
-function pickDeterministic(list, hash, offset = 0) {
-  return list[(hash + offset) % list.length];
-}
 
 function outfitHash(pieces) {
   const source = pieces.join("|").toLowerCase();
@@ -2117,101 +2203,25 @@ function generateOutfitName(top, head, face, accessory) {
   const hash = outfitHash(pieces);
   const lower = pieces.join(" ").toLowerCase();
 
-  // Specific combinations
-  if (
-    lower.includes("3d glasses") &&
-    lower.includes("baseball cap")
-  ) {
-    return "Street Legend";
+  if (lower.includes("3d glasses") && lower.includes("baseball cap")) {
+    return "Shades and a Cap";
+  }
+  if (lower.includes("shag") && lower.includes("dress")) {
+    return "The Shag Dress";
   }
 
-  if (
-    lower.includes("dress") &&
-    lower.includes("glasses")
-  ) {
-    return "After Dark";
-  }
+  const related = [];
+  if (/glass|shade|spec/.test(lower)) related.push(...OUTFIT_NAMES.glasses);
+  if (/cap|hat|beanie|helm|crown/.test(lower)) related.push(...OUTFIT_NAMES.hat);
+  if (/dress|gown|skirt/.test(lower)) related.push(...OUTFIT_NAMES.dress);
+  if (/leather|jacket|coat/.test(lower)) related.push(...OUTFIT_NAMES.leather);
+  if (/shoe|boot|sneaker|heel/.test(lower)) related.push(...OUTFIT_NAMES.shoes);
 
-  if (
-    lower.includes("shag") &&
-    lower.includes("dress")
-  ) {
-    return "Shaggy Icon";
-  }
+  const pool = (related.length && hash % 3 !== 0)
+    ? related
+    : OUTFIT_NAMES.general;
 
-  // Curated naming styles
-  const styles = [
-    () => {
-      const vibe = pickDeterministic(NAME_WORDS.vibe, hash, 11);
-      const fashion = pickDeterministic(NAME_WORDS.fashion, hash, 27);
-      return `${vibe} ${fashion}`;
-    },
-
-    () => {
-      const vibe = pickDeterministic(NAME_WORDS.vibe, hash, 41);
-      const detail = pickDeterministic(NAME_WORDS.detail, hash, 53);
-      return `${vibe} ${detail}`;
-    },
-
-    () => {
-      const fashion = pickDeterministic(NAME_WORDS.fashion, hash, 67);
-      const detail = pickDeterministic(NAME_WORDS.detail, hash, 71);
-      return `${fashion} ${detail}`;
-    },
-
-    () => {
-      const place = pickDeterministic(NAME_WORDS.place, hash, 83);
-      const character = pickDeterministic(NAME_WORDS.character, hash, 97);
-      return `${place} ${character}`;
-    },
-
-    () => {
-      const vibe = pickDeterministic(NAME_WORDS.vibe, hash, 101);
-      const character = pickDeterministic(NAME_WORDS.character, hash, 113);
-      return `${vibe} ${character}`;
-    },
-
-    () => {
-      const character = pickDeterministic(NAME_WORDS.character, hash, 127);
-      const detail = pickDeterministic(NAME_WORDS.detail, hash, 139);
-      return `${character} ${detail}`;
-    },
-
-    () => {
-      const place = pickDeterministic(NAME_WORDS.place, hash, 149);
-      const fashion = pickDeterministic(NAME_WORDS.fashion, hash, 157);
-      return `${place} ${fashion}`;
-    },
-
-    () => {
-      const character = pickDeterministic(NAME_WORDS.character, hash, 163);
-      return `The ${character}`;
-    },
-
-    () => {
-      const vibe = pickDeterministic(NAME_WORDS.vibe, hash, 173);
-      return `${vibe} Club`;
-    },
-
-    () => {
-      const fashion = pickDeterministic(NAME_WORDS.fashion, hash, 181);
-      return `${fashion} Drop`;
-    },
-
-    () => {
-      const vibe = pickDeterministic(NAME_WORDS.vibe, hash, 191);
-      return `${vibe} After Dark`;
-    },
-
-    () => {
-      const vibe = pickDeterministic(NAME_WORDS.vibe, hash, 199);
-      return `${vibe} Studios`;
-    }
-  ];
-
-  const styleIndex = hash % styles.length;
-
-  return styles[styleIndex]();
+  return pool[hash % pool.length];
 }
 
     function setOutfitName(name) {
