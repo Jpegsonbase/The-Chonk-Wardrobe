@@ -3011,14 +3011,12 @@ function generateOutfitName(top, head, face, accessory) {
       progressEl.style.width = `${(elapsed / CYCLE) * 100}%`;
 
       if (remaining > lastRemaining && lastRemaining < 5000) {
-  cached2D = null;
-  cached3DMeta = null;
-  dispose3D();
-
-  // Reset the rating display for the new daily outfit.
-  loadLiveVotes();
-
-  loadChonk(true);
+        cached2D = null;
+        cached3DMeta = null;
+        dispose3D();
+        loadLiveVotes();
+        loadChonk(true);
+      }
       lastRemaining = remaining;
 
       if (remaining < 60000) {
