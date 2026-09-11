@@ -2831,16 +2831,64 @@ function generateOutfitName(top, head, face, accessory) {
 
     let loadRetryTimer = null;
     let autoRetriedLoad = false;
+    const OUTFIT_LOCK_KEY = "daily-chonk-outfit-lock";
+
+    function readOutfitLock(dayKey) {
+      try {
+        const data = JSON.parse(localStorage.getItem(OUTFIT_LOCK_KEY));
+        if (data && data.dayKey === dayKey && data.image) return data;
+      } catch (e) {}
+      return null;
+    }
+
+    function writeOutfitLock(data) {
+      try {
+        localStorage.setItem(OUTFIT_LOCK_KEY, JSON.stringify(data));
+      } catch (e) {
+        console.warn("Could not save today's locked fit.", e);
+      }
+    }
+
+    function applyOutfitSnapshot(snap) {
+      cached2D = snap.image || null;
+      cached3DMeta = snap.zMapFull
+        ? { zMapFull: snap.zMapFull, bgColor: snap.bgColor || "#ffffff" }
+        : null;
+      const meta = { attributes: Array.isArray(snap.attributes) ? snap.attributes : [] };
+      showTraits(meta, {});
+      if (meta.attributes.length) {
+        fetchTraitImagesByNames(meta.attributes).then((imageByValue) => {
+          if (Object.keys(imageByValue).length) showTraits(meta, imageByValue);
+        });
+      }
+      if (snap.name) setOutfitName(snap.name);
+      const wanted3D = getStoredViewMode() === "3d" && cached3DMeta;
+      currentMode = wanted3D ? "3d" : "2d";
+      updateViewButtons();
+      renderCurrentView();
+      stopLoadBanter();
+      statusEl.textContent = "Live — refreshing directly from the Base chain.";
+    }
 
     retryLoadButton.addEventListener("click", () => {
       autoRetriedLoad = false;
-      loadChonk();
+      loadChonk(false);
     });
 
-    /* Load */
-    async function loadChonk() {
+    /* Load — lock the on-chain look to this countdown day so an early bot
+       change doesn't swap the fit before the timer hits 00:00:00. */
+    async function loadChonk(force = false) {
       clearTimeout(loadRetryTimer);
       retryLoadButton.hidden = true;
+      const dayKey = getDailyRatingKey();
+
+      if (!force) {
+        const locked = readOutfitLock(dayKey);
+        if (locked) {
+          applyOutfitSnapshot(locked);
+          return;
+        }
+      }
 
       try {
         startLoadBanter();
@@ -2874,10 +2922,21 @@ function generateOutfitName(top, head, face, accessory) {
         stopLoadBanter();
         statusEl.textContent = "Live — refreshing directly from the Base chain.";
 
+        const snapshot = {
+          dayKey,
+          image: cached2D,
+          attributes: meta.attributes || [],
+          name: currentOutfitName,
+          zMapFull: null,
+          bgColor: "#ffffff"
+        };
+        writeOutfitLock(snapshot);
+
         withProvider(
           () => contract.renderAsDataUri3D(CHONK_ID),
           40000
         ).then((uri3D) => {
+          if (getDailyRatingKey() !== dayKey) return;
           const extracted = extract3DData(uri3D);
           cached3DMeta = extracted.zMapFull
             ? { zMapFull: extracted.zMapFull, bgColor: extracted.bgColor }
@@ -2890,12 +2949,18 @@ function generateOutfitName(top, head, face, accessory) {
             !meta.attributes.length
           ) {
             showTraits(extracted.metadata, {});
+            snapshot.attributes = extracted.metadata.attributes;
           }
 
           if (!cached3DMeta) {
             console.warn("Daily Chonk: could not extract zMapFull from 3D render.");
             return;
           }
+
+          snapshot.zMapFull = cached3DMeta.zMapFull;
+          snapshot.bgColor = cached3DMeta.bgColor;
+          snapshot.name = currentOutfitName;
+          writeOutfitLock(snapshot);
 
           if (wanted3D || getStoredViewMode() === "3d") {
             currentMode = "3d";
@@ -2925,7 +2990,7 @@ function generateOutfitName(top, head, face, accessory) {
         setOutfitName("Today's Chonk");
         if (!autoRetriedLoad) {
           autoRetriedLoad = true;
-          loadRetryTimer = setTimeout(loadChonk, 3000);
+          loadRetryTimer = setTimeout(() => loadChonk(force), 3000);
         }
       }
     }
@@ -2953,8 +3018,7 @@ function generateOutfitName(top, head, face, accessory) {
   // Reset the rating display for the new daily outfit.
   loadLiveVotes();
 
-  loadChonk();
-}
+  loadChonk(true);
       lastRemaining = remaining;
 
       if (remaining < 60000) {
