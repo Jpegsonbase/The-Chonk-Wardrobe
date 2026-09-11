@@ -1252,12 +1252,19 @@ body.chonk-mode-active #chonk-background {
       main { grid-template-columns: 1fr; }
       .chonk-card { min-height: 0; }
       .hero-top {
-        grid-template-columns: minmax(0, 1fr);
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
         gap: 8px;
       }
-      .outfit-name-wrap { padding: 6px 10px; }
-      .view-controls { justify-self: end; }
-      .view-controls { gap: 6px; }
+      .outfit-name-wrap {
+        padding: 6px 10px;
+        align-self: center;
+      }
+      .view-controls {
+        justify-self: end;
+        align-self: center;
+        gap: 6px;
+      }
       #outfit-name { font-size: clamp(0.78rem, 2.8vw, 1.05rem); }
       .share-x-label { display: none; }
       .share-x-button {
