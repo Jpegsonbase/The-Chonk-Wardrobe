@@ -981,12 +981,24 @@ body.chonk-mode-active #chonk-background {
     .loading {
       position: absolute;
       z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
       font-weight: 950;
-      font-size: 1rem;
+      font-size: 1.05rem;
       padding: 30px;
       text-align: center;
-      color: var(--muted);
+      color: var(--ink);
       pointer-events: none;
+    }
+    .loading[hidden] { display: none !important; }
+    .loading-sub {
+      font-size: 0.72rem;
+      font-weight: 850;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
     }
 
     .side {
@@ -1497,7 +1509,7 @@ body.chonk-mode-active #chonk-background {
       <section class="card chonk-card">
         <div class="hero-top">
           <div class="outfit-name-wrap">
-            <h2 id="outfit-name">Finding today's fit…</h2>
+            <h2 id="outfit-name">Getting the fit ready…</h2>
           </div>
 
           <div class="view-controls">
@@ -1519,7 +1531,10 @@ body.chonk-mode-active #chonk-background {
         </div>
 
         <div class="image-wrap">
-  <div id="loading" class="loading">Loading today’s outfit…</div>
+  <div id="loading" class="loading">
+    <span id="loading-line">Getting the fit ready…</span>
+    <span id="loading-sub" class="loading-sub">Talking to Base</span>
+  </div>
   <img id="chonk-image" alt="Today’s Daily Chonk outfit" hidden draggable="false" />
   <canvas id="chonk-3d-canvas"></canvas>
   <div id="rotate-hint" class="rotate-hint">↔ DRAG TO ROTATE · SCROLL TO ZOOM</div>
@@ -1583,7 +1598,7 @@ body.chonk-mode-active #chonk-background {
           <div id="countdown">00:00:00</div>
           <div class="countdown-caption">The wardrobe rolls again soon.</div>
           <div class="progress"><div id="progress"></div></div>
-          <div id="status" class="status">Syncing with the daily cycle…</div>
+          <div id="status" class="status">Talking to Base…</div>
           <button type="button" class="retry-button" id="retry-load" hidden>Retry</button>
         </section>
 
@@ -1591,7 +1606,7 @@ body.chonk-mode-active #chonk-background {
           <div class="section-kicker">The current fit</div>
           <h2>Today's traits</h2>
           <div id="traits" class="traits">
-            <div class="trait"><span>Status</span><span>Loading…</span></div>
+            <div class="trait"><span class="trait-name">Wardrobe</span><span class="trait-cta">On the way…</span></div>
           </div>
         </section>
       </aside>
@@ -2224,9 +2239,66 @@ function generateOutfitName(top, head, face, accessory) {
   return pool[hash % pool.length];
 }
 
+    const LOADING_NAME = "Getting the fit ready…";
+    const LOADING_JOKES = [
+      "Getting the fit ready…",
+      "Talking to Base…",
+      "Zipping it up…",
+      "Checking the mirror…",
+      "One more accessory…",
+      "Don't rush a look…"
+    ];
+    let loadBanterTimer = null;
+    let loadBanterIndex = 0;
+
+    function isOutfitNameLoading(name) {
+      const text = String(name || "").trim();
+      return !text ||
+        text === LOADING_NAME ||
+        text === "Finding today's fit…" ||
+        LOADING_JOKES.includes(text);
+    }
+
+    function setLoadingMessage(main, sub) {
+      loading.hidden = false;
+      const line = document.getElementById("loading-line");
+      const subEl = document.getElementById("loading-sub");
+      if (line) line.textContent = main;
+      else loading.textContent = main;
+      if (subEl) {
+        if (sub) {
+          subEl.hidden = false;
+          subEl.textContent = sub;
+        } else {
+          subEl.hidden = true;
+        }
+      }
+    }
+
+    function startLoadBanter() {
+      stopLoadBanter();
+      outfitNameEl.textContent = LOADING_NAME;
+      shareXButton.disabled = true;
+      saveFitButton.disabled = true;
+      loadBanterIndex = 0;
+      setLoadingMessage(LOADING_JOKES[0], "Talking to Base");
+      loadBanterTimer = setInterval(() => {
+        loadBanterIndex = (loadBanterIndex + 1) % LOADING_JOKES.length;
+        const line = document.getElementById("loading-line");
+        if (line) line.textContent = LOADING_JOKES[loadBanterIndex];
+      }, 2200);
+    }
+
+    function stopLoadBanter() {
+      if (loadBanterTimer) {
+        clearInterval(loadBanterTimer);
+        loadBanterTimer = null;
+      }
+    }
+
     function setOutfitName(name) {
       outfitNameEl.textContent = name;
-      const loadingName = !name || name === "Finding today's fit…";
+      const loadingName = isOutfitNameLoading(name);
       shareXButton.disabled = loadingName;
       saveFitButton.disabled = loadingName || !cached2D || isMobileFitSave();
     }
@@ -2723,8 +2795,8 @@ function generateOutfitName(top, head, face, accessory) {
       isSpinning = false;
 
       if (!cached2D) {
-        loading.hidden = false;
-        loading.textContent = "2D render unavailable.";
+        stopLoadBanter();
+        setLoadingMessage("2D render unavailable.");
         return;
       }
 
@@ -2734,6 +2806,7 @@ function generateOutfitName(top, head, face, accessory) {
         if (currentMode !== "2d") return;
         image.src = cached2D;
         image.hidden = false;
+        stopLoadBanter();
         loading.hidden = true;
         requestAnimationFrame(() => image.classList.remove("changing"));
       }, 120);
@@ -2741,8 +2814,8 @@ function generateOutfitName(top, head, face, accessory) {
 
     async function show3D() {
       if (!cached3DMeta || !cached3DMeta.zMapFull) {
-        loading.hidden = false;
-        loading.textContent = "3D render unavailable.";
+        stopLoadBanter();
+        setLoadingMessage("3D render unavailable.");
         return;
       }
 
@@ -2752,8 +2825,7 @@ function generateOutfitName(top, head, face, accessory) {
 
       image.hidden = true;
       image.classList.remove("changing");
-      loading.hidden = false;
-      loading.textContent = "Loading 3D Chonk…";
+      setLoadingMessage("Loading 3D Chonk…", "Spinning it up");
 
       try {
         await loadThree();
@@ -2763,7 +2835,7 @@ function generateOutfitName(top, head, face, accessory) {
         showRotateHint();
       } catch (error) {
         console.error("Could not load Three.js", error);
-        loading.textContent = "Could not load the 3D viewer.";
+        setLoadingMessage("Could not load the 3D viewer.");
       }
     }
 
@@ -2798,8 +2870,9 @@ function generateOutfitName(top, head, face, accessory) {
       retryLoadButton.hidden = true;
 
       try {
-        loading.hidden = false;
-        loading.textContent = "Loading today’s outfit…";
+        startLoadBanter();
+        statusEl.textContent = "Talking to Base…";
+        traitsEl.innerHTML = `<div class="trait"><span class="trait-name">Wardrobe</span><span class="trait-cta">On the way…</span></div>`;
 
         const uri2D = await withProvider(
           () => contract.renderAsDataUri2D(CHONK_ID),
@@ -2825,6 +2898,7 @@ function generateOutfitName(top, head, face, accessory) {
         updateViewButtons();
         renderCurrentView();
         autoRetriedLoad = false;
+        stopLoadBanter();
         statusEl.textContent = "Live — refreshing directly from the Base chain.";
 
         withProvider(
@@ -2870,8 +2944,8 @@ function generateOutfitName(top, head, face, accessory) {
         });
       } catch (err) {
         console.error("Daily Chonk load error:", err);
-        loading.hidden = false;
-        loading.textContent = "Unable to load today’s outfit.";
+        stopLoadBanter();
+        setLoadingMessage("Couldn't grab today's fit.", "Tap Retry");
         retryLoadButton.hidden = false;
         statusEl.textContent = "Could not reach Base. Tap Retry.";
         traitsEl.innerHTML = `<div class="error">Could not fetch on-chain data. Check your connection, then tap Retry.</div>`;
