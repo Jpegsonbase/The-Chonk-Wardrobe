@@ -1406,6 +1406,32 @@ body.chonk-mode-active #chonk-background {
   font-weight: 850;
 }
 
+.save-fit-button {
+  appearance: none;
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  border: 3px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  border-radius: 999px;
+  box-shadow: 4px 4px 0 var(--line);
+  padding: 11px 16px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+.save-fit-button:hover { background: var(--accent); color: #191919; }
+.save-fit-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: var(--card);
+  color: var(--ink);
+}
+.save-fit-button:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+
 @media (max-width: 500px) {
   .rating-section {
     padding: 15px;
@@ -1539,6 +1565,10 @@ body.chonk-mode-active #chonk-background {
   <div id="rating-status" class="rating-status">
     Tap a star to rate today's fit.
   </div>
+
+  <button type="button" class="save-fit-button" id="save-fit" disabled>
+    Save the fit
+  </button>
 </div>
 
       </section>
@@ -1734,6 +1764,7 @@ body.chonk-mode-active #chonk-background {
     const button3D = document.getElementById("view-3d");
     const buttonSpin = document.getElementById("view-spin");
     const shareXButton = document.getElementById("share-x");
+    const saveFitButton = document.getElementById("save-fit");
     const retryLoadButton = document.getElementById("retry-load");
 const chonkModeButton = document.getElementById("chonk-mode");
 const chonkBackground = document.getElementById("chonk-background");
@@ -1802,6 +1833,7 @@ chonkModeButton.addEventListener("click", () => {
 
     let currentMode = "2d";
     let cached2D = null;
+    let lastOutfitAttrs = [];
     let cached3DMeta = null;
     let viewerReady = false;
     let isSpinning = false;
@@ -2184,6 +2216,107 @@ function generateOutfitName(top, head, face, accessory) {
       outfitNameEl.textContent = name;
       const loadingName = !name || name === "Finding today's fit…";
       shareXButton.disabled = loadingName;
+      saveFitButton.disabled = loadingName || !cached2D;
+    }
+
+    function loadFitImage(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error("Could not load image"));
+        img.src = src;
+      });
+    }
+
+    function collectFitTraits() {
+      return Array.from(traitsEl.querySelectorAll(".trait")).map((row) => {
+        const name = (row.querySelector(".trait-name")?.textContent || "").trim();
+        const thumb = row.querySelector("img.trait-thumb");
+        return {
+          name,
+          src: thumb && thumb.src ? thumb.src : null
+        };
+      }).filter((trait) => trait.name && trait.name !== "Source");
+    }
+
+    function fitGridSize(traitCount) {
+      let cols = 5;
+      if (traitCount <= 2) cols = 3;
+      else if (traitCount <= 4) cols = 4;
+      const beside = Math.max(0, (cols - 2) * 2);
+      const extraRows = Math.ceil(Math.max(0, traitCount - beside) / cols);
+      return { cols, rows: 2 + extraRows };
+    }
+
+    function drawCover(ctx, img, x, y, size) {
+      const src = Math.min(img.width || size, img.height || size);
+      const sx = Math.max(0, ((img.width || src) - src) / 2);
+      const sy = Math.max(0, ((img.height || src) - src) / 2);
+      ctx.drawImage(img, sx, sy, src, src, x, y, size, size);
+    }
+
+    async function saveTheFit() {
+      if (!cached2D) return;
+      saveFitButton.disabled = true;
+      const previousLabel = saveFitButton.textContent;
+      saveFitButton.textContent = "Saving…";
+
+      try {
+        const chonkImg = await loadFitImage(cached2D);
+        let traits = collectFitTraits();
+        if (lastOutfitAttrs.length) {
+          const fetched = await fetchTraitImagesByNames(lastOutfitAttrs);
+          traits = traits.map((trait) => {
+            const lookup = String(trait.name).replace(/^[^:]+:\s*/, "").toLowerCase();
+            return { ...trait, src: trait.src || fetched[lookup] || fetched[trait.name.toLowerCase()] || null };
+          });
+        }
+        const thumbs = [];
+        for (const trait of traits) {
+          if (!trait.src) continue;
+          try { thumbs.push(await loadFitImage(trait.src)); } catch (e) {}
+        }
+
+        const gap = 18;
+        const pad = 36;
+        const cell = 220;
+        const { cols, rows } = thumbs.length ? fitGridSize(thumbs.length) : { cols: 2, rows: 2 };
+        const width = pad * 2 + cols * cell + (cols - 1) * gap;
+        const height = pad * 2 + rows * cell + (rows - 1) * gap;
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#ececec";
+        ctx.fillRect(0, 0, width, height);
+        ctx.imageSmoothingEnabled = false;
+
+        const heroSize = cell * 2 + gap;
+        drawCover(ctx, chonkImg, pad, pad, heroSize);
+
+        const used = new Set(["0,0", "0,1", "1,0", "1,1"]);
+        let traitIndex = 0;
+        for (let r = 0; r < rows && traitIndex < thumbs.length; r++) {
+          for (let c = 0; c < cols && traitIndex < thumbs.length; c++) {
+            if (used.has(`${r},${c}`)) continue;
+            const x = pad + c * (cell + gap);
+            const y = pad + r * (cell + gap);
+            drawCover(ctx, thumbs[traitIndex], x, y, cell);
+            traitIndex += 1;
+          }
+        }
+
+        const link = document.createElement("a");
+        link.download = `${getDailyRatingKey()}-fit.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      } catch (error) {
+        console.warn("Could not save Daily Chonk fit.", error);
+        statusEl.textContent = "Could not save today's fit. Try again in a moment.";
+      } finally {
+        saveFitButton.textContent = previousLabel || "Save the fit";
+        saveFitButton.disabled = !cached2D;
+      }
     }
 
     function shareOutfitOnX() {
@@ -2196,6 +2329,7 @@ function generateOutfitName(top, head, face, accessory) {
     }
 
     shareXButton.addEventListener("click", shareOutfitOnX);
+    saveFitButton.addEventListener("click", saveTheFit);
 
     function updateOutfitName(attrs) {
       const traits = {
@@ -2339,6 +2473,7 @@ function generateOutfitName(top, head, face, accessory) {
     function showTraits(json, imageByValue = {}) {
       traitsEl.innerHTML = "";
       const attrs = Array.isArray(json.attributes) ? json.attributes : [];
+      lastOutfitAttrs = attrs;
       updateOutfitName(attrs);
 
       if (!attrs.length) {
