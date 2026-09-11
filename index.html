@@ -563,6 +563,60 @@ body.chonk-mode-active #chonk-background {
       to { transform: translateX(-50%); }
     }
 
+    .name-entry {
+      margin: 0 0 14px;
+      padding: 12px 14px;
+      border: 3px solid var(--line);
+      border-radius: 14px;
+      background: var(--progress-bg);
+    }
+    .name-entry-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .name-entry input {
+      flex: 1;
+      min-width: 0;
+      border: 3px solid var(--line);
+      border-radius: 999px;
+      background: var(--card);
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 850;
+      padding: 8px 14px;
+    }
+    .name-entry input:focus {
+      outline: 3px solid var(--green);
+      outline-offset: 2px;
+    }
+    .name-entry button {
+      appearance: none;
+      flex: 0 0 auto;
+      border: 3px solid var(--line);
+      background: var(--accent);
+      color: #191919;
+      border-radius: 999px;
+      box-shadow: 3px 3px 0 var(--line);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 950;
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+    .name-entry button:disabled {
+      opacity: 0.55;
+      cursor: default;
+      box-shadow: none;
+    }
+    .name-entry-status {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 850;
+    }
+
     .view-controls {
       display: flex;
       justify-content: flex-end;
@@ -1498,6 +1552,17 @@ body.chonk-mode-active #chonk-background {
           </div>
         </div>
 
+        <div id="name-entry" class="name-entry" hidden>
+          <div class="section-kicker">Name the fit</div>
+          <form id="name-form" autocomplete="off">
+            <div class="name-entry-row">
+              <input id="name-input" maxlength="32" placeholder="2–32 characters" aria-label="Submit a name for today's outfit" />
+              <button type="submit" id="name-submit">Submit</button>
+            </div>
+          </form>
+          <p id="name-entry-status" class="name-entry-status">First hour only. One random name gets picked.</p>
+        </div>
+
         <div class="image-wrap">
   <div id="loading" class="loading">
     <span id="loading-line">Getting the fit ready…</span>
@@ -1643,6 +1708,7 @@ body.chonk-mode-active #chonk-background {
     ];
     const LAST_CHANGE = Date.parse("2026-09-06T18:37:34Z");
     const CYCLE = 24 * 60 * 60 * 1000;
+    const NAME_WINDOW_MS = 60 * 60 * 1000;
     const TRAIT_PAGE_BASE = "https://www.chonks.xyz/traits/";
 
     const CATEGORY_NUM = {
@@ -1724,6 +1790,11 @@ body.chonk-mode-active #chonk-background {
     const shareXButton = document.getElementById("share-x");
     const saveFitButton = document.getElementById("save-fit");
     const retryLoadButton = document.getElementById("retry-load");
+    const nameEntryEl = document.getElementById("name-entry");
+    const nameFormEl = document.getElementById("name-form");
+    const nameInputEl = document.getElementById("name-input");
+    const nameSubmitEl = document.getElementById("name-submit");
+    const nameEntryStatusEl = document.getElementById("name-entry-status");
 const chonkModeButton = document.getElementById("chonk-mode");
 const chonkBackground = document.getElementById("chonk-background");
 const starRating = document.getElementById("star-rating");
@@ -1993,52 +2064,6 @@ chonkModeButton.addEventListener("click", () => {
       return found ? cleanTraitName(found.value) : "";
     }
 
-    function simplifyTrait(value) {
-      if (!value) return "";
-      return value.replace(/\b(color|colours?)\b/gi, "").replace(/\s+/g, " ").trim();
-    }
-
-    /* Nicknames plus one punchy trait word. Skip filler, colors, and slots. */
-    const NAME_STOP = new Set([
-      "on", "the", "a", "an", "of", "with", "for", "and", "in", "at", "to",
-      "from", "by", "as", "or", "its", "it's"
-    ]);
-    const NAME_COLORS = new Set([
-      "black", "white", "red", "blue", "green", "yellow", "orange", "pink",
-      "purple", "brown", "grey", "gray", "gold", "silver", "navy", "beige",
-      "cream", "tan", "teal", "mint", "maroon", "ivory", "khaki", "camo"
-    ]);
-    const NAME_SLOT = new Set([
-      "top", "bottom", "shoes", "shoe", "pants", "shirt", "body", "base",
-      "trait", "none", "empty", "default", "background"
-    ]);
-    const NAME_SKIP_TYPES = new Set([
-      "body", "body type", "background", "background color"
-    ]);
-
-    const OUTFIT_NICKNAMES = [
-      "Poser", "Peacocker", "Showoff", "Flexer", "Dresser", "Styler",
-      "Trendsetter", "Trendchaser", "Hypebeast", "Tryhard", "Wannabe",
-      "Pretender", "Performer", "Exhibitionist", "Showman", "Peacock",
-      "Dandy", "Snob", "Swagger", "Flash", "Drip", "Icon", "Looker",
-      "Head-Turner", "Tastemaker", "Influencer", "Copycat", "Follower",
-      "Original", "Individualist", "Rebel", "Maverick", "Eccentric",
-      "Minimalist", "Maximalist", "Classic", "Vintage", "Retro",
-      "Experimentalist", "Risk-Taker", "Sophisticate", "Charmer",
-      "Showstopper", "Statement", "Spectacle", "Persona",
-      "Imposter", "Facade", "Projection", "Fantasy", "Costume",
-      "Mannequin", "Mirror", "Model", "Runway", "Streetwear",
-      "Fashionista", "Stylist", "Tailor", "Sharpener", "Sharpie",
-      "Snappy", "Slick", "Smoothie", "Swaggerer", "Flamboyant", "Dapper",
-      "Dressed-Up", "Overdresser", "Underdresser", "Showboat",
-      "Attention-Seeker", "Try-On", "Dress-Up", "Copy", "Replica",
-      "Knockoff", "Chameleon", "Transformer", "Shapeshifter",
-      "Scene-Stealer", "Eye-Catcher", "Crowd-Pleaser", "Cultivated",
-      "Meticulous", "Effortless", "Unbothered", "Understated",
-      "Overstated", "Statement-Maker", "Rulebreaker", "Lookmaker",
-      "Fitmaker", "Outfitmaker", "Attention", "Aesthetic"
-    ];
-
     function outfitHash(pieces) {
       const source = pieces.join("|").toLowerCase();
       let hash = 2166136261;
@@ -2047,46 +2072,6 @@ chonkModeButton.addEventListener("click", () => {
         hash = Math.imul(hash, 16777619);
       }
       return hash >>> 0;
-    }
-
-    function traitPhraseForName(value) {
-      const tokens = simplifyTrait(value).split(/\s+/).filter(Boolean);
-      const kept = [];
-      for (const token of tokens) {
-        const word = token.toLowerCase().replace(/[^a-z0-9+]/g, "");
-        if (!word) continue;
-        if (NAME_STOP.has(word)) continue;
-        if (NAME_COLORS.has(word)) continue;
-        if (NAME_SLOT.has(word)) continue;
-        kept.push(token);
-      }
-      return kept.join(" ").trim();
-    }
-
-    function generateOutfitNameFromAttrs(attrs) {
-      const phrases = [];
-      const seen = new Set();
-      for (const attr of attrs || []) {
-        const typeKey = String(attr.trait_type || "").trim().toLowerCase();
-        if (NAME_SKIP_TYPES.has(typeKey)) continue;
-        const phrase = traitPhraseForName(attr.value);
-        const key = phrase.toLowerCase();
-        if (!phrase || seen.has(key)) continue;
-        seen.add(key);
-        phrases.push(phrase);
-      }
-
-      const hash = outfitHash(phrases.length ? phrases : ["daily"]);
-      const nick = OUTFIT_NICKNAMES[hash % OUTFIT_NICKNAMES.length];
-      const hook = phrases
-        .filter((phrase) => phrase.split(/\s+/).length === 1)
-        .sort((a, b) => b.length - a.length)[0];
-
-      if (!hook) return nick;
-
-      const combo = `${hook} ${nick}`;
-      if (combo.length > 24) return nick;
-      return (hash % 3 === 0) ? nick : combo;
     }
 
     const LOADING_NAME = "Getting the fit ready…";
@@ -2387,63 +2372,35 @@ chonkModeButton.addEventListener("click", () => {
     function shareOutfitOnX() {
       const name = currentOutfitName || "Daily Chonk";
       const text = `${name} — today's Daily Chonk.\nA new onchain outfit every 24 hours.`;
-      const shareUrl =
+      const tweetUrl =
         "https://x.com/intent/tweet?text=" + encodeURIComponent(text) +
         "&url=" + encodeURIComponent(SHARE_URL);
-      window.open(shareUrl, "_blank", "noopener,noreferrer");
+
+      if (navigator.share) {
+        navigator.share({
+          title: "Daily Chonk",
+          text,
+          url: SHARE_URL
+        }).catch(() => {});
+        return;
+      }
+
+      const mobile = window.matchMedia("(pointer: coarse)").matches || window.innerWidth <= 820;
+      if (mobile) {
+        window.location.assign(tweetUrl);
+        return;
+      }
+
+      window.open(tweetUrl, "_blank", "noopener,noreferrer");
     }
 
     shareXButton.addEventListener("click", shareOutfitOnX);
     saveFitButton.addEventListener("click", saveTheFit);
 
-    function updateOutfitName(attrs) {
-      const traits = {
-        top: getTraitPart(attrs, "top"),
-        head: getTraitPart(attrs, "head"),
-        face: getTraitPart(attrs, "face"),
-        accessory: getTraitPart(attrs, "accessory")
-      };
-
-      setOutfitName(generateOutfitNameFromAttrs(attrs));
-      loadLiveOutfitName(traits);
-    }
-
-    async function loadLiveOutfitName(traits) {
-      if (!OUTFIT_NAME_FUNCTION_URL) return;
-
-      const dayKey = getDailyRatingKey();
-
-      try {
-        const cached = await fetch(
-          `${getDatabaseUrl()}/daily-chonk-names/${encodeURIComponent(dayKey)}.json`
-        );
-        if (cached.ok) {
-          const payload = await cached.json();
-          if (payload && payload.name) {
-            setOutfitName(payload.name);
-            return;
-          }
-        }
-      } catch (error) {
-        console.warn("Could not load cached outfit name.", error);
-      }
-
-      if (!OUTFIT_NAME_FUNCTION_URL) return;
-
-      try {
-        const response = await fetch(OUTFIT_NAME_FUNCTION_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(traits)
-        });
-        if (!response.ok) return;
-        const payload = await response.json();
-        if (payload && payload.name) {
-          setOutfitName(payload.name);
-        }
-      } catch (error) {
-        console.warn("Could not generate live outfit name.", error);
-      }
+    function updateOutfitName() {
+      setOutfitName(defaultOutfitName());
+      syncCommunityOutfitName();
+      updateNameEntryUI();
     }
 
     function escapeHtml(s) {
@@ -2920,6 +2877,7 @@ chonkModeButton.addEventListener("click", () => {
 
     /* Countdown */
     let lastRemaining = Infinity;
+    let nameWindowWasOpen = false;
     function tick() {
       const now = Date.now();
       let elapsed = (now - LAST_CHANGE) % CYCLE;
@@ -2942,7 +2900,15 @@ chonkModeButton.addEventListener("click", () => {
       }
       lastRemaining = remaining;
 
-      if (remaining < 60000) {
+      if (nameWindowWasOpen && !isNameWindowOpen()) {
+        syncCommunityOutfitName();
+        updateNameEntryUI();
+      }
+      nameWindowWasOpen = isNameWindowOpen();
+
+      if (isNameWindowOpen()) {
+        statusEl.textContent = "Naming is open. Submit a name — one random pick after the first hour.";
+      } else if (remaining < 60000) {
         statusEl.textContent = "The wardrobe is about to roll…";
       } else if (remaining < 3600000) {
         statusEl.textContent = "Less than an hour until the next fit.";
@@ -2979,6 +2945,136 @@ function getDailyRatingKey() {
 
   return `daily-chonk-${dayNumber}`;
 }
+
+function getOutfitNumber() {
+  return Math.max(1, Math.floor((Date.now() - LAST_CHANGE) / CYCLE) + 1);
+}
+
+function defaultOutfitName() {
+  return `Outfit #${getOutfitNumber()}`;
+}
+
+function isNameWindowOpen() {
+  let elapsed = (Date.now() - LAST_CHANGE) % CYCLE;
+  if (elapsed < 0) elapsed += CYCLE;
+  return elapsed < NAME_WINDOW_MS;
+}
+
+const NAME_SUBMITTED_KEY = "daily-chonk-name-submitted";
+
+function hasSubmittedTodayName() {
+  try {
+    return localStorage.getItem(NAME_SUBMITTED_KEY) === getDailyRatingKey();
+  } catch (e) {
+    return false;
+  }
+}
+
+function markSubmittedTodayName() {
+  try {
+    localStorage.setItem(NAME_SUBMITTED_KEY, getDailyRatingKey());
+  } catch (e) {}
+}
+
+function cleanSubmittedName(raw) {
+  const text = String(raw || "").replace(/\s+/g, " ").trim().replace(/[<>]/g, "");
+  if (text.length < 2 || text.length > 32) return "";
+  if (/https?:\/\//i.test(text) || /www\./i.test(text)) return "";
+  return text;
+}
+
+function nameSubmissionsUrl(dayKey) {
+  return `${getDatabaseUrl()}/daily-chonk-names/${encodeURIComponent(dayKey)}/submissions.json`;
+}
+
+function nameSubmissionUrl(dayKey, voterId) {
+  return `${getDatabaseUrl()}/daily-chonk-names/${encodeURIComponent(dayKey)}/submissions/${encodeURIComponent(voterId)}.json`;
+}
+
+function pickCommunityName(dayKey, submissions) {
+  const entries = Object.keys(submissions || {})
+    .sort()
+    .map((key) => cleanSubmittedName(submissions[key]))
+    .filter(Boolean);
+  if (!entries.length) return defaultOutfitName();
+  return entries[outfitHash([dayKey]) % entries.length];
+}
+
+function updateNameEntryUI() {
+  if (!nameEntryEl) return;
+  const open = isNameWindowOpen();
+  nameEntryEl.hidden = !open;
+  if (!open) return;
+
+  const submitted = hasSubmittedTodayName();
+  if (nameInputEl) nameInputEl.disabled = submitted;
+  if (nameSubmitEl) nameSubmitEl.disabled = submitted;
+  if (nameEntryStatusEl) {
+    nameEntryStatusEl.textContent = submitted
+      ? "You're in today's pool. A random name locks in after the first hour."
+      : "First hour only. One random name gets picked.";
+  }
+}
+
+async function syncCommunityOutfitName() {
+  if (isOutfitNameLoading(currentOutfitName)) return;
+  if (isNameWindowOpen()) {
+    setOutfitName(defaultOutfitName());
+    return;
+  }
+  if (!isLiveVotingEnabled()) {
+    setOutfitName(defaultOutfitName());
+    return;
+  }
+  try {
+    const dayKey = getDailyRatingKey();
+    const response = await fetch(nameSubmissionsUrl(dayKey));
+    if (!response.ok) throw new Error(`Could not load names (${response.status})`);
+    const submissions = await response.json();
+    setOutfitName(pickCommunityName(dayKey, submissions || {}));
+  } catch (error) {
+    console.warn("Could not load community outfit names.", error);
+    setOutfitName(defaultOutfitName());
+  }
+}
+
+async function submitOutfitName(event) {
+  event.preventDefault();
+  if (!isNameWindowOpen()) {
+    updateNameEntryUI();
+    syncCommunityOutfitName();
+    return;
+  }
+  const name = cleanSubmittedName(nameInputEl && nameInputEl.value);
+  if (!name) {
+    if (nameEntryStatusEl) nameEntryStatusEl.textContent = "Use 2–32 characters. No links.";
+    return;
+  }
+  if (!isLiveVotingEnabled()) {
+    if (nameEntryStatusEl) nameEntryStatusEl.textContent = "Live naming needs the Firebase URL.";
+    return;
+  }
+  if (nameSubmitEl) nameSubmitEl.disabled = true;
+  try {
+    const response = await fetch(nameSubmissionUrl(getDailyRatingKey(), getVoterId()), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(name)
+    });
+    if (!response.ok) throw new Error(`Could not save name (${response.status})`);
+    markSubmittedTodayName();
+    if (nameInputEl) nameInputEl.value = name;
+    updateNameEntryUI();
+  } catch (error) {
+    console.warn("Could not submit outfit name.", error);
+    if (nameSubmitEl) nameSubmitEl.disabled = hasSubmittedTodayName();
+    if (nameEntryStatusEl) {
+      nameEntryStatusEl.textContent = "Could not reach the name pool. Try again.";
+    }
+  }
+}
+
+if (nameFormEl) nameFormEl.addEventListener("submit", submitOutfitName);
 
 function getVoterId() {
   try {
@@ -3234,7 +3330,7 @@ starRating.addEventListener("mouseleave", () => {
  * Load the current rating when the page opens.
  */
 loadLiveVotes();
-
+updateNameEntryUI();
 loadChonk();
 tick();
 setInterval(tick, 1000);
