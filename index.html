@@ -3125,3 +3125,44 @@ setInterval(tick, 1000);
           // Rainbow shades only work when Chonk Mode is active
           if (chonkModeActive) {
             startShadesRain();
+          }
+          typedSequence = "";
+        }
+      } else if (key === "backspace") {
+        typedSequence = typedSequence.slice(0, -1);
+      } else if (key === "escape") {
+        stopHeadRain();
+        stopShadesRain();
+        typedSequence = "";
+      } else {
+        // Reset on other keys (space, arrows, etc.)
+        typedSequence = "";
+      }
+    });
+    console.log(`
+
+
+___________________________________________________________________
+
+Riddle
+
+The answer isn't behind a door,
+nor buried deep within.
+
+It waits upon the place
+where every journey begins.
+
+Speak the right five letters
+and suddenly, things get a little... chonky.
+___________________________________________________________________
+
+Let's F*cking Chonk! 💙
+___________________________________________________________________
+
+                                                                                                                    
+`);
+
+  })();
+  </script>
+</body>
+</html>
