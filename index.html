@@ -376,6 +376,7 @@ body.chonk-mode-active #chonk-background {
 
     @media (prefers-reduced-motion: reduce) {
       .title-line { opacity: 1; transform: none; animation: none; }
+      #outfit-name.scrolling .outfit-name-track { animation: none; }
     }
 
     .header-right {
@@ -518,6 +519,8 @@ body.chonk-mode-active #chonk-background {
       border-radius: 999px;
       box-shadow: 4px 4px 0 var(--line);
       min-width: 0;
+      max-width: 100%;
+      overflow: hidden;
       text-align: center;
       justify-self: start;
     }
@@ -530,7 +533,33 @@ body.chonk-mode-active #chonk-background {
       font-weight: 1000;
       white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;
+    }
+
+    .outfit-name-track {
+      display: inline-flex;
+      width: max-content;
+      will-change: transform;
+    }
+
+    .outfit-name-copy {
+      padding-right: 2.4em;
+    }
+
+    #outfit-name:not(.scrolling) .outfit-name-copy {
+      padding-right: 0;
+    }
+
+    #outfit-name.scrolling .outfit-name-track {
+      animation: outfitMarquee 9s linear infinite;
+    }
+
+    #outfit-name.scrolling:hover .outfit-name-track {
+      animation-play-state: paused;
+    }
+
+    @keyframes outfitMarquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
     }
 
     .view-controls {
@@ -576,80 +605,6 @@ body.chonk-mode-active #chonk-background {
       color: var(--ink);
     }
     .share-x-button:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
-
-    .share-modal {
-      position: fixed;
-      inset: 0;
-      z-index: 80;
-      display: grid;
-      place-items: center;
-      padding: 18px;
-    }
-    .share-modal[hidden] { display: none; }
-    .share-modal-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(25, 25, 25, 0.55);
-    }
-    .share-modal-card {
-      position: relative;
-      width: min(100%, 420px);
-      border: 3px solid var(--line);
-      border-radius: 16px;
-      background: var(--card);
-      box-shadow: 8px 8px 0 var(--line);
-      padding: 20px;
-      z-index: 1;
-    }
-    .share-modal-close {
-      appearance: none;
-      position: absolute;
-      top: 10px;
-      right: 12px;
-      border: 0;
-      background: transparent;
-      color: var(--ink);
-      font-size: 1.6rem;
-      line-height: 1;
-      cursor: pointer;
-    }
-    .share-modal-preview {
-      width: 100%;
-      border: 3px solid var(--line);
-      border-radius: 12px;
-      margin: 12px 0;
-      display: block;
-      background: var(--progress-bg);
-    }
-    .share-modal-text {
-      margin: 0 0 14px;
-      white-space: pre-wrap;
-      font-weight: 850;
-      font-size: 0.92rem;
-      line-height: 1.4;
-    }
-    .share-modal-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .share-modal-actions button {
-      appearance: none;
-      border: 3px solid var(--line);
-      background: var(--accent);
-      color: #191919;
-      border-radius: 999px;
-      box-shadow: 4px 4px 0 var(--line);
-      padding: 8px 14px;
-      font-family: inherit;
-      font-size: 0.72rem;
-      font-weight: 950;
-      cursor: pointer;
-    }
-    .share-modal-actions button.secondary {
-      background: var(--card);
-      color: var(--ink);
-    }
 
     .view-toggle {
       display: inline-flex;
@@ -1509,7 +1464,11 @@ body.chonk-mode-active #chonk-background {
       <section class="card chonk-card">
         <div class="hero-top">
           <div class="outfit-name-wrap">
-            <h2 id="outfit-name">Getting the fit ready…</h2>
+            <h2 id="outfit-name">
+              <span class="outfit-name-track" id="outfit-name-track">
+                <span class="outfit-name-copy">Getting the fit ready…</span>
+              </span>
+            </h2>
           </div>
 
           <div class="view-controls">
@@ -1657,32 +1616,6 @@ body.chonk-mode-active #chonk-background {
   </div>
 </footer>
 
-  </div>
-
-  <div id="share-modal" class="share-modal" hidden>
-    <div class="share-modal-backdrop" data-close-share></div>
-    <div
-      class="share-modal-card"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="share-modal-title"
-    >
-      <button type="button" class="share-modal-close" data-close-share aria-label="Close share">×</button>
-      <div class="section-kicker">Today's fit</div>
-      <h3 id="share-modal-title">Share Daily Chonk</h3>
-      <img
-        class="share-modal-preview"
-        src="https://dailychonk.xyz/og.png"
-        alt="Daily Chonk share card"
-        width="1200"
-        height="630"
-      >
-      <p id="share-modal-text" class="share-modal-text"></p>
-      <div class="share-modal-actions">
-        <button type="button" id="share-copy">Copy post</button>
-        <button type="button" id="share-native" class="secondary" hidden>Share from this device</button>
-      </div>
-    </div>
   </div>
 
   <script type="module">
@@ -2277,9 +2210,7 @@ function generateOutfitName(top, head, face, accessory) {
 
     function startLoadBanter() {
       stopLoadBanter();
-      outfitNameEl.textContent = LOADING_NAME;
-      shareXButton.disabled = true;
-      saveFitButton.disabled = true;
+      setOutfitName(LOADING_NAME);
       loadBanterIndex = 0;
       setLoadingMessage(LOADING_JOKES[0], "Talking to Base");
       loadBanterTimer = setInterval(() => {
@@ -2296,12 +2227,54 @@ function generateOutfitName(top, head, face, accessory) {
       }
     }
 
+    let currentOutfitName = LOADING_NAME;
+    let nameScrollTimer = null;
+
+    function updateOutfitNameScroll() {
+      const track = document.getElementById("outfit-name-track");
+      const wrap = outfitNameEl && outfitNameEl.parentElement;
+      if (!track || !wrap) return;
+
+      const copies = Array.from(track.querySelectorAll(".outfit-name-copy"));
+      if (!copies.length) return;
+      copies.slice(1).forEach((copy) => copy.remove());
+      copies[0].removeAttribute("aria-hidden");
+      outfitNameEl.classList.remove("scrolling");
+      track.style.animationDuration = "";
+
+      const overflow = copies[0].scrollWidth > wrap.clientWidth - 28;
+      if (!overflow) return;
+
+      const extra = document.createElement("span");
+      extra.className = "outfit-name-copy";
+      extra.textContent = currentOutfitName;
+      extra.setAttribute("aria-hidden", "true");
+      track.appendChild(extra);
+      outfitNameEl.classList.add("scrolling");
+      const seconds = Math.max(7, Math.min(18, currentOutfitName.length * 0.38));
+      track.style.animationDuration = `${seconds}s`;
+    }
+
     function setOutfitName(name) {
-      outfitNameEl.textContent = name;
-      const loadingName = isOutfitNameLoading(name);
+      currentOutfitName = String(name || "").trim() || "Daily Chonk";
+      const track = document.getElementById("outfit-name-track");
+      if (track) {
+        track.replaceChildren();
+        const span = document.createElement("span");
+        span.className = "outfit-name-copy";
+        span.textContent = currentOutfitName;
+        track.appendChild(span);
+      } else {
+        outfitNameEl.textContent = currentOutfitName;
+      }
+      const loadingName = isOutfitNameLoading(currentOutfitName);
       shareXButton.disabled = loadingName;
       saveFitButton.disabled = loadingName || !cached2D || isMobileFitSave();
+      clearTimeout(nameScrollTimer);
+      nameScrollTimer = setTimeout(updateOutfitNameScroll, 40);
     }
+
+    window.addEventListener("resize", updateOutfitNameScroll);
 
     function isMobileFitSave() {
       return window.matchMedia("(max-width: 820px)").matches;
@@ -2482,7 +2455,7 @@ function generateOutfitName(top, head, face, accessory) {
     }
 
     function shareOutfitOnX() {
-      const name = (outfitNameEl.textContent || "Daily Chonk").trim();
+      const name = currentOutfitName || "Daily Chonk";
       const text = `${name} — today's Daily Chonk.\nA new onchain outfit every 24 hours.`;
       const shareUrl =
         "https://x.com/intent/tweet?text=" + encodeURIComponent(text) +
