@@ -1702,13 +1702,14 @@ body.chonk-mode-active #chonk-background {
       ]);
     }
 
-    async function withProvider(work) {
+    async function withProvider(work, timeoutMs) {
       let lastError;
+      const wait = timeoutMs || 25000;
       for (let i = 0; i < RPC_URLS.length; i++) {
         const index = (rpcIndex + i) % RPC_URLS.length;
         bindContracts(RPC_URLS[index]);
         try {
-          const result = await withTimeout(work(), 10000);
+          const result = await withTimeout(work(), wait);
           rpcIndex = index;
           return result;
         } catch (error) {
@@ -2572,25 +2573,18 @@ function generateOutfitName(top, head, face, accessory) {
         loading.hidden = false;
         loading.textContent = "Loading today’s outfit…";
 
-        const [uri2D, uri3D] = await withProvider(() => Promise.all([
-          contract.renderAsDataUri2D(CHONK_ID),
-          contract.renderAsDataUri3D(CHONK_ID)
-        ]));
+        const uri2D = await withProvider(
+          () => contract.renderAsDataUri2D(CHONK_ID),
+          25000
+        );
 
         const parsed2D = extract2D(uri2D);
         cached2D = parsed2D.image;
 
-        const extracted = extract3DData(uri3D);
-        cached3DMeta = extracted.zMapFull
-          ? { zMapFull: extracted.zMapFull, bgColor: extracted.bgColor }
-          : null;
-
         const meta =
           (parsed2D.metadata && Array.isArray(parsed2D.metadata.attributes) && parsed2D.metadata) ||
-          (extracted.metadata && Array.isArray(extracted.metadata.attributes) && extracted.metadata) ||
           { attributes: [] };
 
-        // Show traits immediately, then fill in thumbs from the indexer
         showTraits(meta, {});
         if (meta.attributes?.length) {
           fetchTraitImagesByNames(meta.attributes).then((imageByValue) => {
@@ -2598,18 +2592,54 @@ function generateOutfitName(top, head, face, accessory) {
           });
         }
 
-        if (!cached3DMeta) {
-          console.warn("Daily Chonk: could not extract zMapFull from 3D render.");
-          if (currentMode === "3d") {
-            currentMode = "2d";
-            setStoredViewMode("2d");
-          }
-        }
-
+        const wanted3D = currentMode === "3d";
+        currentMode = "2d";
         updateViewButtons();
         renderCurrentView();
         autoRetriedLoad = false;
         statusEl.textContent = "Live — refreshing directly from the Base chain.";
+
+        withProvider(
+          () => contract.renderAsDataUri3D(CHONK_ID),
+          40000
+        ).then((uri3D) => {
+          const extracted = extract3DData(uri3D);
+          cached3DMeta = extracted.zMapFull
+            ? { zMapFull: extracted.zMapFull, bgColor: extracted.bgColor }
+            : null;
+
+          if (
+            extracted.metadata &&
+            Array.isArray(extracted.metadata.attributes) &&
+            extracted.metadata.attributes.length &&
+            !meta.attributes.length
+          ) {
+            showTraits(extracted.metadata, {});
+          }
+
+          if (!cached3DMeta) {
+            console.warn("Daily Chonk: could not extract zMapFull from 3D render.");
+            return;
+          }
+
+          if (wanted3D || getStoredViewMode() === "3d") {
+            currentMode = "3d";
+            setStoredViewMode("3d");
+            updateViewButtons();
+            renderCurrentView();
+          } else {
+            updateViewButtons();
+          }
+        }).catch((error) => {
+          console.warn("Daily Chonk: 3D render unavailable.", error);
+          cached3DMeta = null;
+          if (currentMode === "3d") {
+            currentMode = "2d";
+            setStoredViewMode("2d");
+            updateViewButtons();
+            renderCurrentView();
+          }
+        });
       } catch (err) {
         console.error("Daily Chonk load error:", err);
         loading.hidden = false;
@@ -3095,33 +3125,3 @@ setInterval(tick, 1000);
           // Rainbow shades only work when Chonk Mode is active
           if (chonkModeActive) {
             startShadesRain();
-          }
-          typedSequence = "";
-        }
-      } else if (key === "backspace") {
-        typedSequence = typedSequence.slice(0, -1);
-      } else if (key === "escape") {
-        stopHeadRain();
-        stopShadesRain();
-        typedSequence = "";
-      } else {
-        // Reset on other keys (space, arrows, etc.)
-        typedSequence = "";
-      }
-    });
-    console.log(`
-
-
-___________________________________________________________________
-
-Riddle
-
-The answer isn't behind a door,
-nor buried deep within.
-
-It waits upon the place
-where every journey begins.
-
-Speak the right five letters
-and suddenly, things get a little... chonky.
-___________________________________________________________________
