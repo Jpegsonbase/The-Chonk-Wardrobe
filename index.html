@@ -1991,8 +1991,7 @@ chonkModeButton.addEventListener("click", () => {
       return value.replace(/\b(color|colours?)\b/gi, "").replace(/\s+/g, " ").trim();
     }
 
-    /* Names come from the traits on the Chonk. Skip filler words, colors,
-       and generic slots like "top" / "shoes" so you never get "On Purpose". */
+    /* Nicknames plus one punchy trait word. Skip filler, colors, and slots. */
     const NAME_STOP = new Set([
       "on", "the", "a", "an", "of", "with", "for", "and", "in", "at", "to",
       "from", "by", "as", "or", "its", "it's"
@@ -2009,6 +2008,29 @@ chonkModeButton.addEventListener("click", () => {
     const NAME_SKIP_TYPES = new Set([
       "body", "body type", "background", "background color"
     ]);
+
+    const OUTFIT_NICKNAMES = [
+      "Poser", "Peacocker", "Showoff", "Flexer", "Dresser", "Styler",
+      "Trendsetter", "Trendchaser", "Hypebeast", "Tryhard", "Wannabe",
+      "Pretender", "Performer", "Exhibitionist", "Showman", "Peacock",
+      "Dandy", "Snob", "Swagger", "Flash", "Drip", "Icon", "Looker",
+      "Head-Turner", "Tastemaker", "Influencer", "Copycat", "Follower",
+      "Original", "Individualist", "Rebel", "Maverick", "Eccentric",
+      "Minimalist", "Maximalist", "Classic", "Vintage", "Retro",
+      "Experimentalist", "Risk-Taker", "Sophisticate", "Charmer",
+      "Showstopper", "Statement", "Spectacle", "Character", "Persona",
+      "Imposter", "Facade", "Projection", "Fantasy", "Costume",
+      "Mannequin", "Mirror", "Model", "Runway", "Streetwear",
+      "Fashionista", "Stylist", "Tailor", "Sharpener", "Sharpie",
+      "Snappy", "Slick", "Smoothie", "Swaggerer", "Flamboyant", "Dapper",
+      "Dressed-Up", "Overdresser", "Underdresser", "Showboat",
+      "Attention-Seeker", "Try-On", "Dress-Up", "Copy", "Replica",
+      "Knockoff", "Chameleon", "Transformer", "Shapeshifter",
+      "Scene-Stealer", "Eye-Catcher", "Crowd-Pleaser", "Cultivated",
+      "Meticulous", "Effortless", "Unbothered", "Understated",
+      "Overstated", "Statement-Maker", "Rulebreaker", "Lookmaker",
+      "Fitmaker", "Outfitmaker", "Attention", "Aesthetic"
+    ];
 
     function outfitHash(pieces) {
       const source = pieces.join("|").toLowerCase();
@@ -2034,11 +2056,6 @@ chonkModeButton.addEventListener("click", () => {
       return kept.join(" ").trim();
     }
 
-    function scoreNamePhrase(phrase) {
-      const n = phrase.split(/\s+/).filter(Boolean).length;
-      return n * 16 + phrase.length;
-    }
-
     function generateOutfitNameFromAttrs(attrs) {
       const phrases = [];
       const seen = new Set();
@@ -2052,19 +2069,17 @@ chonkModeButton.addEventListener("click", () => {
         phrases.push(phrase);
       }
 
-      if (!phrases.length) return "Daily Chonk";
+      const hash = outfitHash(phrases.length ? phrases : ["daily"]);
+      const nick = OUTFIT_NICKNAMES[hash % OUTFIT_NICKNAMES.length];
+      const hook = phrases
+        .filter((phrase) => phrase.split(/\s+/).length === 1)
+        .sort((a, b) => b.length - a.length)[0];
 
-      phrases.sort((a, b) => scoreNamePhrase(b) - scoreNamePhrase(a));
-      const top = phrases.slice(0, 3);
-      const hash = outfitHash(phrases);
+      if (!hook) return nick;
 
-      if (top.length === 1) return top[0];
-
-      const joined = `${top[0]} ${top[1]}`;
-      if (joined.length <= 28) {
-        return hash % 2 === 0 ? joined : `${top[1]} ${top[0]}`;
-      }
-      return top[hash % top.length];
+      const combo = `${hook} ${nick}`;
+      if (combo.length > 24) return nick;
+      return (hash % 3 === 0) ? nick : combo;
     }
 
     const LOADING_NAME = "Getting the fit ready…";
