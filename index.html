@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <title>Daily Chonk</title>
+  <script>
+    (function () {
+      var stored = null;
+      try { stored = localStorage.getItem("chonk-theme-choice"); } catch (e) {}
+      var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      var theme = stored === "dark" || stored === "light"
+        ? stored
+        : (prefersDark ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
 
   <meta
     name="description"
@@ -41,6 +52,7 @@
       --progress-bg: #ffffff;
       --green: #63d391;
       --shadow: 8px 8px 0 var(--line);
+      color-scheme: light;
     }
 
     [data-theme="dark"] {
@@ -54,6 +66,7 @@
       --progress-bg: #0f172a;
       --green: #63d391;
       --shadow: 8px 8px 0 var(--line);
+      color-scheme: dark;
     }
 
     * { box-sizing: border-box; }
@@ -771,6 +784,8 @@ body.chonk-mode-active #chonk-background {
       max-height: 580px;
       height: auto;
       image-rendering: pixelated;
+      cursor: default;
+      pointer-events: none;
       transition: opacity 0.35s ease, transform 0.45s cubic-bezier(.2,.8,.2,1);
     }
     #chonk-image.changing {
@@ -789,10 +804,12 @@ body.chonk-mode-active #chonk-background {
       transition: opacity 0.4s ease, transform 0.4s cubic-bezier(.2,.8,.2,1);
       z-index: 3;
       cursor: grab;
+      pointer-events: none;
     }
     #chonk-3d-canvas.loaded {
       opacity: 1;
       transform: scale(1);
+      pointer-events: auto;
     }
     #chonk-3d-canvas:active { cursor: grabbing; }
 
@@ -1297,7 +1314,7 @@ body.chonk-mode-active #chonk-background {
 
         <div class="image-wrap">
   <div id="loading" class="loading">Loading today’s outfit…</div>
-  <img id="chonk-image" alt="Today’s Daily Chonk outfit" hidden />
+  <img id="chonk-image" alt="Today’s Daily Chonk outfit" hidden draggable="false" />
   <canvas id="chonk-3d-canvas"></canvas>
   <div id="rotate-hint" class="rotate-hint">↔ DRAG TO ROTATE · SCROLL TO ZOOM</div>
 
@@ -1600,22 +1617,34 @@ chonkModeButton.addEventListener("click", () => {
 
     updateViewButtons();
 
-    /* Theme */
+    /* Theme — follow OS until the visitor picks one */
     function getStoredTheme() {
-      try { return localStorage.getItem("chonk-theme"); } catch (e) { return null; }
+      try { return localStorage.getItem("chonk-theme-choice"); } catch (e) { return null; }
     }
     function setStoredTheme(theme) {
-      try { localStorage.setItem("chonk-theme", theme); } catch (e) {}
+      try { localStorage.setItem("chonk-theme-choice", theme); } catch (e) {}
     }
-    function applyTheme(theme) {
+    function getOSTheme() {
+      return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    }
+    function applyTheme(theme, persist) {
       document.documentElement.setAttribute("data-theme", theme);
       themeCheckbox.checked = theme === "dark";
-      setStoredTheme(theme);
+      if (persist) setStoredTheme(theme);
     }
-    applyTheme(getStoredTheme() || "light");
+    applyTheme(getStoredTheme() || getOSTheme(), false);
     themeCheckbox.addEventListener("change", () => {
-      applyTheme(themeCheckbox.checked ? "dark" : "light");
+      applyTheme(themeCheckbox.checked ? "dark" : "light", true);
     });
+    const osThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const onOSThemeChange = (event) => {
+      if (getStoredTheme() === "dark" || getStoredTheme() === "light") return;
+      applyTheme(event.matches ? "dark" : "light", false);
+    };
+    if (osThemeQuery.addEventListener) osThemeQuery.addEventListener("change", onOSThemeChange);
+    else if (osThemeQuery.addListener) osThemeQuery.addListener(onOSThemeChange);
 
     /* Data URI helpers */
     function decodeDataUri(uri) {
@@ -2285,6 +2314,7 @@ function generateOutfitName(top, head, face, accessory) {
    /* ========== RATE THE FIT ========== */
 
 const RATING_STORAGE_KEY = "daily-chonk-rating";
+const VOTER_ID_KEY = "daily-chonk-voter-id";
 
 function getDailyRatingKey() {
   const elapsed = Date.now() - LAST_CHANGE;
@@ -2293,70 +2323,64 @@ function getDailyRatingKey() {
   return `daily-chonk-${dayNumber}`;
 }
 
-function getDailySeed() {
-  const elapsed = Date.now() - LAST_CHANGE;
-  return Math.floor(elapsed / CYCLE);
+function getVoterId() {
+  try {
+    let id = localStorage.getItem(VOTER_ID_KEY);
+    if (!id) {
+      id = (crypto.randomUUID && crypto.randomUUID()) ||
+        (`${Date.now()}-${Math.random().toString(16).slice(2)}`);
+      localStorage.setItem(VOTER_ID_KEY, id);
+    }
+    return id;
+  } catch (e) {
+    return "local-voter";
+  }
 }
 
-function seededRandom(seed) {
-  const x = Math.sin(seed) * 10000;
-  return x - Math.floor(x);
-}
-
-function getFakeDailyScore() {
-  const day = getDailySeed();
-
-  // Different vote count every day.
-  const voteCount =
-  10 + Math.floor(seededRandom(day + 100) * 21);
-
-  // Different average every day.
-  // Range: approximately 3.2 to 4.9
-  const average =
-    3.2 + seededRandom(day + 200) * 1.7;
-
+function emptyRatings(key) {
   return {
-    average,
-    voteCount
+    key: key,
+    votes: {},
+    myRating: null
   };
 }
 
 function getRatings() {
   const key = getDailyRatingKey();
+  const voterId = getVoterId();
 
   try {
     const stored = localStorage.getItem(RATING_STORAGE_KEY);
 
-    if (!stored) {
-      return {
-        key: key,
-        ratings: [],
-        myRating: null
-      };
-    }
+    if (!stored) return emptyRatings(key);
 
     const data = JSON.parse(stored);
 
+    if (data.key !== key) return emptyRatings(key);
+
+    const votes = (data.votes && typeof data.votes === "object")
+      ? data.votes
+      : {};
+
     /*
-     * If the day has changed, throw away
-     * the previous day's ratings.
+     * Migrate the old per-browser ratings array, if present.
      */
-    if (data.key !== key) {
-      return {
-        key: key,
-        ratings: [],
-        myRating: null
-      };
+    if (Array.isArray(data.ratings) && data.myRating != null && votes[voterId] == null) {
+      votes[voterId] = data.myRating;
     }
 
-    return data;
+    const myRating = Object.prototype.hasOwnProperty.call(votes, voterId)
+      ? Number(votes[voterId])
+      : null;
 
-  } catch (e) {
     return {
       key: key,
-      ratings: [],
-      myRating: null
+      votes: votes,
+      myRating: Number.isFinite(myRating) ? myRating : null
     };
+
+  } catch (e) {
+    return emptyRatings(key);
   }
 }
 
@@ -2364,26 +2388,41 @@ function saveRatings(data) {
   try {
     localStorage.setItem(
       RATING_STORAGE_KEY,
-      JSON.stringify(data)
+      JSON.stringify({
+        key: data.key,
+        votes: data.votes
+      })
     );
   } catch (e) {
     console.warn("Could not save Daily Chonk rating.", e);
   }
 }
 
+function getRealScore(data) {
+  const ratings = Object.values(data.votes || {})
+    .map(Number)
+    .filter(rating => Number.isFinite(rating) && rating >= 1 && rating <= 5);
+
+  const voteCount = ratings.length;
+  const average = voteCount
+    ? ratings.reduce((sum, rating) => sum + rating, 0) / voteCount
+    : 0;
+
+  return { average, voteCount };
+}
+
 function updateRatingUI() {
   const data = getRatings();
-  const fakeScore = getFakeDailyScore();
+  const score = getRealScore(data);
 
-  /*
-   * Show the synthetic daily score.
-   */
-  ratingAverageEl.textContent =
-    `${fakeScore.average.toFixed(1)} / 5 · ${fakeScore.voteCount} votes`;
+  if (score.voteCount === 0) {
+    ratingAverageEl.textContent = "No votes yet";
+  } else {
+    const label = score.voteCount === 1 ? "vote" : "votes";
+    ratingAverageEl.textContent =
+      `${score.average.toFixed(1)} / 5 · ${score.voteCount} ${label}`;
+  }
 
-  /*
-   * Highlight the visitor's own rating.
-   */
   const buttons = starRating.querySelectorAll("button");
 
   buttons.forEach(button => {
@@ -2395,9 +2434,6 @@ function updateRatingUI() {
     );
   });
 
-  /*
-   * Show the visitor's personal rating.
-   */
   if (data.myRating !== null) {
     ratingStatusEl.textContent =
       `You rated this fit ${data.myRating}/5.`;
@@ -2409,23 +2445,9 @@ function updateRatingUI() {
 
 function submitRating(rating) {
   const data = getRatings();
+  const voterId = getVoterId();
 
-  /*
-   * If this visitor already voted,
-   * replace their previous vote.
-   */
-  if (data.myRating !== null) {
-    const index = data.ratings.indexOf(data.myRating);
-
-    if (index !== -1) {
-      data.ratings[index] = rating;
-    } else {
-      data.ratings.push(rating);
-    }
-  } else {
-    data.ratings.push(rating);
-  }
-
+  data.votes[voterId] = rating;
   data.myRating = rating;
 
   saveRatings(data);
