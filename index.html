@@ -2295,6 +2295,31 @@ function generateOutfitName(top, head, face, accessory) {
       ctx.drawImage(source, x, y, size, size);
     }
 
+    function drawTraitLabel(ctx, text, x, y, size) {
+      const label = String(text || "").trim();
+      if (!label) return;
+      const maxWidth = size - 16;
+      ctx.save();
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+      let fontSize = 13;
+      ctx.font = `800 ${fontSize}px Trebuchet MS, sans-serif`;
+      while (fontSize > 9 && ctx.measureText(label).width > maxWidth) {
+        fontSize -= 1;
+        ctx.font = `800 ${fontSize}px Trebuchet MS, sans-serif`;
+      }
+      const cx = x + size / 2;
+      const cy = y + size - 8;
+      ctx.lineJoin = "round";
+      ctx.miterLimit = 2;
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = "rgba(25, 25, 25, 0.88)";
+      ctx.strokeText(label, cx, cy, maxWidth);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(label, cx, cy, maxWidth);
+      ctx.restore();
+    }
+
     function fitGridSize(traitCount) {
       let cols = 5;
       if (traitCount <= 2) cols = 3;
@@ -2328,7 +2353,7 @@ function generateOutfitName(top, head, face, accessory) {
           const map = lastTraitColorMaps[value.toLowerCase()];
           if (!map) return;
           const tile = colorMapToCanvas(map, 220, "#f7f1e7");
-          if (tile) thumbs.push(tile);
+          if (tile) thumbs.push({ tile, name: value });
         });
 
         const gap = 18;
@@ -2355,7 +2380,8 @@ function generateOutfitName(top, head, face, accessory) {
             if (used.has(`${r},${c}`)) continue;
             const x = pad + c * (cell + gap);
             const y = pad + r * (cell + gap);
-            drawFitTile(ctx, thumbs[traitIndex], x, y, cell);
+            drawFitTile(ctx, thumbs[traitIndex].tile, x, y, cell);
+            drawTraitLabel(ctx, thumbs[traitIndex].name, x, y, cell);
             traitIndex += 1;
           }
         }
