@@ -20,7 +20,7 @@
     content="One Chonk. One new onchain fit every day. Live on Base."
   />
   <meta property="og:image" content="https://dailychonk.xyz/og.png" />
-  <meta property="og:image:alt" content="Daily Chonk voxel character on a cream poster" />
+  <meta property="og:image:alt" content="Today's Daily Chonk on dailychonk.xyz" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -550,13 +550,22 @@ body.chonk-mode-active #chonk-background {
       border-radius: 999px;
       box-shadow: 4px 4px 0 var(--line);
       padding: 7px 12px;
-      min-height: 40px;
+      min-height: 42px;
       font-family: inherit;
       font-size: 0.68rem;
       font-weight: 950;
       letter-spacing: 0.04em;
       cursor: pointer;
       white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+    }
+    .share-x-button svg {
+      width: 14px;
+      height: 14px;
+      flex: 0 0 auto;
     }
     .share-x-button:hover { background: var(--accent); color: #191919; }
     .share-x-button:disabled {
@@ -566,6 +575,80 @@ body.chonk-mode-active #chonk-background {
       color: var(--ink);
     }
     .share-x-button:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
+
+    .share-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+    }
+    .share-modal[hidden] { display: none; }
+    .share-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(25, 25, 25, 0.55);
+    }
+    .share-modal-card {
+      position: relative;
+      width: min(100%, 420px);
+      border: 3px solid var(--line);
+      border-radius: 16px;
+      background: var(--card);
+      box-shadow: 8px 8px 0 var(--line);
+      padding: 20px;
+      z-index: 1;
+    }
+    .share-modal-close {
+      appearance: none;
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      font-size: 1.6rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .share-modal-preview {
+      width: 100%;
+      border: 3px solid var(--line);
+      border-radius: 12px;
+      margin: 12px 0;
+      display: block;
+      background: var(--progress-bg);
+    }
+    .share-modal-text {
+      margin: 0 0 14px;
+      white-space: pre-wrap;
+      font-weight: 850;
+      font-size: 0.92rem;
+      line-height: 1.4;
+    }
+    .share-modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .share-modal-actions button {
+      appearance: none;
+      border: 3px solid var(--line);
+      background: var(--accent);
+      color: #191919;
+      border-radius: 999px;
+      box-shadow: 4px 4px 0 var(--line);
+      padding: 8px 14px;
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 950;
+      cursor: pointer;
+    }
+    .share-modal-actions button.secondary {
+      background: var(--card);
+      color: var(--ink);
+    }
 
     .view-toggle {
       display: inline-flex;
@@ -1200,11 +1283,18 @@ body.chonk-mode-active #chonk-background {
       main { grid-template-columns: 1fr; }
       .chonk-card { min-height: 0; }
       .hero-top {
-        grid-template-columns: auto minmax(0, 1fr) auto;
-        gap: 8px;
+        grid-template-columns: 1fr;
+        gap: 10px;
       }
+      .outfit-name-wrap { justify-self: stretch; width: 100%; }
+      .view-controls { justify-content: space-between; width: 100%; }
       #outfit-name { font-size: clamp(0.85rem, 3vw, 1.15rem); }
-      .share-x-button { padding: 6px 10px; font-size: 0.6rem; min-height: 36px; }
+      .share-x-label { display: none; }
+      .share-x-button {
+        width: 42px;
+        min-width: 42px;
+        padding: 0;
+      }
       .view-button { padding: 7px 11px; min-width: 45px; }
       .spin-button { min-width: 38px; padding: 7px 10px; }
       .image-wrap { min-height: 390px; }
@@ -1375,8 +1465,14 @@ body.chonk-mode-active #chonk-background {
           </div>
 
           <div class="view-controls">
-            <button type="button" class="share-x-button" id="share-x" disabled aria-label="Share today's outfit on X">
-              X
+            <button type="button" class="share-x-button" id="share-x" disabled aria-label="Share today's outfit">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="18" cy="5" r="2.4"></circle>
+                <circle cx="6" cy="12" r="2.4"></circle>
+                <circle cx="18" cy="19" r="2.4"></circle>
+                <path d="M8.2 13.1 15.8 17.2M15.8 6.8 8.2 10.9"></path>
+              </svg>
+              <span class="share-x-label">Share</span>
             </button>
             <div class="view-toggle" role="group" aria-label="Chonk display mode">
               <button type="button" class="view-button" id="view-2d" data-mode="2d" aria-pressed="true">2D</button>
@@ -1506,6 +1602,32 @@ body.chonk-mode-active #chonk-background {
   </div>
 </footer>
 
+  </div>
+
+  <div id="share-modal" class="share-modal" hidden>
+    <div class="share-modal-backdrop" data-close-share></div>
+    <div
+      class="share-modal-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="share-modal-title"
+    >
+      <button type="button" class="share-modal-close" data-close-share aria-label="Close share">×</button>
+      <div class="section-kicker">Today's fit</div>
+      <h3 id="share-modal-title">Share Daily Chonk</h3>
+      <img
+        class="share-modal-preview"
+        src="https://dailychonk.xyz/og.png"
+        alt="Daily Chonk share card"
+        width="1200"
+        height="630"
+      >
+      <p id="share-modal-text" class="share-modal-text"></p>
+      <div class="share-modal-actions">
+        <button type="button" id="share-copy">Copy post</button>
+        <button type="button" id="share-native" class="secondary" hidden>Share from this device</button>
+      </div>
+    </div>
   </div>
 
   <script type="module">
@@ -3003,5 +3125,3 @@ ___________________________________________________________________
 
   })();
   </script>
-</body>
-</html>
