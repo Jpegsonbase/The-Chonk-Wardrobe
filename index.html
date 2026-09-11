@@ -2984,11 +2984,11 @@ function cleanSubmittedName(raw) {
 }
 
 function nameSubmissionsUrl(dayKey) {
-  return `${getDatabaseUrl()}/daily-chonk-names/${encodeURIComponent(dayKey)}/submissions.json`;
+  return `${getDatabaseUrl()}/daily-chonk-votes/${encodeURIComponent(dayKey)}/names.json`;
 }
 
 function nameSubmissionUrl(dayKey, voterId) {
-  return `${getDatabaseUrl()}/daily-chonk-names/${encodeURIComponent(dayKey)}/submissions/${encodeURIComponent(voterId)}.json`;
+  return `${getDatabaseUrl()}/daily-chonk-votes/${encodeURIComponent(dayKey)}/names/${encodeURIComponent(voterId)}.json`;
 }
 
 function pickCommunityName(dayKey, submissions) {
@@ -3033,7 +3033,6 @@ async function syncCommunityOutfitName() {
     const submissions = await response.json();
     setOutfitName(pickCommunityName(dayKey, submissions || {}));
   } catch (error) {
-    console.warn("Could not load community outfit names.", error);
     setOutfitName(defaultOutfitName());
   }
 }
