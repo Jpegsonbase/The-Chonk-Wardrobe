@@ -2297,7 +2297,7 @@ function generateOutfitName(top, head, face, accessory) {
   dispose3D();
 
   // Reset the rating display for the new daily outfit.
-  updateRatingUI();
+  loadLiveVotes();
 
   loadChonk();
 }
@@ -2313,8 +2313,25 @@ function generateOutfitName(top, head, face, accessory) {
     }
    /* ========== RATE THE FIT ========== */
 
+/*
+ * Paste your Firebase Realtime Database URL here (no trailing slash).
+ * Example: https://daily-chonk-xxxxx-default-rtdb.firebaseio.com
+ * Leave empty until you create the database — votes stay on this device only.
+ */
+const FIREBASE_RTDB_URL = "https://daily-chonk-default-rtdb.firebaseio.com";
+
 const RATING_STORAGE_KEY = "daily-chonk-rating";
 const VOTER_ID_KEY = "daily-chonk-voter-id";
+
+function isLiveVotingEnabled() {
+  const url = getDatabaseUrl();
+  return url.startsWith("https://") &&
+    (url.includes("firebaseio.com") || url.includes("firebasedatabase.app"));
+}
+
+function getDatabaseUrl() {
+  return String(FIREBASE_RTDB_URL || "").replace(/\/$/, "");
+}
 
 function getDailyRatingKey() {
   const elapsed = Date.now() - LAST_CHANGE;
@@ -2331,7 +2348,7 @@ function getVoterId() {
         (`${Date.now()}-${Math.random().toString(16).slice(2)}`);
       localStorage.setItem(VOTER_ID_KEY, id);
     }
-    return id;
+    return String(id).replace(/[.#$\[\]\/]/g, "-");
   } catch (e) {
     return "local-voter";
   }
@@ -2362,9 +2379,6 @@ function getRatings() {
       ? data.votes
       : {};
 
-    /*
-     * Migrate the old per-browser ratings array, if present.
-     */
     if (Array.isArray(data.ratings) && data.myRating != null && votes[voterId] == null) {
       votes[voterId] = data.myRating;
     }
@@ -2411,9 +2425,50 @@ function getRealScore(data) {
   return { average, voteCount };
 }
 
-function updateRatingUI() {
+function liveVotesUrl(dayKey) {
+  return `${getDatabaseUrl()}/daily-chonk-votes/${encodeURIComponent(dayKey)}/voters.json`;
+}
+
+function liveVoteUrl(dayKey, voterId) {
+  return `${getDatabaseUrl()}/daily-chonk-votes/${encodeURIComponent(dayKey)}/voters/${encodeURIComponent(voterId)}.json`;
+}
+
+async function fetchLiveVotes(dayKey) {
+  const response = await fetch(liveVotesUrl(dayKey));
+  if (!response.ok) {
+    throw new Error(`Could not load votes (${response.status})`);
+  }
+  const payload = await response.json();
+  if (!payload || typeof payload !== "object") return {};
+  return payload;
+}
+
+function mergeLiveVotes(dayKey, liveVotes) {
   const data = getRatings();
-  const score = getRealScore(data);
+  const voterId = getVoterId();
+  data.key = dayKey;
+  data.votes = {};
+
+  Object.entries(liveVotes || {}).forEach(([id, value]) => {
+    const rating = Number(value);
+    if (Number.isFinite(rating) && rating >= 1 && rating <= 5) {
+      data.votes[id] = rating;
+    }
+  });
+
+  if (data.votes[voterId] != null) {
+    data.myRating = Number(data.votes[voterId]);
+  } else {
+    data.myRating = null;
+  }
+
+  saveRatings(data);
+  return data;
+}
+
+function updateRatingUI(data) {
+  const current = data || getRatings();
+  const score = getRealScore(current);
 
   if (score.voteCount === 0) {
     ratingAverageEl.textContent = "No votes yet";
@@ -2430,20 +2485,46 @@ function updateRatingUI() {
 
     button.classList.toggle(
       "selected",
-      data.myRating !== null && rating <= data.myRating
+      current.myRating !== null && rating <= current.myRating
     );
   });
 
-  if (data.myRating !== null) {
+  if (!isLiveVotingEnabled()) {
+    ratingStatusEl.textContent = current.myRating !== null
+      ? `You rated this fit ${current.myRating}/5. Live community votes need the Firebase URL.`
+      : "Tap a star to rate today's fit. Community totals need the Firebase URL.";
+    return;
+  }
+
+  if (current.myRating !== null) {
     ratingStatusEl.textContent =
-      `You rated this fit ${data.myRating}/5.`;
+      `You rated this fit ${current.myRating}/5.`;
   } else {
     ratingStatusEl.textContent =
       "Tap a star to rate today's fit.";
   }
 }
 
-function submitRating(rating) {
+async function loadLiveVotes() {
+  const key = getDailyRatingKey();
+
+  if (!isLiveVotingEnabled()) {
+    updateRatingUI();
+    return;
+  }
+
+  try {
+    const liveVotes = await fetchLiveVotes(key);
+    updateRatingUI(mergeLiveVotes(key, liveVotes));
+  } catch (e) {
+    console.warn("Could not load live Daily Chonk votes.", e);
+    updateRatingUI();
+    ratingStatusEl.textContent =
+      "Could not reach the live vote count. Showing what this browser has.";
+  }
+}
+
+async function submitRating(rating) {
   const data = getRatings();
   const voterId = getVoterId();
 
@@ -2451,7 +2532,26 @@ function submitRating(rating) {
   data.myRating = rating;
 
   saveRatings(data);
-  updateRatingUI();
+  updateRatingUI(data);
+
+  if (!isLiveVotingEnabled()) return;
+
+  try {
+    const response = await fetch(liveVoteUrl(data.key, voterId), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(rating)
+    });
+    if (!response.ok) {
+      throw new Error(`Could not save vote (${response.status})`);
+    }
+    const liveVotes = await fetchLiveVotes(data.key);
+    updateRatingUI(mergeLiveVotes(data.key, liveVotes));
+  } catch (e) {
+    console.warn("Could not save live Daily Chonk vote.", e);
+    ratingStatusEl.textContent =
+      "Your rating is saved on this device, but the live count could not be updated.";
+  }
 }
 
 /*
@@ -2493,7 +2593,7 @@ starRating.addEventListener("mouseleave", () => {
 /*
  * Load the current rating when the page opens.
  */
-updateRatingUI();
+loadLiveVotes();
 
 loadChonk();
 tick();
