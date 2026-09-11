@@ -567,6 +567,205 @@ body.chonk-mode-active #chonk-background {
       z-index: 10;
     }
 
+    /* ========== DISCO BALL (Chonk Mode) ========== */
+    .disco-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 14;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      overflow: hidden;
+      border-radius: 11px;
+    }
+
+    body.chonk-mode-active .disco-overlay {
+      opacity: 1;
+    }
+
+    .disco-ball {
+      position: absolute;
+      top: 8%;
+      left: 50%;
+      width: 64px;
+      height: 64px;
+      margin-left: -32px;
+      z-index: 16;
+    }
+
+    /* Hang wire (does not rotate) */
+    .disco-ball::after {
+      content: "";
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      width: 3px;
+      height: 22px;
+      margin-left: -1.5px;
+      background: linear-gradient(to bottom, #555, #999);
+      border-radius: 2px;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Spinning sphere */
+    .disco-ball::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 32% 28%, #ffffff 0%, #e8e8e8 12%, #b0b0b0 28%, #707070 55%, #303030 100%);
+      box-shadow:
+        inset -6px -8px 14px rgba(0, 0, 0, 0.45),
+        inset 4px 4px 10px rgba(255, 255, 255, 0.35),
+        0 0 22px rgba(255, 255, 255, 0.45),
+        0 0 48px rgba(255, 207, 74, 0.4),
+        0 0 70px rgba(255, 100, 200, 0.2);
+      animation: discoBallSpin 2.8s linear infinite;
+    }
+
+    /* Facet pattern layered on the sphere */
+    .disco-facets {
+      position: absolute;
+      inset: 6%;
+      border-radius: 50%;
+      background:
+        repeating-conic-gradient(
+          from 0deg,
+          rgba(255, 255, 255, 0.85) 0deg 4deg,
+          rgba(200, 200, 200, 0.5) 4deg 8deg,
+          rgba(120, 120, 120, 0.7) 8deg 12deg,
+          rgba(60, 60, 60, 0.6) 12deg 16deg
+        );
+      opacity: 0.85;
+      mix-blend-mode: overlay;
+      animation: discoBallSpin 2.8s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes discoBallSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Moving disco light spots that sweep across the Chonk */
+    .disco-light {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      filter: blur(7px);
+      opacity: 0;
+      animation: discoLightSweep 3.2s ease-in-out infinite;
+    }
+
+    body.chonk-mode-active .disco-light {
+      opacity: 1;
+    }
+
+    .disco-light:nth-child(2) {
+      background: radial-gradient(circle, #ffb3d1 0%, #ff8fbb 40%, transparent 72%);
+      top: 22%;
+      left: 18%;
+      animation-delay: 0s;
+      animation-duration: 2.6s;
+    }
+    .disco-light:nth-child(3) {
+      background: radial-gradient(circle, #9bf0e8 0%, #5ee0d4 40%, transparent 72%);
+      top: 38%;
+      left: 62%;
+      width: 40px;
+      height: 40px;
+      animation-delay: 0.4s;
+      animation-duration: 3.1s;
+    }
+    .disco-light:nth-child(4) {
+      background: radial-gradient(circle, #fff3a0 0%, #ffe66d 40%, transparent 72%);
+      top: 55%;
+      left: 30%;
+      width: 26px;
+      height: 26px;
+      animation-delay: 0.9s;
+      animation-duration: 2.4s;
+    }
+    .disco-light:nth-child(5) {
+      background: radial-gradient(circle, #d4c1ff 0%, #b8a0ff 40%, transparent 72%);
+      top: 28%;
+      left: 72%;
+      width: 36px;
+      height: 36px;
+      animation-delay: 1.3s;
+      animation-duration: 3.4s;
+    }
+    .disco-light:nth-child(6) {
+      background: radial-gradient(circle, #ffc48a 0%, #ffb060 40%, transparent 72%);
+      top: 68%;
+      left: 48%;
+      width: 30px;
+      height: 30px;
+      animation-delay: 0.6s;
+      animation-duration: 2.9s;
+    }
+    .disco-light:nth-child(7) {
+      background: radial-gradient(circle, #8ae8ff 0%, #4dd8ff 40%, transparent 72%);
+      top: 45%;
+      left: 12%;
+      width: 28px;
+      height: 28px;
+      animation-delay: 1.7s;
+      animation-duration: 2.7s;
+    }
+
+    @keyframes discoLightSweep {
+      0% {
+        transform: translate(0, 0) scale(0.7);
+        opacity: 0.35;
+      }
+      25% {
+        transform: translate(40px, -25px) scale(1.2);
+        opacity: 1;
+      }
+      50% {
+        transform: translate(-30px, 35px) scale(0.95);
+        opacity: 0.8;
+      }
+      75% {
+        transform: translate(55px, 20px) scale(1.3);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(0, 0) scale(0.7);
+        opacity: 0.35;
+      }
+    }
+
+    /* Darken the main Chonk in Chonk Mode so the disco ball & lights stand out */
+    body.chonk-mode-active #chonk-image,
+    body.chonk-mode-active #chonk-3d-canvas.loaded {
+      filter: brightness(0.62) contrast(1.08) saturate(1.1);
+      transition: filter 0.5s ease;
+    }
+
+    /* Soft dark vignette over the stage while disco is on */
+    body.chonk-mode-active .image-wrap::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 11px;
+      background:
+        radial-gradient(
+          ellipse at 50% 40%,
+          transparent 25%,
+          rgba(0, 0, 0, 0.35) 70%,
+          rgba(0, 0, 0, 0.55) 100%
+        );
+      pointer-events: none;
+      z-index: 5;
+      transition: opacity 0.5s ease;
+    }
+
     #chonk-image {
       width: min(100%, 650px);
       max-height: 580px;
@@ -1069,6 +1268,19 @@ body.chonk-mode-active #chonk-background {
   <img id="chonk-image" alt="Today’s Daily Chonk outfit" hidden />
   <canvas id="chonk-3d-canvas"></canvas>
   <div id="rotate-hint" class="rotate-hint">↔ DRAG TO ROTATE · SCROLL TO ZOOM</div>
+
+  <!-- Disco ball overlay (visible only in Chonk Mode) -->
+  <div class="disco-overlay" aria-hidden="true">
+    <div class="disco-ball">
+      <div class="disco-facets"></div>
+    </div>
+    <div class="disco-light"></div>
+    <div class="disco-light"></div>
+    <div class="disco-light"></div>
+    <div class="disco-light"></div>
+    <div class="disco-light"></div>
+    <div class="disco-light"></div>
+  </div>
 </div>
 
 <div class="rating-section">
