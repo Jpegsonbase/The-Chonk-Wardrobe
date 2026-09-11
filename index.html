@@ -920,10 +920,12 @@ body.chonk-mode-active #chonk-background {
       overflow: hidden;
       border: 1px solid var(--line);
       color: var(--ink);
-      display: block;
+      display: flex;
+      align-items: center;
+      gap: 12px;
       font-size: 15px;
       line-height: 15px;
-      padding: 18px 18px 17px;
+      padding: 10px 14px 10px 10px;
       text-decoration: none;
       cursor: pointer;
       background: var(--progress-bg);
@@ -933,13 +935,42 @@ body.chonk-mode-active #chonk-background {
       border-radius: 10px;
       min-height: 52px;
     }
-    .trait span:first-child {
+
+    .trait-thumb {
+      position: relative;
+      z-index: 10;
+      flex: 0 0 40px;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      border: 2px solid var(--line);
+      background: #fff;
+      object-fit: contain;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    .trait-thumb.placeholder {
+      background:
+        linear-gradient(135deg, var(--accent-soft) 25%, transparent 25%) -4px 0 / 8px 8px,
+        linear-gradient(225deg, var(--accent-soft) 25%, transparent 25%) -4px 0 / 8px 8px,
+        linear-gradient(315deg, var(--accent-soft) 25%, transparent 25%) 0 0 / 8px 8px,
+        linear-gradient(45deg, var(--accent-soft) 25%, var(--progress-bg) 25%) 0 0 / 8px 8px;
+    }
+
+    .trait-name {
       position: relative;
       transition: color 600ms cubic-bezier(0.48, 0, 0.12, 1);
       z-index: 10;
       font-weight: 950;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
-    .trait span:last-child {
+
+    .trait-cta {
       color: white;
       display: block;
       position: absolute;
@@ -954,6 +985,7 @@ body.chonk-mode-active #chonk-background {
       line-height: 13px;
       font-weight: 950;
       white-space: nowrap;
+      pointer-events: none;
     }
     .trait:after {
       content: "";
@@ -972,13 +1004,13 @@ body.chonk-mode-active #chonk-background {
       transform-origin: bottom center;
       transform: skewY(9.3deg) scaleY(2);
     }
-    .trait:hover span:last-child {
+    .trait:hover .trait-cta {
       color: #191919;
       transform: translateX(-50%) translateY(-50%);
       opacity: 1;
       transition: all 900ms cubic-bezier(0.48, 0, 0.12, 1);
     }
-    .trait:hover span:first-child { color: #191919; }
+    .trait:hover .trait-name { color: #191919; }
 
     .about { margin-top: 30px; padding: 30px; }
     .about-inner { max-width: 820px; }
@@ -1391,25 +1423,39 @@ body.chonk-mode-active #chonk-background {
   (() => {
     const CHONK_ID = 30000;
     const CONTRACT = "0x07152bfde079b5319e5308c43fb1dbc9c76cb4f9";
+    const TRAITS_CURRENT = "0x74D8725A65C21251A83f6647aa23140Bd80504b1";
+    const TRAITS_LEGACY = "0x6B8f34E0559aa9A5507e74aD93374D9745CdbF09";
+    const LEGACY_TRAIT_MAX = 340646; // traits below this live on the legacy contract
     const RPC = "https://mainnet.base.org";
     const LAST_CHANGE = Date.parse("2026-09-06T18:40:34Z");
     const CYCLE = 24 * 60 * 60 * 1000;
     const TRAIT_PAGE_BASE = "https://www.chonks.xyz/traits/";
-   
 
     const CATEGORY_NUM = {
       head: 1, hair: 2, face: 3, accessory: 4,
       top: 5, bottoms: 6, bottom: 6, pants: 6, shoes: 7, shoe: 7
     };
 
+    const CATEGORY_KEYS = [
+      "headId", "hairId", "faceId", "accessoryId",
+      "topId", "bottomId", "shoesId"
+    ];
+
     const abi = [
       "function tokenURI(uint256) view returns (string)",
       "function renderAsDataUri2D(uint256) view returns (string)",
-      "function renderAsDataUri3D(uint256) view returns (string)"
+      "function renderAsDataUri3D(uint256) view returns (string)",
+      "function getChonk(uint256) view returns (tuple(uint256 tokenId, uint256 headId, uint256 hairId, uint256 faceId, uint256 accessoryId, uint256 topId, uint256 bottomId, uint256 shoesId, uint8 bodyIndex, string backgroundColor, bool render3D))"
+    ];
+
+    const traitsAbi = [
+      "function tokenURI(uint256) view returns (string)"
     ];
 
     const provider = new ethers.JsonRpcProvider(RPC);
     const contract = new ethers.Contract(CONTRACT, abi, provider);
+    const traitsCurrent = new ethers.Contract(TRAITS_CURRENT, traitsAbi, provider);
+    const traitsLegacy = new ethers.Contract(TRAITS_LEGACY, traitsAbi, provider);
 
     const image = document.getElementById("chonk-image");
     const loading = document.getElementById("loading");
@@ -1856,18 +1902,104 @@ function generateOutfitName(top, head, face, accessory) {
       }[c]));
     }
 
-    function showTraits(json) {
+    /* ---- Trait thumbs via Chonks indexer (same source as chonks.xyz / ztudio data) ---- */
+    const INDEXER = "https://indexer.chonks.xyz";
+
+    // colorMap is hex chunks of (x,y,rrggbb) — same format Chonks uses on-site
+    function colorMapToSvgDataUri(colorMap) {
+      if (!colorMap || typeof colorMap !== "string") return null;
+      let hex = colorMap.trim();
+      if (hex.startsWith("0x") || hex.startsWith("0X")) hex = hex.slice(2);
+      if (hex.length < 10 || hex.length % 10 !== 0) return null;
+
+      const rects = [];
+      let minX = 29, minY = 29, maxX = 0, maxY = 0;
+
+      for (let i = 0; i < hex.length; i += 10) {
+        const x = parseInt(hex.slice(i, i + 2), 16);
+        const y = parseInt(hex.slice(i + 2, i + 4), 16);
+        const r = parseInt(hex.slice(i + 4, i + 6), 16);
+        const g = parseInt(hex.slice(i + 6, i + 8), 16);
+        const b = parseInt(hex.slice(i + 8, i + 10), 16);
+        if (Number.isNaN(x) || Number.isNaN(y)) continue;
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+        rects.push(
+          `<rect x="${x}" y="${y}" width="1" height="1" fill="rgb(${r},${g},${b})"/>`
+        );
+      }
+
+      if (!rects.length) return null;
+
+      const pad = 1;
+      const viewX = Math.max(0, minX - pad);
+      const viewY = Math.max(0, minY - pad);
+      const viewW = Math.max(1, maxX - minX + 1 + pad * 2);
+      const viewH = Math.max(1, maxY - minY + 1 + pad * 2);
+
+      const svg =
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewX} ${viewY} ${viewW} ${viewH}" shape-rendering="crispEdges">` +
+        `<rect x="${viewX}" y="${viewY}" width="${viewW}" height="${viewH}" fill="#f7f1e7"/>` +
+        rects.join("") +
+        `</svg>`;
+
+      return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+    }
+
+    async function fetchTraitColorMap(traitName) {
+      if (!traitName) return null;
+      try {
+        const url = `${INDEXER}/trait/colormap/${encodeURIComponent(traitName)}`;
+        const res = await fetch(url, { cache: "force-cache" });
+        if (!res.ok) return null;
+        const json = await res.json();
+        if (!json?.success || !json?.data?.colorMap) return null;
+        return json.data.colorMap;
+      } catch (err) {
+        console.warn("Indexer colormap fetch failed for", traitName, err);
+        return null;
+      }
+    }
+
+    async function fetchTraitImagesByNames(attrs) {
+      const results = {};
+      await Promise.all(
+        (attrs || []).map(async (a) => {
+          const value = String(a.value ?? "").trim();
+          if (!value || value === "—") return;
+          const typeKey = String(a.trait_type || "").trim().toLowerCase();
+          if (["body", "body type", "background", "background color"].includes(typeKey)) {
+            return;
+          }
+          const colorMap = await fetchTraitColorMap(value);
+          const image = colorMapToSvgDataUri(colorMap);
+          if (image) results[value.toLowerCase()] = image;
+        })
+      );
+      return results;
+    }
+
+    function showTraits(json, imageByValue = {}) {
       traitsEl.innerHTML = "";
       const attrs = Array.isArray(json.attributes) ? json.attributes : [];
       updateOutfitName(attrs);
+
       if (!attrs.length) {
-        traitsEl.innerHTML = `<div class="trait"><span>Source</span><span>Onchain</span></div>`;
+        traitsEl.innerHTML = `<div class="trait"><span class="trait-name">Source</span><span class="trait-cta">Onchain</span></div>`;
         return;
       }
+
       attrs.forEach(a => {
         const type = a.trait_type ?? "Trait";
         const value = String(a.value ?? "—");
         const href = resolveTraitPageUrl(type, value);
+        const image = imageByValue[value.toLowerCase()] || null;
+        const thumbHtml = image
+          ? `<img class="trait-thumb" src="${image}" alt="" width="40" height="40" loading="lazy" />`
+          : `<div class="trait-thumb placeholder" aria-hidden="true"></div>`;
+
         if (href) {
           const link = document.createElement("a");
           link.className = "trait";
@@ -1875,15 +2007,13 @@ function generateOutfitName(top, head, face, accessory) {
           link.target = "_blank";
           link.rel = "noopener";
           link.title = `Browse ${value} traits on Chonks`;
-          link.innerHTML = `<span>${escapeHtml(value)}</span><span>Buy Trait</span>`;
+          link.innerHTML = `${thumbHtml}<span class="trait-name">${escapeHtml(value)}</span><span class="trait-cta">Buy Trait</span>`;
           traitsEl.appendChild(link);
         } else {
           const row = document.createElement("div");
           row.className = "trait";
           row.style.cursor = "default";
-          row.innerHTML = `<span>${escapeHtml(type)}</span><span>${escapeHtml(value)}</span>`;
-          row.style.overflow = "visible";
-          row.style.background = "var(--progress-bg)";
+          row.innerHTML = `${thumbHtml}<span class="trait-name">${escapeHtml(type)}: ${escapeHtml(value)}</span>`;
           traitsEl.appendChild(row);
         }
       });
@@ -2083,10 +2213,17 @@ function generateOutfitName(top, head, face, accessory) {
           ? { zMapFull: extracted.zMapFull, bgColor: extracted.bgColor }
           : null;
 
-        if (parsed2D.metadata && Array.isArray(parsed2D.metadata.attributes)) {
-          showTraits(parsed2D.metadata);
-        } else if (extracted.metadata && Array.isArray(extracted.metadata.attributes)) {
-          showTraits(extracted.metadata);
+        const meta =
+          (parsed2D.metadata && Array.isArray(parsed2D.metadata.attributes) && parsed2D.metadata) ||
+          (extracted.metadata && Array.isArray(extracted.metadata.attributes) && extracted.metadata) ||
+          { attributes: [] };
+
+        // Show traits immediately, then fill in thumbs from the indexer
+        showTraits(meta, {});
+        if (meta.attributes?.length) {
+          fetchTraitImagesByNames(meta.attributes).then((imageByValue) => {
+            if (Object.keys(imageByValue).length) showTraits(meta, imageByValue);
+          });
         }
 
         if (!cached3DMeta) {
