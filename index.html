@@ -832,7 +832,16 @@
 
     /* ========== RESPONSIVE ========== */
     @media (max-width: 960px) {
-      .panels { grid-template-columns: 1fr; }
+      /* Single column: fit card, rating, name entry, traits, experiment, Chonkit */
+      .wrap { display: flex; flex-direction: column; }
+      .panels, .panel-col { display: contents; }
+      .fit-card { order: 1; }
+      .rating-section { order: 2; margin-top: 20px; }
+      .name-entry { order: 3; margin-top: 20px; }
+      .traits-panel { order: 4; margin-top: 20px; }
+      .about { order: 5; margin-top: 20px; }
+      .promo { order: 6; margin-top: 20px; flex: none; }
+      footer { order: 7; }
     }
     @media (max-width: 900px) {
       .hero { grid-template-columns: 1fr; gap: 32px; padding-bottom: 40px; }
@@ -960,7 +969,7 @@
     </section>
 
     <div class="panels">
-      <section class="panel">
+      <section class="panel traits-panel">
         <div class="step-head"><span class="n" style="--c: #A9C2FF">1</span><h2>Today's traits</h2></div>
         <p class="note">Pulled from the backpack. Tap one to find it on Chonks.</p>
         <div id="traits" class="traits">
