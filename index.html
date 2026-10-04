@@ -315,6 +315,7 @@
       flex: 0 0 auto;
     }
     .n.wide { width: auto; padding: 0 8px; }
+    .num-mob { display: none; }
     .step-head .val {
       margin-left: auto;
       font-weight: 500;
@@ -835,6 +836,8 @@
       /* Single column: fit card, rating, name entry, traits, experiment, Chonkit */
       .wrap { display: flex; flex-direction: column; }
       .panels, .panel-col { display: contents; }
+      .num-desk { display: none; }
+      .num-mob { display: inline; }
       .fit-card { order: 1; }
       .rating-section { order: 2; margin-top: 20px; }
       .name-entry { order: 3; margin-top: 20px; }
@@ -970,7 +973,7 @@
 
     <div class="panels">
       <section class="panel traits-panel">
-        <div class="step-head"><span class="n" style="--c: #A9C2FF">1</span><h2>Today's traits</h2></div>
+        <div class="step-head"><span class="n" style="--c: #A9C2FF"><span class="num-desk">1</span><span class="num-mob">2</span></span><h2>Today's traits</h2></div>
         <p class="note">Pulled from the backpack. Tap one to find it on Chonks.</p>
         <div id="traits" class="traits">
           <div class="trait"><span class="trait-thumb placeholder" aria-hidden="true"></span><span class="trait-name">Wardrobe</span><span class="trait-cta">On the way…</span></div>
@@ -980,7 +983,7 @@
       <div class="panel-col">
         <section class="panel rating-section">
           <div class="step-head">
-            <span class="n" style="--c: #FF9ECB">2</span>
+            <span class="n" style="--c: #FF9ECB"><span class="num-desk">2</span><span class="num-mob">1</span></span>
             <h2>Rate the fit</h2>
             <span id="rating-average" class="val">Daily score</span>
           </div>
