@@ -732,6 +732,12 @@
       transition: background 0.15s;
     }
     .promo:hover .promo-cta { background: var(--blue-press); }
+    .promo.is-soon { cursor: default; }
+    .promo.is-soon:hover { transform: none; box-shadow: none; }
+    .promo.is-soon .promo-art img { filter: grayscale(1); opacity: 0.55; }
+    .promo.is-soon .promo-title { color: var(--muted); }
+    .promo.is-soon .promo-cta,
+    .promo.is-soon:hover .promo-cta { background: var(--soft); color: var(--muted); }
 
     /* ========== ABOUT ========== */
     .about {
@@ -992,16 +998,18 @@
           </form>
           <p id="name-entry-status" class="name-entry-status">First hour only. One random name gets picked.</p>
         </section>
-        <!-- Chonkit promo: remove "hidden" below to show it -->
-        <a class="promo" hidden href="https://chonkit.xyz/" target="_blank" rel="noopener">
+        <!-- Chonkit promo (coming soon). To launch: change this <div> back to
+             <a class="promo" href="https://chonkit.xyz/" target="_blank" rel="noopener">,
+             the closing </div> to </a>, drop "is-soon", and set the button text to "Try Chonkit ↗". -->
+        <div class="promo is-soon" aria-label="Chonkit, coming soon">
           <span class="promo-art"><img src="https://chonkit.xyz/og.png?v=3" alt="A picture rebuilt as a mosaic of Chonks" loading="lazy" /></span>
           <span class="promo-body">
-            <span class="promo-tag">Also by @jpegsonbase</span>
+            <span class="promo-tag">Coming soon from @jpegsonbase</span>
             <span class="promo-title">Turn any picture into Chonks</span>
             <span class="promo-text">Drop in an image and Chonkit rebuilds it as a mosaic made from the whole collection. Free, and it runs in your browser.</span>
-            <span class="promo-cta">Try Chonkit ↗</span>
+            <span class="promo-cta">Coming soon</span>
           </span>
-        </a>
+        </div>
       </div>
     </div>
 
