@@ -2247,8 +2247,10 @@ function getDatabaseUrl() {
 function getDailyRatingKey() {
   const elapsed = Date.now() - LAST_CHANGE;
   const dayNumber = Math.floor(elapsed / CYCLE);
-
-  return `daily-chonk-${dayNumber}`;
+  // Key each outfit by its start time (UTC), so moving LAST_CHANGE never
+  // reuses an old day's votes, names or outfit lock.
+  const start = new Date(LAST_CHANGE + dayNumber * CYCLE).toISOString();
+  return `daily-chonk-${start.slice(0, 10)}-${start.slice(11, 13)}${start.slice(14, 16)}`;
 }
 
 function getOutfitNumber() {
