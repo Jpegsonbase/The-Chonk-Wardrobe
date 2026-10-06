@@ -733,7 +733,7 @@
       transition: background 0.15s;
     }
     .promo:hover .promo-cta { background: var(--blue-press); }
-    .promo.is-soon { cursor: default; }
+    .promo.is-soon { cursor: default; pointer-events: none; }
     .promo.is-soon:hover { transform: none; box-shadow: none; }
     .promo.is-soon .promo-art img { filter: grayscale(1); opacity: 0.55; }
     .promo.is-soon .promo-title { color: var(--muted); }
@@ -1010,18 +1010,17 @@
           </form>
           <p id="name-entry-status" class="name-entry-status">First hour only. One random name gets picked.</p>
         </section>
-        <!-- Chonkit promo (coming soon). To launch: change this <div> back to
-             <a class="promo" href="https://chonkit.xyz/" target="_blank" rel="noopener">,
-             the closing </div> to </a>, drop "is-soon", and set the button text to "Try Chonkit ↗". -->
-        <div class="promo is-soon" aria-label="Chonkit, coming soon">
+        <!-- Chonkit promo. Greyed out and not clickable until CHONKIT_LAUNCH
+             (set in the script), then it switches to a live link on its own. -->
+        <a class="promo is-soon" id="chonkit-promo" href="https://chonkit.xyz/" target="_blank" rel="noopener" aria-disabled="true" tabindex="-1">
           <span class="promo-art"><img src="https://chonkit.xyz/og.png?v=3" alt="A picture rebuilt as a mosaic of Chonks" loading="lazy" /></span>
           <span class="promo-body">
-            <span class="promo-tag">Coming soon from @jpegsonbase</span>
+            <span class="promo-tag" id="chonkit-promo-tag">Coming soon from @jpegsonbase</span>
             <span class="promo-title">Turn any picture into Chonks</span>
             <span class="promo-text">Drop in an image and Chonkit rebuilds it as a mosaic made from the whole collection. Free, and it runs in your browser.</span>
-            <span class="promo-cta">Coming soon</span>
+            <span class="promo-cta" id="chonkit-promo-cta">Coming soon</span>
           </span>
-        </div>
+        </a>
       </div>
     </div>
 
@@ -2643,6 +2642,31 @@ setInterval(tick, 1000);
 
 
   })();
+  </script>
+  <script>
+/* Chonkit promo: goes live at launch (11pm UK time, 6 Oct 2026). */
+const CHONKIT_LAUNCH = Date.parse("2026-10-06T22:00:00Z");
+function launchChonkitPromo() {
+  const promo = document.getElementById("chonkit-promo");
+  if (!promo) return;
+  promo.classList.remove("is-soon");
+  promo.removeAttribute("aria-disabled");
+  promo.removeAttribute("tabindex");
+  const tag = document.getElementById("chonkit-promo-tag");
+  const cta = document.getElementById("chonkit-promo-cta");
+  if (tag) tag.textContent = "Also by @jpegsonbase";
+  if (cta) cta.textContent = "Try Chonkit ↗";
+}
+function blockSoonPromoClick(event) {
+  if (event.currentTarget.classList.contains("is-soon")) event.preventDefault();
+}
+(function scheduleChonkitPromo() {
+  const promo = document.getElementById("chonkit-promo");
+  if (promo) promo.addEventListener("click", blockSoonPromoClick);
+  const wait = CHONKIT_LAUNCH - Date.now();
+  if (wait <= 0) launchChonkitPromo();
+  else setTimeout(launchChonkitPromo, Math.min(wait, 2147483647));
+})();
   </script>
 </body>
 </html>
