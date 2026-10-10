@@ -42,6 +42,16 @@
       document.documentElement.setAttribute("data-theme", theme);
     })();
   </script>
+  <!-- Halloween: purple and pumpkin theme, BatFont titles and bats on load, like chonkit.xyz.
+       Switches itself off at midnight UK time on 1 Nov 2026. -->
+  <script>
+    (function () {
+      var HALLOWEEN_END = Date.parse("2026-11-01T00:00:00Z");
+      if (Date.now() < HALLOWEEN_END) document.documentElement.classList.add("halloween");
+    })();
+  </script>
+  <link rel="stylesheet" href="theme-halloween.css?v=1" />
+  <script src="halloween-bats.js?v=1" defer></script>
 
   <link
     rel="icon"
@@ -883,7 +893,7 @@
   <div class="wrap">
 
     <nav>
-      <a class="logo" href="./"><i aria-hidden="true"><b class="px-o"></b><b class="px-o"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-o"></b><b class="px-o"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-o"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-r"></b><b class="px-y"></b><b class="px-y"></b><b class="px-w"></b><b class="px-k"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-w"></b><b class="px-k"></b><b class="px-y"></b><b class="px-r"></b><b class="px-y"></b><b class="px-y"></b><b class="px-w"></b><b class="px-k"></b><b class="px-r"></b><b class="px-r"></b><b class="px-r"></b><b class="px-w"></b><b class="px-k"></b><b class="px-y"></b><b class="px-o"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-o"></b><b class="px-o"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-o"></b></i>Daily Chonk</a>
+      <a class="logo" href="./"><svg class="logo-witch" viewBox="0 0 11 12" shape-rendering="crispEdges" aria-hidden="true"><path fill="#7B3FE4" d="M6 0h1v1h-1zM5 1h2v1h-2zM4 2h4v1h-4zM3 3h1v1h-1zM7 3h1v1h-1zM0 4h11v1h-11z"></path><path fill="#FF8A1F" d="M4 3h3v1h-3z"></path><path fill="#FDCB58" d="M2 5h8v1h-8zM1 6h10v5h-10zM2 11h8v1h-8z"></path><path fill="#F4900C" d="M0 8h1v2h-1zM5 9h3v1h-3z"></path><path fill="#E6E7E8" d="M3 8h1v2h-1zM8 8h1v2h-1z"></path><path fill="#31373D" d="M4 8h1v2h-1zM9 8h1v2h-1z"></path></svg><i aria-hidden="true"><b class="px-o"></b><b class="px-o"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-o"></b><b class="px-o"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-o"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-r"></b><b class="px-y"></b><b class="px-y"></b><b class="px-w"></b><b class="px-k"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-w"></b><b class="px-k"></b><b class="px-y"></b><b class="px-r"></b><b class="px-y"></b><b class="px-y"></b><b class="px-w"></b><b class="px-k"></b><b class="px-r"></b><b class="px-r"></b><b class="px-r"></b><b class="px-w"></b><b class="px-k"></b><b class="px-y"></b><b class="px-o"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-o"></b><b class="px-o"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-o"></b></i>Daily Chonk</a>
       <div class="nav-right">
         <a class="chain-pill" href="https://basescan.org/address/0x07152bfde079b5319e5308c43fb1dbc9c76cb4f9" target="_blank" rel="noopener"><span class="live-dot" aria-hidden="true"></span>Live on Base</a>
         <label class="theme-btn">

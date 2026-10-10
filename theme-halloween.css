@@ -1,0 +1,95 @@
+/* Halloween theme: purple and pumpkin orange, matching chonkit.xyz.
+   Every rule here only applies while <html> has the "halloween" class.
+   The small script in index.html's <head> adds that class until
+   HALLOWEEN_END (midnight UK time, 1 Nov 2026), so it switches itself off.
+   To remove it for good: delete this file, halloween-bats.js, fonts/batfont.woff2,
+   and the lines marked "Halloween" in index.html. */
+
+html.halloween {
+  --paper: #FAF6FF;
+  --surface: #FFFFFF;
+  --ink: #1E1030;
+  --muted: #625577;
+  --line: #E8E0F2;
+  --soft: #F3ECFA;
+  --blue: #C2410C;          /* the site's main accent, now pumpkin */
+  --blue-press: #9A3412;
+  --pink: #7B3FE4;
+  --yellow: #FF8A1F;
+  --mint: #A77BF3;
+  --violet: #7B3FE4;
+  --wall: #F1EAF8;
+  --btn-disabled: #D8C7E8;
+  --btn-disabled-ink: #FFFFFF;
+  --quiet-hover: #EDE3F7;
+  --quiet-disabled-ink: #B3A6C4;
+  --glass: rgba(255, 255, 255, .93);
+  --shadow: rgba(30, 16, 48, .35);
+  --shadow-soft: rgba(30, 16, 48, .14);
+  --chip1: #FFE8D6; --chip2: #EFE4FF; --chip3: #FFF0DC; --chip4: #EEE6FA;
+  --star-off: #DCCFEA;
+  --bat: #2A1B3D;
+  --display: "BatFont", "Unbounded", "Arial Black", sans-serif;
+}
+
+html.halloween[data-theme="dark"] {
+  --paper: #120C1C;
+  --surface: #1C1428;
+  --ink: #F3EBDD;
+  --muted: #A99DBB;
+  --line: #2F2442;
+  --soft: #241A33;
+  --blue: #FF7A1A;
+  --blue-press: #E8650A;
+  --pink: #9B5CFF;
+  --yellow: #FF8A1F;
+  --mint: #B48CFF;
+  --violet: #9B5CFF;
+  --wall: #150F20;
+  --warn: #FF8FB0;
+  --btn-disabled: #3A2D4F;
+  --btn-disabled-ink: #8E80A3;
+  --quiet-hover: #2F2442;
+  --quiet-disabled-ink: #64587A;
+  --glass: rgba(28, 20, 40, .9);
+  --shadow: rgba(0, 0, 0, .6);
+  --shadow-soft: rgba(0, 0, 0, .35);
+  --chip1: #3D2414; --chip2: #2E1E4A; --chip3: #3D2A10; --chip4: #2A1F45;
+  --star-off: #3A2D4F;
+  --bat: #7E5DB8;
+}
+
+/* Bright orange needs dark text in dark mode */
+html.halloween[data-theme="dark"] .btn:not(.quiet):not(:disabled),
+html.halloween[data-theme="dark"] .view-button.active,
+html.halloween[data-theme="dark"] .promo:not(.is-soon) .promo-cta { color: #1A0F05; }
+
+/* Halloween title font: BatFont by J.F.Y. Daniel Gauthier (GautFonts), freeware */
+@font-face {
+  font-family: "BatFont";
+  src: url("fonts/batfont.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+/* Witch-hat Chonk logo */
+.logo .logo-witch { display: none; }
+html.halloween .logo .logo-witch { display: block; flex: none; width: 40px; height: 44px; }
+html.halloween .logo i { display: none; }
+
+/* Orange "Daily." in the headline */
+html.halloween .hero h1 .title-line:nth-child(2) { color: var(--blue); }
+
+/* Bats that fly across the page on load (halloween-bats.js) */
+.bat-layer { position: fixed; inset: 0; pointer-events: none; z-index: 60; overflow: hidden; }
+.bat { position: absolute; left: 0; top: 0; will-change: transform; }
+.bat svg { display: block; width: 100%; height: auto; fill: var(--bat, #2A1B3D); overflow: visible; }
+.bat .bat-wing { animation: bat-flap var(--flap, .2s) ease-in-out infinite alternate; }
+@keyframes bat-flap {
+  from { transform: rotate(28deg) scaleY(1); }
+  to { transform: rotate(-22deg) scaleY(.55); }
+}
+
+/* Numbered section badges in pumpkin and purple */
+html.halloween .n[style*="#A9C2FF"] { --c: #FFB37A !important; }
+html.halloween .n[style*="#FF9ECB"] { --c: #C9A8FF !important; }
