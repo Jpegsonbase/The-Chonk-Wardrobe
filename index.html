@@ -42,16 +42,6 @@
       document.documentElement.setAttribute("data-theme", theme);
     })();
   </script>
-  <!-- Halloween: purple and pumpkin theme, BatFont titles and bats on load, like chonkit.xyz.
-       Switches itself off at midnight UK time on 1 Nov 2026. -->
-  <script>
-    (function () {
-      var HALLOWEEN_END = Date.parse("2026-11-01T00:00:00Z");
-      if (Date.now() < HALLOWEEN_END) document.documentElement.classList.add("halloween");
-    })();
-  </script>
-  <link rel="stylesheet" href="theme-halloween.css?v=1" />
-  <script src="halloween-bats.js?v=1" defer></script>
 
   <link
     rel="icon"
@@ -59,9 +49,11 @@
     href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAH0CAYAAADL1t+KAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OTA0N0MzMEFBQzczMTFGMUIyOURGQTEzMzA4RjEzMzAiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OTA0N0MzMEJBQzczMTFGMUIyOURGQTEzMzA4RjEzMzAiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo5MDQ3QzMwOEFDNzMxMUYxQjI5REZBMTMzMDhGMTMzMCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo5MDQ3QzMwOUFDNzMxMUYxQjI5REZBMTMzMDhGMTMzMCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pn1WR0gAAA1+SURBVHja7N1NbBxX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"
   >
 
+  <link rel="preload" href="fonts/sangyo.woff2" as="font" type="font/woff2" crossorigin />
+  <style>@font-face { font-family: "Sangyo"; src: url("fonts/sangyo.woff2") format("woff2"); font-weight: 400 900; font-display: swap; } html { font-synthesis-weight: none; }</style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Manrope:ital,wght@0,400;0,500;0,700;1,500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:ital,wght@0,400;0,500;0,700;1,500&display=swap" rel="stylesheet" />
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
 
@@ -102,7 +94,7 @@
       --chip3: #FFF3D1;
       --chip4: #D9F8EE;
       --star-off: #D5D9EA;
-      --display: "Unbounded", "Arial Black", sans-serif;
+      --display: "Sangyo", "Arial Black", sans-serif;
       --body: "Manrope", system-ui, sans-serif;
       color-scheme: light;
     }
@@ -886,6 +878,125 @@
       #outfit-name.scrolling .outfit-name-track { animation: none; }
       * { transition: none !important; }
     }
+
+    /* =====================================================================
+       Chonky refresh, matching chonkit.xyz: Sangyo titles, thick outlines and
+       solid offset shadows like the 1px outlines in the Chonk art. Buttons are
+       keys you press down, and the Chonk hangs in a frame.
+       ===================================================================== */
+    :root {
+      --paper: #F1F3FA; --wall: #E3E7F3;
+      --edge: #12142B; --pop: #12142B; --frame: #12142B;
+      --line: #D9DDEC;
+    }
+    :root[data-theme="dark"] {
+      --paper: #0D1024; --wall: #12152C;
+      --edge: #3A427A; --pop: #262C58; --frame: #05060F;
+    }
+
+    /* titles: Sangyo is a single-weight display face */
+    .hero h1, .step-head h2, .about h2, .statement, .stat b, .loading, .promo-title, .n, .statement-badge { font-weight: 400; }
+
+    /* nav */
+    .logo { font-size: 24px; }
+    .logo .logo-mark { display: block; flex: none; width: 44px; height: 28px; }
+    .chain-pill, .theme-btn { border: 2px solid var(--edge); box-shadow: 3px 3px 0 var(--pop); }
+
+    /* buttons: chunky keys */
+    .btn {
+      border: 2px solid var(--edge); border-radius: 14px; box-shadow: 0 4px 0 var(--pop);
+      transition: background .15s, transform .08s, box-shadow .08s;
+    }
+    .btn:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 var(--pop); }
+    .btn:disabled { border-color: var(--line); box-shadow: none; }
+    .btn.quiet { background: var(--surface); box-shadow: 0 3px 0 var(--pop); }
+    .btn.quiet:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 var(--pop); }
+    .btn.quiet:disabled { background: var(--soft); border-color: var(--line); box-shadow: none; }
+
+    /* hero */
+    .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 5vw, 72px); padding: 36px 0 88px; }
+    .hero h1 { font-size: clamp(46px, 6.6vw, 96px); line-height: .94; letter-spacing: -0.01em; margin-bottom: 24px; }
+    .hero h1 .title-line:nth-child(2) { color: var(--blue); }
+    .hero p { line-height: 1.55; margin-bottom: 30px; }
+    .hero-kicker .n { border: 2px solid var(--edge); box-shadow: 2px 2px 0 var(--pop); height: 30px; font-size: 14px; }
+
+    /* the Chonk hangs in a frame */
+    .stage { margin-right: 20px; transform: rotate(1.4deg); }
+    .image-wrap {
+      border: clamp(10px, 1.2vw, 14px) solid var(--frame); border-radius: 6px;
+      box-shadow: 10px 10px 0 var(--pop);
+    }
+    .image-wrap::after {
+      left: -2px; bottom: -2px; border-radius: 0 6px 0 0;
+      background: var(--surface); border: 2px solid var(--edge); box-shadow: none; font-weight: 700;
+    }
+    .view-controls { top: 26px; right: 26px; }
+    .view-toggle { border: 2px solid var(--edge); box-shadow: 3px 3px 0 var(--pop); }
+    .view-button.active { background: var(--yellow); color: #12142B; }
+    .view-button.active:hover:not(:disabled) { background: var(--yellow); }
+
+    /* panels */
+    .panel { border: 2px solid var(--edge); box-shadow: 6px 6px 0 var(--pop); border-radius: 20px; }
+    .step-head h2 { font-size: 24px; }
+    .step-head .n {
+      width: 30px; height: 30px; border-radius: 9px; font-size: 15px; color: #12142B;
+      border: 2px solid var(--edge); box-shadow: 2px 2px 0 var(--pop);
+    }
+    #outfit-name { font-size: 24px; }
+    .bar { height: 10px; border: 2px solid var(--line); }
+    .stat { border: 2px solid var(--edge); border-radius: 12px; background: var(--surface); }
+    .stat:nth-child(1) { background: var(--chip3); }
+    .stat:nth-child(2) { background: var(--chip2); }
+    .stat:nth-child(3) { background: var(--chip1); }
+    .stat:nth-child(4) { background: var(--chip4); }
+    .stat b { font-size: 26px; }
+    .stats { gap: 10px; }
+    .trait { border: 1.5px solid var(--edge); }
+    .trait-thumb { border: 1.5px solid var(--edge); }
+    .name-row input { border: 2px solid var(--line); }
+    .name-row input:focus { border-color: var(--edge); }
+
+    /* the experiment */
+    .about { border: 2px solid var(--edge); border-radius: 22px; box-shadow: 6px 6px 0 var(--pop); }
+    .about h2 { font-size: clamp(30px, 3.6vw, 48px); }
+    .statement-card { border: 2px solid var(--edge); border-radius: 16px; box-shadow: 6px 6px 0 var(--pop); }
+    .statement-badge { border: 2px solid var(--edge); box-shadow: 2px 2px 0 var(--pop); font-size: 18px; }
+    .statement { font-size: 26px; }
+    .chips a { border: 1.5px solid var(--edge); }
+
+    /* Chonkit card: the blue card Chonkit uses for Daily Chonk, in reverse */
+    .promo { border: 2px solid var(--edge); box-shadow: 6px 6px 0 var(--pop); background: #0B3BD6; color: #FFFFFF; }
+    .promo:hover { transform: translate(-2px, -2px); box-shadow: 8px 8px 0 var(--pop); }
+    .promo-art { border-bottom: 2px solid var(--edge); }
+    .promo-tag { color: #FFE08A; font-size: 14px; }
+    .promo-title { font-size: 34px; line-height: 1.05; color: #FFFFFF; }
+    .promo-text { color: rgba(255, 255, 255, .8); }
+    .promo-cta,
+    .promo:hover .promo-cta { background: var(--yellow); color: #12142B; border: 2px solid #12142B; box-shadow: 0 3px 0 #12142B; font-weight: 800; }
+    .promo.is-soon { background: var(--soft); color: var(--muted); box-shadow: 6px 6px 0 var(--pop); }
+    .promo.is-soon .promo-tag, .promo.is-soon .promo-title, .promo.is-soon .promo-text { color: var(--muted); }
+    .promo.is-soon .promo-cta { background: var(--soft); color: var(--muted); border-color: var(--line); box-shadow: none; }
+
+    /* footer */
+    .credit { border: 2px solid var(--edge); box-shadow: 3px 3px 0 var(--pop); }
+    .credit:hover { background: var(--yellow); color: #12142B; border-color: var(--edge); }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: minmax(0, 1fr); padding-bottom: 56px; }
+      .stage { margin-right: 10px; transform: rotate(1deg); }
+    }
+    @media (max-width: 700px) {
+      .hero h1 { font-size: clamp(42px, 13vw, 60px); }
+      .hero p { font-size: 17px; }
+      .promo-title { font-size: 26px; }
+    }
+    @media (max-width: 440px) {
+      .logo { font-size: 20px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .stage { transform: none; }
+      .btn:active:not(:disabled), .promo:hover { transform: none; }
+    }
 </style>
 </head>
 
@@ -893,7 +1004,7 @@
   <div class="wrap">
 
     <nav>
-      <a class="logo" href="./"><svg class="logo-witch" viewBox="0 0 11 12" shape-rendering="crispEdges" aria-hidden="true"><path fill="#7B3FE4" d="M6 0h1v1h-1zM5 1h2v1h-2zM4 2h4v1h-4zM3 3h1v1h-1zM7 3h1v1h-1zM0 4h11v1h-11z"></path><path fill="#FF8A1F" d="M4 3h3v1h-3z"></path><path fill="#FDCB58" d="M2 5h8v1h-8zM1 6h10v5h-10zM2 11h8v1h-8z"></path><path fill="#F4900C" d="M0 8h1v2h-1zM5 9h3v1h-3z"></path><path fill="#E6E7E8" d="M3 8h1v2h-1zM8 8h1v2h-1z"></path><path fill="#31373D" d="M4 8h1v2h-1zM9 8h1v2h-1z"></path></svg><i aria-hidden="true"><b class="px-o"></b><b class="px-o"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-o"></b><b class="px-o"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-o"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-r"></b><b class="px-y"></b><b class="px-y"></b><b class="px-w"></b><b class="px-k"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-w"></b><b class="px-k"></b><b class="px-y"></b><b class="px-r"></b><b class="px-y"></b><b class="px-y"></b><b class="px-w"></b><b class="px-k"></b><b class="px-r"></b><b class="px-r"></b><b class="px-r"></b><b class="px-w"></b><b class="px-k"></b><b class="px-y"></b><b class="px-o"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-o"></b><b class="px-o"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-y"></b><b class="px-o"></b></i>Daily Chonk</a>
+      <a class="logo" href="./"><svg class="logo-mark" viewBox="0 0 11 7" shape-rendering="crispEdges" aria-hidden="true"><path fill="#FDCB58" d="M2 0h8v1h-8zM1 1h10v5h-10zM2 6h8v1h-8z"/><path fill="#F4900C" d="M0 3h1v2h-1zM5 4h3v1h-3z"/><path fill="#E6E7E8" d="M3 3h1v2h-1zM8 3h1v2h-1z"/><path fill="#31373D" d="M4 3h1v2h-1zM9 3h1v2h-1z"/></svg>Daily Chonk</a>
       <div class="nav-right">
         <a class="chain-pill" href="https://basescan.org/address/0x07152bfde079b5319e5308c43fb1dbc9c76cb4f9" target="_blank" rel="noopener"><span class="live-dot" aria-hidden="true"></span>Live on Base</a>
         <label class="theme-btn">
