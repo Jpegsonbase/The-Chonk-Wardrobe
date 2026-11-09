@@ -1450,6 +1450,76 @@ const ratingStatusEl = document.getElementById("rating-status");
       return { zMapFull, bgColor, metadata };
     }
 
+    /* Fallback render: the same SVG the contract makes (body + equipped traits,
+       layered shoes → accessory), built from getChonk and each trait's own image.
+       Used when renderAsDataUri2D runs out of gas because the backpack is too big. */
+    const LAYER_ORDER = ["shoes", "bottom", "top", "hair", "face", "head", "accessory"];
+    // Chonks known to render, per body type, to borrow the body pixels from.
+    const BODY_DONORS = {
+      0: [13838, 14249, 15071, 15893],
+      1: [14934, 15756, 22058, 2193, 4726],
+      2: [14797, 21647, 1919, 2330],
+      3: [14112, 14523, 14660, 15208],
+      4: [13975, 14386, 16030, 17263]
+    };
+
+    function decodeDataJson(uri) {
+      const b64 = String(uri).split(",")[1] || "";
+      return JSON.parse(decodeURIComponent(escape(atob(b64))));
+    }
+    function decodeSvgImage(image) {
+      const b64 = String(image).split(",")[1] || "";
+      return atob(b64);
+    }
+
+    async function fetchBodySvg(bodyIndex) {
+      for (const donorId of BODY_DONORS[bodyIndex] || []) {
+        try {
+          const donor = await withProvider(() => contract.getChonk(donorId), 15000);
+          if (Number(donor.bodyIndex) !== bodyIndex) continue;
+          const uri = await withProvider(() => contract.renderAsDataUri2D(donorId), 20000);
+          const svg = decodeSvgImage(decodeDataJson(uri).image);
+          const body = svg.match(/<g id="Body">([\s\S]*?)<\/g>/);
+          if (body) return body[1];
+        } catch (_) {}
+      }
+      throw new Error("No body art available for body " + bodyIndex);
+    }
+
+    async function fetchTraitPart(traitId) {
+      let uri;
+      try { uri = await withProvider(() => traitsCurrent.tokenURI(traitId), 15000); }
+      catch (_) { uri = await withProvider(() => traitsLegacy.tokenURI(traitId), 15000); }
+      const meta = decodeDataJson(uri);
+      const svg = decodeSvgImage(meta.image);
+      const group = svg.match(/<g id="Trait">[\s\S]*?<\/g>/);
+      return { group: group ? group[0] : "", attribute: (meta.attributes || [])[0] || null };
+    }
+
+    async function buildChonkFromTraits() {
+      const chonk = await withProvider(() => contract.getChonk(CHONK_ID), 15000);
+      const bg = "#" + String(chonk.backgroundColor || "ffffff").replace(/^#/, "");
+      const equipped = LAYER_ORDER
+        .map((slot) => chonk[slot + "Id"])
+        .filter((id) => id && BigInt(id) !== 0n);
+      const [body, ...parts] = await Promise.all([
+        fetchBodySvg(Number(chonk.bodyIndex)),
+        ...equipped.map(fetchTraitPart)
+      ]);
+      const svg =
+        '<svg shape-rendering="crispEdges" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+        '<style> body{overflow: hidden; margin: 0;} svg{ max-width: 100vw; max-height: 100vh; width: 100%;} #main rect{width:1px; height: 1px;} .bg{width:30px; height: 30px;} </style>' +
+        "<style>body, svg{ background: " + bg + "; }.bg { fill: " + bg + "; }</style>" +
+        '<rect class="bg"/><g id="main"><g id="Body">' + body + "</g>" +
+        parts.map((p) => p.group).join("") + "</g></svg>";
+      const metadata = {
+        name: "Chonk #" + CHONK_ID,
+        attributes: parts.map((p) => p.attribute).filter(Boolean),
+        image: "data:image/svg+xml;base64," + btoa(svg)
+      };
+      return "data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(metadata))));
+    }
+
     function extract2D(uri) {
       const parsed = parseDataUri(uri);
       const metadata = parsed.metadata;
@@ -2197,10 +2267,18 @@ const ratingStatusEl = document.getElementById("rating-status");
         statusEl.textContent = "Talking to Base…";
         traitsEl.innerHTML = `<div class="trait"><span class="trait-name">Wardrobe</span><span class="trait-cta">On the way…</span></div>`;
 
-        const uri2D = await withProvider(
-          () => contract.renderAsDataUri2D(CHONK_ID),
-          25000
-        );
+        let uri2D;
+        try {
+          uri2D = await withProvider(
+            () => contract.renderAsDataUri2D(CHONK_ID),
+            25000
+          );
+        } catch (renderError) {
+          // The contract draws the whole backpack into every render, and with a
+          // big wardrobe it runs out of gas. Rebuild the outfit from its parts.
+          console.warn("Daily Chonk: on-chain render failed, building from traits.", renderError);
+          uri2D = await buildChonkFromTraits();
+        }
 
         const parsed2D = extract2D(uri2D);
         cached2D = parsed2D.image;
