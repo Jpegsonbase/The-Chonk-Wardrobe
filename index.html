@@ -1207,6 +1207,7 @@
       "function tokenURI(uint256) view returns (string)",
       "function renderAsDataUri2D(uint256) view returns (string)",
       "function renderAsDataUri3D(uint256) view returns (string)",
+      "function getChonkZMap(uint256) view returns (string)",
       "function getChonk(uint256) view returns (tuple(uint256 tokenId, uint256 headId, uint256 hairId, uint256 faceId, uint256 accessoryId, uint256 topId, uint256 bottomId, uint256 shoesId, uint8 bodyIndex, string backgroundColor, bool render3D))"
     ];
 
@@ -1518,6 +1519,25 @@ const ratingStatusEl = document.getElementById("rating-status");
         image: "data:image/svg+xml;base64," + btoa(svg)
       };
       return "data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(metadata))));
+    }
+
+    /* 3D: the full render also draws the backpack and runs out of gas with a big
+       wardrobe. getChonkZMap returns the same voxel map without the backpack. */
+    async function fetch3DData() {
+      try {
+        const uri3D = await withProvider(() => contract.renderAsDataUri3D(CHONK_ID), 40000);
+        const extracted = extract3DData(uri3D);
+        if (extracted.zMapFull) return extracted;
+      } catch (error) {
+        console.warn("Daily Chonk: on-chain 3D render failed, using the voxel map.", error);
+      }
+      const [zMap, chonk] = await Promise.all([
+        withProvider(() => contract.getChonkZMap(CHONK_ID), 20000),
+        withProvider(() => contract.getChonk(CHONK_ID), 15000)
+      ]);
+      const zMapFull = String(zMap || "").replace(/^0x/i, "");
+      const bg = String(chonk.backgroundColor || "ffffff").replace(/^#/, "");
+      return { zMapFull: zMapFull || null, bgColor: "#" + bg, metadata: {} };
     }
 
     function extract2D(uri) {
@@ -2240,6 +2260,20 @@ const ratingStatusEl = document.getElementById("rating-status");
       renderCurrentView();
       stopLoadBanter();
       statusEl.textContent = "Live — refreshing directly from the Base chain.";
+
+      // A saved fit without 3D data (e.g. the 3D render failed earlier): fetch it now.
+      if (!snap.zMapFull) {
+        fetch3DData().then((extracted) => {
+          if (!extracted.zMapFull || getDailyRatingKey() !== snap.dayKey) return;
+          cached3DMeta = { zMapFull: extracted.zMapFull, bgColor: extracted.bgColor };
+          writeOutfitLock({ ...snap, zMapFull: extracted.zMapFull, bgColor: extracted.bgColor });
+          if (getStoredViewMode() === "3d") {
+            currentMode = "3d";
+            renderCurrentView();
+          }
+          updateViewButtons();
+        }).catch((error) => console.warn("Daily Chonk: 3D data unavailable.", error));
+      }
     }
 
     retryLoadButton.addEventListener("click", () => {
@@ -2312,12 +2346,8 @@ const ratingStatusEl = document.getElementById("rating-status");
         };
         writeOutfitLock(snapshot);
 
-        withProvider(
-          () => contract.renderAsDataUri3D(CHONK_ID),
-          40000
-        ).then((uri3D) => {
+        fetch3DData().then((extracted) => {
           if (getDailyRatingKey() !== dayKey) return;
-          const extracted = extract3DData(uri3D);
           cached3DMeta = extracted.zMapFull
             ? { zMapFull: extracted.zMapFull, bgColor: extracted.bgColor }
             : null;
